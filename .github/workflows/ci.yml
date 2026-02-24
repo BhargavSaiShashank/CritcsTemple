@@ -30,7 +30,8 @@ jobs:
       env:
         PYTHONPATH: .
         ENVIRONMENT: "testing"
-        MONGODB_URI: "mongodb://localhost:27017/testdb"
+        MONGODB_URL: "mongodb://localhost:27017/testdb"
+        DATABASE_NAME: "testdb"
         TMDB_API_KEY: "dummy"
         OMDB_API_KEY: "dummy"
         SECRET_KEY: "ci_secret_key"
