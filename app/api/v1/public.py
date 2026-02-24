@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from typing import List, Optional
 from app.db.mongodb import get_database
 from app.models.review import Verdict
-from pymongo import DESCENDING
+from pymongo import DESCENDING, ASCENDING
 
 router = APIRouter()
 
@@ -18,16 +18,31 @@ async def get_latest_reviews(
     limit: int = 10,
     offset: int = 0,
     tag: Optional[str] = None,
-    verdict: Optional[Verdict] = None,
+    verdict: Optional[str] = None,
+    search: Optional[str] = None,
+    sort_by: Optional[str] = "date",
+    order: Optional[str] = "desc",
     db = Depends(get_database)
 ):
-    query = {"status": "published"}
+    query: dict = {"status": "published"}
     if tag:
         query["tags"] = tag
-    if verdict:
-        query["verdict"] = verdict.value
     
-    cursor = db.reviews.find(query).sort("published_at", DESCENDING).skip(offset).limit(limit)
+    # Check if verdict is a single string or multiple
+    if verdict and verdict.strip():
+        query["verdict"] = verdict.strip()
+        
+    if search and search.strip():
+        query["$or"] = [
+            {"movie_title": {"$regex": search.strip(), "$options": "i"}},
+            {"verdict": {"$regex": search.strip(), "$options": "i"}},
+            {"tags": {"$regex": search.strip(), "$options": "i"}}
+        ]
+        
+    sort_field = "overall_rating" if sort_by == "score" else "published_at"
+    sort_direction = ASCENDING if (order or "desc").lower() == "asc" else DESCENDING
+    
+    cursor = db.reviews.find(query).sort(sort_field, sort_direction).skip(offset).limit(limit)
     reviews = await cursor.to_list(length=limit)
     return [serialize_doc(r) for r in reviews]
 

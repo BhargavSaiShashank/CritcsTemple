@@ -29,5 +29,6 @@ export const deleteReview = (id) => api.delete(`/admin/reviews/${id}`);
 export const uploadImage = (formData) => api.post('/admin/upload', formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
 });
+export const exportDataVault = () => api.get('/admin/export/vault', { responseType: 'blob' });
 
 export default api;

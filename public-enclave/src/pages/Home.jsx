@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { Star, ChevronRight, Search, Film, TrendingUp } from 'lucide-react';
 import { getLatestReviews } from '../services/api';
 import ReviewGrid from '../components/ReviewGrid';
@@ -15,25 +16,77 @@ export default function Home() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
 
+    // Filters
+    const [verdictFilter, setVerdictFilter] = useState('All');
+    const [sortOption, setSortOption] = useState('date-desc');
+
+    // Infinite Scroll State
+    const [page, setPage] = useState(0);
+    const [hasMore, setHasMore] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const observer = useRef();
+
+    const fetchReviews = async (currentPage, isReset = false, currentSearch = search, currentVerdict = verdictFilter, currentSort = sortOption) => {
+        try {
+            const limit = 15;
+            const offset = currentPage * limit;
+            const [sortBy, order] = currentSort.split('-');
+            const { data } = await getLatestReviews(limit, offset, currentSearch, currentVerdict, sortBy, order);
+
+            if (data && data.length > 0) {
+                setReviews(prev => isReset || currentPage === 0 ? data : [...prev, ...data]);
+                setHasMore(data.length === limit);
+            } else {
+                if (isReset || currentPage === 0) setReviews([]);
+                setHasMore(false);
+            }
+        } catch (err) {
+            console.error("Failed to fetch archives", err);
+            setHasMore(false); // Prevent infinite IntersectionObserver retry loops
+        }
+    };
+
     useEffect(() => {
-        getLatestReviews(30)
-            .then(({ data }) => setReviews(data || []))
-            .catch(console.error)
-            .finally(() => setLoading(false));
-    }, []);
+        setLoading(true);
+        setPage(0);
+        setHasMore(true);
+        const timeout = setTimeout(() => {
+            fetchReviews(0, true, search, verdictFilter, sortOption).finally(() => setLoading(false));
+        }, 400);
+        return () => clearTimeout(timeout);
+    }, [search, verdictFilter, sortOption]);
+
+    const lastElementRef = useCallback(node => {
+        if (loading || loadingMore) return;
+        if (observer.current) observer.current.disconnect();
+        observer.current = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting && hasMore) {
+                setLoadingMore(true);
+                setPage(prev => {
+                    const nextPage = prev + 1;
+                    fetchReviews(nextPage, false, search, verdictFilter, sortOption).finally(() => setLoadingMore(false));
+                    return nextPage;
+                });
+            }
+        });
+        if (node) observer.current.observe(node);
+    }, [loading, loadingMore, hasMore, search, verdictFilter, sortOption]);
 
     const hero = reviews[0];
     const heroColor = VERDICT_COLOR[hero?.verdict] || '#f5a623';
 
-    const filtered = reviews.filter(r =>
-        !search ||
-        r.movie_title?.toLowerCase().includes(search.toLowerCase()) ||
-        r.verdict?.toLowerCase().includes(search.toLowerCase()) ||
-        r.tags?.some(t => t.toLowerCase().includes(search.toLowerCase()))
-    );
+    // The backend now natively filters via MongoDB `$regex` so we pass reviews directly
+    const filtered = reviews;
 
     return (
         <div style={{ background: '#080808', minHeight: '100vh' }}>
+            <Helmet>
+                <title>The Sanctuary: Cinema Archive</title>
+                <meta property="og:title" content="The Sanctuary: Cinema Archive" />
+                <meta property="og:description" content="An elite, highly aesthetics-focused movie review platform." />
+                <meta property="og:type" content="website" />
+                <meta name="twitter:card" content="summary_large_image" />
+            </Helmet>
 
             {/* ── HERO: Flexible height to prevent massive gaps ── */}
             <section style={{
@@ -127,21 +180,56 @@ export default function Home() {
                         {!loading && <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.25)', marginTop: '5px' }}>{filtered.length} imprints in the archive</div>}
                     </div>
 
-                    <div style={{ position: 'relative' }}>
-                        <Search size={13} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.25)', pointerEvents: 'none' }} />
-                        <input
-                            type="text"
-                            placeholder="Search title, verdict, tag…"
-                            value={search}
-                            onChange={e => setSearch(e.target.value)}
-                            style={{ padding: '9px 14px 9px 34px', borderRadius: '10px', width: '230px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', fontSize: '12px', color: '#f2f2f2', outline: 'none', fontFamily: 'Outfit, sans-serif' }}
-                            onFocus={e => e.target.style.borderColor = 'rgba(245,166,35,0.25)'}
-                            onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
-                        />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                        <div style={{ position: 'relative' }}>
+                            <Search size={13} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.25)', pointerEvents: 'none' }} />
+                            <input
+                                type="text"
+                                placeholder="Search title, verdict, tag…"
+                                value={search}
+                                onChange={e => setSearch(e.target.value)}
+                                style={{ padding: '9px 14px 9px 34px', borderRadius: '10px', width: '230px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', fontSize: '12px', color: '#f2f2f2', outline: 'none', fontFamily: 'Outfit, sans-serif' }}
+                                onFocus={e => e.target.style.borderColor = 'rgba(245,166,35,0.25)'}
+                                onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
+                            />
+                        </div>
+
+                        <select
+                            value={verdictFilter}
+                            onChange={e => setVerdictFilter(e.target.value)}
+                            style={{ padding: '9px 14px', borderRadius: '10px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', fontSize: '12px', color: 'rgba(255,255,255,0.8)', outline: 'none', fontFamily: 'Outfit, sans-serif', cursor: 'pointer', appearance: 'none', WebkitAppearance: 'none' }}
+                        >
+                            <option value="All">All Verdicts</option>
+                            <option value="Legendary">Legendary</option>
+                            <option value="Masterpiece">Masterpiece</option>
+                            <option value="Essential">Essential</option>
+                            <option value="Elite">Elite</option>
+                            <option value="Great">Great</option>
+                            <option value="Good">Good</option>
+                            <option value="Decent">Decent</option>
+                            <option value="Average">Average</option>
+                            <option value="Mediocre">Mediocre</option>
+                            <option value="Poor">Poor</option>
+                        </select>
+
+                        <select
+                            value={sortOption}
+                            onChange={e => setSortOption(e.target.value)}
+                            style={{ padding: '9px 14px', borderRadius: '10px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', fontSize: '12px', color: 'rgba(255,255,255,0.8)', outline: 'none', fontFamily: 'Outfit, sans-serif', cursor: 'pointer', appearance: 'none', WebkitAppearance: 'none' }}
+                        >
+                            <option value="date-desc">Newest First</option>
+                            <option value="score-desc">Highest Rated</option>
+                            <option value="score-asc">Lowest Rated</option>
+                        </select>
                     </div>
                 </div>
 
                 <ReviewGrid reviews={filtered} loading={loading} />
+
+                {/* Infinite Scroll Trigger */}
+                <div ref={lastElementRef} style={{ height: '40px', marginTop: '40px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    {loadingMore && <div style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(245,166,35,0.6)', letterSpacing: '0.2em', textTransform: 'uppercase', animation: 'pulse 1.5s infinite' }}>Unearthing Deeper Archives...</div>}
+                </div>
             </section>
         </div >
     );

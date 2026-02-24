@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Body, File, UploadFile, Query
+from fastapi.responses import Response
 import re
+import json
 import traceback
 from typing import List, Any, Optional, Dict
 from app.db.mongodb import get_database
@@ -15,6 +17,21 @@ from slugify import slugify
 from datetime import datetime
 
 router = APIRouter()
+
+@router.get("/export/vault")
+async def export_data_vault(db = Depends(get_database), admin = Depends(get_current_admin)):
+    """Exports the entire library of reviews as a JSON Array."""
+    cursor = db.reviews.find({})
+    reviews = await cursor.to_list(length=None)
+    for r in reviews:
+        r["_id"] = str(r["_id"])
+    
+    response_data = json.dumps(reviews, default=str)
+    return Response(
+        content=response_data,
+        media_type="application/json",
+        headers={"Content-Disposition": f"attachment; filename=sanctuary_vault_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"}
+    )
 
 @router.get("/movies/search")
 async def search_movies(
@@ -38,6 +55,13 @@ async def fetch_and_save_movie(
 ):
     print(f"ADMIN: Fetching movie details for: {search_term}")
     
+    if db is None:
+        print("ADMIN ERROR: Database connection is not available")
+        raise HTTPException(
+            status_code=503, 
+            detail="Sanctuary Database Offline. Please check MongoDB IP whitelist."
+        )
+    
     try:
         # Fetch from OMDb
         movie_data = await omdb_service.fetch_movie_details(search_term)
@@ -46,10 +70,26 @@ async def fetch_and_save_movie(
         existing = await db.movies.find_one({"imdb_id": movie_data.imdb_id})
         if existing:
             print(f"ADMIN: Movie {movie_data.imdb_id} already exists in Sanctuary DB")
+            
+            # Proactive Poster Recovery: If DB has a placeholder or if it's potentially stale,
+            # we can decide to update it with the fresh one from movie_data
+            current_poster = existing.get("poster_url")
+            if not current_poster or "unsplash.com" in current_poster or "N/A" in current_poster:
+                 print(f"ADMIN: Refreshing poster for existing movie {movie_data.imdb_id}")
+                 await db.movies.update_one(
+                     {"imdb_id": movie_data.imdb_id},
+                     {"$set": {"poster_url": movie_data.poster_url}}
+                 )
+                 existing["poster_url"] = movie_data.poster_url
+
             # Filter keys to only those expected by MovieCreate to avoid validation errors
-            # Using Pydantic V2 syntax
             expected_fields = MovieCreate.model_fields.keys() if hasattr(MovieCreate, "model_fields") else MovieCreate.__fields__.keys()
             filtered_existing = {k: v for k, v in existing.items() if k in expected_fields}
+            
+            # Ensure required fields are present (Pydantic V2)
+            if "imdb_id" not in filtered_existing: filtered_existing["imdb_id"] = movie_data.imdb_id
+            if "title" not in filtered_existing: filtered_existing["title"] = movie_data.title
+            
             return MovieCreate(**filtered_existing)
 
         # Save to DB - ensure we use the model's dict for clean insertion
@@ -63,6 +103,7 @@ async def fetch_and_save_movie(
         raise he
     except Exception as e:
         print(f"ADMIN ERROR in fetch_and_save_movie: {str(e)}")
+        import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Sanctuary Fetch Engine Error: {str(e)}")
 
@@ -157,110 +198,105 @@ async def list_reviews(
     db = Depends(get_database),
     admin = Depends(get_current_admin)
 ):
-    query = {}
-    if status:
-        query["status"] = status
-    
-    # Sort by published_at or created_at
-    reviews = await db.reviews.find(query).sort("created_at", -1).to_list(1000)
-    
-    # Convert ObjectIds to strings for JSON serialization
-    for review in reviews:
-        if "_id" in review:
-            review["_id"] = str(review["_id"])
-            
-    return reviews
+    try:
+        query = {}
+        if status:
+            query["status"] = status
+        
+        # Sort by published_at or created_at
+        reviews = await db.reviews.find(query).sort("created_at", -1).to_list(1000)
+        
+        # Convert ObjectIds to strings for JSON serialization
+        for review in reviews:
+            if "_id" in review:
+                review["_id"] = str(review["_id"])
+                
+        return reviews
+    except Exception as e:
+        print(f"ADMIN ERROR in list_reviews: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Database Query Error: {str(e)}")
 
 @router.get("/analytics/dna")
 async def get_dna_analytics(
     db = Depends(get_database),
     admin = Depends(get_current_admin)
 ):
-    # Fetch all published reviews to build the DNA profile
-    reviews = await db.reviews.find({"status": "published"}).to_list(1000)
-    
-    # Use a fixed order for the radar chart to keep it consistent
-    aspect_keys = [
-        "story", "screenplay", "direction", "acting", "cinematography",
-        "editing", "bg_score", "music", "production_design", "vfx",
-        "originality", "pacing", "dialogues", "climax", "opening",
-        "emotional_impact", "rewatch_value"
-    ]
+    try:
+        # Fetch all published reviews to build the DNA profile
+        reviews = await db.reviews.find({"status": "published"}).to_list(1000)
+        
+        # Use a fixed order for the radar chart to keep it consistent
+        aspect_keys = [
+            "story", "screenplay", "direction", "acting", "cinematography",
+            "editing", "bg_score", "music", "production_design", "vfx",
+            "originality", "pacing", "dialogues", "climax", "opening",
+            "emotional_impact", "rewatch_value"
+        ]
 
-    if not reviews:
-        # Default empty aspects to show the chart structure at least
-        return [{"subject": k.replace("_", " ").title(), "A": 0, "fullMark": 10} for k in aspect_keys]
-        
-    aspect_totals = {}
-    aspect_counts = {}
-    
-    for r in reviews:
-        aspects = r.get("aspects", {})
-        if not aspects:
-            continue
+        if not reviews:
+            # Default empty aspects to show the chart structure at least
+            return [{"subject": k.replace("_", " ").title(), "A": 0, "fullMark": 10} for k in aspect_keys]
             
-        # Aspects is a dict where keys are aspect names and values are dicts with 'score'
-        # e.g., {'story': {'score': 8}, ...}, but DB could also have {'story': None}
-        for field, data in aspects.items():
-            if data and isinstance(data, dict) and "score" in data:
-                score = data["score"]
-                aspect_totals[field] = aspect_totals.get(field, 0) + score
-                aspect_counts[field] = aspect_counts.get(field, 0) + 1
-                
-    results: List[Dict[str, Any]] = []
-    
-    for k in aspect_keys:
-        total = aspect_totals.get(k, 0)
-        count = aspect_counts.get(k, 0)
-        avg = float(f"{total / count:.1f}") if count > 0 else 0.0
-        results.append({
-            "subject": k.replace("_", " ").title(),
-            "A": avg,
-            "fullMark": 10
-        })
+        aspect_totals = {}
+        aspect_counts = {}
         
-    return results
+        for r in reviews:
+            aspects = r.get("aspects", {})
+            if not aspects:
+                continue
+                
+            # Aspects is a dict where keys are aspect names and values are dicts with 'score'
+            # e.g., {'story': {'score': 8}, ...}, but DB could also have {'story': None}
+            for field, data in aspects.items():
+                if data and isinstance(data, dict) and "score" in data:
+                    score = data["score"]
+                    aspect_totals[field] = aspect_totals.get(field, 0) + score
+                    aspect_counts[field] = aspect_counts.get(field, 0) + 1
+                    
+        results: List[Dict[str, Any]] = []
+        
+        for k in aspect_keys:
+            total = aspect_totals.get(k, 0)
+            count = aspect_counts.get(k, 0)
+            avg = float(f"{total / count:.1f}") if count > 0 else 0.0
+            results.append({
+                "subject": k.replace("_", " ").title(),
+                "A": avg,
+                "fullMark": 10
+            })
+            
+        return results
+    except Exception as e:
+        print(f"ADMIN ERROR in get_dna_analytics: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Analytics Engine Error: {str(e)}")
 
 @router.post("/ai/draft-verdict")
 async def draft_verdict(
-    aspects: dict = Body(...),
+    payload: dict = Body(...),
     admin = Depends(get_current_admin)
 ):
     """
-    Sophisticated Lexical Heuristic Engine.
-    Translates 0.1 precision scores into a nuanced cinematic critique.
+    The Sanctuary Oracle (AI LLM Engine).
+    Passes Structural DNA + Cinematic Lore to Gemini for a highly bespoke draft critique.
     """
-    # Logic to generate a draft from aspects
-    narrative_score = sum([aspects.get(k, {}).get("score", 0) for k in ["story", "screenplay", "originality"]]) / 3
-    visual_score = sum([aspects.get(k, {}).get("score", 0) for k in ["cinematography", "vfx", "production_design"]]) / 3
-    audio_score = sum([aspects.get(k, {}).get("score", 0) for k in ["bg_score", "music"]]) / 2
-    soul_score = sum([aspects.get(k, {}).get("score", 0) for k in ["emotional_impact", "pacing", "rewatch_value"]]) / 3
-    
-    # Simple templates based on scores
-    templates = {
-        "masterpiece": "A transcendental cinematic achievement that redefines the medium. Every structural element resonates with absolute precision.",
-        "great": "A formidable entry into the cinematic lexicon. While minor fractures exist, the overall impact is undeniable and authoritative.",
-        "average": "A safe, competent assembly of tropes. It fulfills its purpose without ever truly piercing the veil of mediocrity.",
-        "poor": "A hollow exercise in missed potential. Structural failures in the narrative and direction lead to a fragmented, unearned experience."
+    aspects = payload.get("aspects", {})
+    lore = {
+        "cast_performances": payload.get("cast_performances", ""),
+        "director_trademarks": payload.get("director_trademarks", ""),
+        "viewing_context": payload.get("viewing_context", ""),
+        "trivia_and_details": payload.get("trivia_and_details", "")
     }
     
-    score = (narrative_score + visual_score + audio_score + soul_score) / 4
+    # Prune empty lore
+    active_lore = {k: v for k, v in lore.items() if v and v.strip()}
     
-    if score >= 9: base_draft = templates["masterpiece"]
-    elif score >= 7.5: base_draft = templates["great"]
-    elif score >= 5: base_draft = templates["average"]
-    else: base_draft = templates["poor"]
-    
-    # Nuance based on sub-categories
-    nuance = []
-    if visual_score > narrative_score + 2:
-        nuance.append("Visually arresting but narratively fragile.")
-    if audio_score > 8.5:
-        nuance.append("Anchored by a masterful and dominant sonic landscape.")
-    if soul_score < 4:
-        nuance.append("Technically proficient yet emotionally vacant.")
-        
-    final_draft = f"{base_draft} {' '.join(nuance)}"
+    # We call the external Oracle Service 
+    from app.services.ai import generate_verdict_draft
+    final_draft = await generate_verdict_draft(aspect_scores=aspects, cinematic_lore=active_lore)
     
     return {"draft": final_draft}
 

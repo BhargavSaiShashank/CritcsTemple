@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { auth } from '../services/firebase'
-import { fetchMovieFromOMDb, searchMovies, createReview } from '../services/api'
+import { fetchMovieFromOMDb, searchMovies, createReview, exportDataVault } from '../services/api'
 import { useNavigate, Link } from 'react-router-dom';
 import ReviewForm from '../components/ReviewForm'
-import { Search, Film, Loader2, Info, Sparkles, LogOut, Clapperboard, ChevronRight, LayoutGrid, List, TrendingUp, Star, Clock, Calendar, Plus, CheckCircle2, X } from 'lucide-react'
+import { Search, Film, Loader2, Info, Sparkles, LogOut, Clapperboard, ChevronRight, LayoutGrid, List, TrendingUp, Star, Clock, Calendar, Plus, CheckCircle2, X, DownloadCloud } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
 
@@ -18,6 +18,40 @@ const Dashboard = () => {
         return saved ? new Set(JSON.parse(saved)) : new Set();
     })
     const navigate = useNavigate();
+    const [exporting, setExporting] = useState(false);
+
+    const handleExportVault = async () => {
+        if (exporting) return;
+        setExporting(true);
+        try {
+            const response = await exportDataVault();
+            // Create a blob from the response data
+            const blob = new Blob([response.data], { type: 'application/json' });
+            // Extract filename from the Content-Disposition header if possible, else use default
+            let filename = 'sanctuary_vault.json';
+            const disposition = response.headers['content-disposition'];
+            if (disposition && disposition.indexOf('filename=') !== -1) {
+                const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(disposition);
+                if (matches != null && matches[1]) {
+                    filename = matches[1].replace(/['"]/g, '');
+                }
+            }
+            // Create a temporary link to trigger download
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        } catch (error) {
+            console.error("Failed to export The Data Vault:", error);
+            alert("Failed to export to The Data Vault. Please check console.");
+        } finally {
+            setExporting(false);
+        }
+    };
 
     const debounce = (func, wait) => {
         let timeout;
@@ -108,6 +142,19 @@ const Dashboard = () => {
                     >
                         <TrendingUp size={18} className="text-gray-400 group-hover:text-amber-500 transition-colors" />
                     </Link>
+
+                    <button
+                        onClick={handleExportVault}
+                        disabled={exporting}
+                        className="p-3 bg-white/5 hover:bg-white/10 border border-white/5 rounded-2xl transition-all group disabled:opacity-50"
+                        title="Export Data Vault (JSON)"
+                    >
+                        {exporting ? (
+                            <Loader2 size={18} className="text-amber-500 animate-spin" />
+                        ) : (
+                            <DownloadCloud size={18} className="text-gray-400 group-hover:text-amber-500 transition-colors" />
+                        )}
+                    </button>
 
                     <motion.button
                         whileHover={{ scale: 1.05 }}

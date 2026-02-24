@@ -63,7 +63,14 @@ const ReviewForm = ({ movie, onSubmit, loading }) => {
     const handleAIDraft = async () => {
         setAiLoading(true)
         try {
-            const { data } = await draftVerdict(formData.aspects)
+            const payload = {
+                aspects: formData.aspects,
+                cast_performances: formData.cast_performances,
+                director_trademarks: formData.director_trademarks,
+                viewing_context: formData.viewing_context,
+                trivia_and_details: formData.trivia_and_details
+            }
+            const { data } = await draftVerdict(payload)
             setFormData(prev => ({ ...prev, content: data.draft }))
         } catch (err) {
             console.error("AI Drafting failed:", err)
