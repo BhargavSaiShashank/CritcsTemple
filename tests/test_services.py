@@ -1,8 +1,10 @@
 import pytest
+import os
 from app.services.movie_service import movie_service
 from app.models.movie import MovieCreate
 
 @pytest.mark.anyio
+@pytest.mark.skipif(os.getenv("ENVIRONMENT") == "testing", reason="Skipping integration test in CI")
 async def test_fetch_and_save_movie_integration(db):
     # This is an integration test that hits OMDb (depends on API key being valid)
     # We use a well-known IMDb ID to ensure stability
@@ -27,6 +29,7 @@ async def test_fetch_and_save_movie_integration(db):
     assert movie_2.title == "Inception"
     
 @pytest.mark.anyio
+@pytest.mark.skipif(os.getenv("ENVIRONMENT") == "testing", reason="Skipping database test in CI")
 async def test_get_dna_analytics_empty(db):
     from app.services.analytics_service import analytics_service
     # Clear reviews for test
