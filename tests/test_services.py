@@ -1,8 +1,10 @@
 import pytest
+import os
 from app.services.movie_service import movie_service
 from app.models.movie import MovieCreate
 
 @pytest.mark.anyio
+@pytest.mark.skipif(os.getenv("OMDB_API_KEY") == "dummy", reason="Requires valid OMDb API key")
 async def test_fetch_and_save_movie_integration(db):
     # This is an integration test that hits OMDb (depends on API key being valid)
     # We use a well-known IMDb ID to ensure stability
