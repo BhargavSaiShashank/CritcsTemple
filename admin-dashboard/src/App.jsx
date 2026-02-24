@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Intelligence from './pages/Intelligence'
+import EditReview from './pages/EditReview'
 import PrivateRoute from './components/PrivateRoute'
 import { auth } from './services/firebase'
 
@@ -24,6 +25,14 @@ const App = () => {
                         element={
                             <PrivateRoute>
                                 <Intelligence />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/edit/:id"
+                        element={
+                            <PrivateRoute>
+                                <EditReview />
                             </PrivateRoute>
                         }
                     />

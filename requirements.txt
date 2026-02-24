@@ -10,3 +10,4 @@ cloudinary
 python-multipart
 python-slugify
 pytest
+aiocache

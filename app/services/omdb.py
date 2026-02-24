@@ -4,6 +4,7 @@ import re
 import traceback
 from typing import List, Any, Optional, Dict
 from datetime import datetime
+from aiocache import cached
 from app.core.config import get_settings
 from app.models.movie import MovieCreate, CastMember, CrewMember
 from fastapi import HTTPException
@@ -16,6 +17,7 @@ class OMDBService:
     def __init__(self):
         self.api_key = settings.OMDB_API_KEY
 
+    @cached(ttl=3600)
     async def search_movies(self, title: str) -> List[Any]:
         """
         Search for movies by title and return a list of matches.
@@ -51,6 +53,7 @@ class OMDBService:
                 title = parts[0]
         return title.strip()
 
+    @cached(ttl=3600)
     async def get_discovery(self, category: str = "english") -> List[Any]:
         """
         Discovery engine with Sanctuary Quality Control.
@@ -127,6 +130,7 @@ class OMDBService:
         
         return all_results[:20]
 
+    @cached(ttl=3600)
     async def fetch_movie_details(self, search_term: str) -> MovieCreate:
         """
         search_term can be an IMDb ID (starts with 'tt') or a Movie Title.

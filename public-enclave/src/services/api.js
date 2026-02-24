@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8000/api/v1';
+export const API_URL = 'http://localhost:8000/api/v1';
 
 const api = axios.create({
     baseURL: API_URL,
@@ -13,6 +13,9 @@ export const getLatestReviews = (limit = 12, offset = 0, search = '', verdict = 
     return api.get(`/reviews?${params.toString()}`);
 };
 export const getReviewBySlug = (slug) => api.get(`/reviews/${slug}`);
+export const clapReview = (slug) => api.post(`/reviews/${slug}/clap`);
+export const unclapReview = (slug) => api.delete(`/reviews/${slug}/clap`);
+export const getRelatedReviews = (slug) => api.get(`/reviews/${slug}/related`);
 export const getMasterpieces = () => api.get('/masterpieces');
 export const getHallOfFameReviews = () => api.get('/masterpieces');
 export const getMovieDetails = (imdbId) => api.get(`/movie/${imdbId}`);

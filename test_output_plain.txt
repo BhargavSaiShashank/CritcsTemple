@@ -1,0 +1,35 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.2, pytest-9.0.2, pluggy-1.6.0 -- C:\Users\shahs\Review\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\shahs\Review
+plugins: anyio-4.12.1
+collecting ... collected 2 items
+
+tests/test_services.py::test_fetch_and_save_movie_integration ERROR      [ 50%]
+tests/test_services.py::test_get_dna_analytics_empty ERROR               [100%]
+
+=================================== ERRORS ====================================
+___________ ERROR at setup of test_fetch_and_save_movie_integration ___________
+ScopeMismatch: You tried to access the function scoped fixture anyio_backend with a session scoped request object. Requesting fixture stack:
+tests\conftest.py:20:  def db(db_client)
+.venv\Lib\site-packages\anyio\pytest_plugin.py:101:  def wrapper(anyio_backend: 'Any', request: 'SubRequest', **kwargs: 'Any') -> 'Any'
+Requested fixture:
+tests\conftest.py:24:  def anyio_backend()
+_______________ ERROR at setup of test_get_dna_analytics_empty ________________
+ScopeMismatch: You tried to access the function scoped fixture anyio_backend with a session scoped request object. Requesting fixture stack:
+tests\conftest.py:20:  def db(db_client)
+.venv\Lib\site-packages\anyio\pytest_plugin.py:101:  def wrapper(anyio_backend: 'Any', request: 'SubRequest', **kwargs: 'Any') -> 'Any'
+Requested fixture:
+tests\conftest.py:24:  def anyio_backend()
+=========================== short test summary info ===========================
+ERROR tests/test_services.py::test_fetch_and_save_movie_integration - Failed: ScopeMismatch: You tried to access the function scoped fixture anyio_backend with a session scoped request object. Requesting fixture stack:
+tests\conftest.py:20:  def db(db_client)
+.venv\Lib\site-packages\anyio\pytest_plugin.py:101:  def wrapper(anyio_backend: 'Any', request: 'SubRequest', **kwargs: 'Any') -> 'Any'
+Requested fixture:
+tests\conftest.py:24:  def anyio_backend()
+ERROR tests/test_services.py::test_get_dna_analytics_empty - Failed: ScopeMismatch: You tried to access the function scoped fixture anyio_backend with a session scoped request object. Requesting fixture stack:
+tests\conftest.py:20:  def db(db_client)
+.venv\Lib\site-packages\anyio\pytest_plugin.py:101:  def wrapper(anyio_backend: 'Any', request: 'SubRequest', **kwargs: 'Any') -> 'Any'
+Requested fixture:
+tests\conftest.py:24:  def anyio_backend()
+============================== 2 errors in 0.33s ==============================

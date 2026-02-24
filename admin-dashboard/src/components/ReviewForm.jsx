@@ -34,28 +34,54 @@ const aspectGroups = [
     }
 ]
 
-const ReviewForm = ({ movie, onSubmit, loading }) => {
+const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
     const { id } = useParams();
     const navigate = useNavigate();
     const cardRef = useRef(null);
     const [submitting, setSubmitting] = useState(false);
     const [exportLoading, setExportLoading] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
-    const [formData, setFormData] = useState({
-        summary: '',
-        content: '',
-        verdict: 'Good',
-        status: 'published',
-        is_featured: false,
-        cast_performances: '',
-        director_trademarks: '',
-        viewing_context: '',
-        trivia_and_details: '',
-        tags: [],
-        aspects: aspectGroups.flatMap(g => g.aspects).reduce((acc, aspect) => ({
+    const [formData, setFormData] = useState(() => {
+        const defaultAspects = aspectGroups.flatMap(g => g.aspects).reduce((acc, aspect) => ({
             ...acc, [aspect]: { score: 0, comment: '' }
-        }), {})
-    })
+        }), {});
+
+        if (initialData) {
+            return {
+                summary: initialData.summary || '',
+                content: initialData.content || '',
+                verdict: initialData.verdict || 'Good',
+                status: initialData.status || 'published',
+                is_featured: initialData.is_featured || false,
+                author: initialData.author || '',
+                watch_links: initialData.watch_links || '',
+                movie_poster_url: initialData.movie_poster_url || '',
+                cast_performances: initialData.cast_performances || '',
+                director_trademarks: initialData.director_trademarks || '',
+                viewing_context: initialData.viewing_context || '',
+                trivia_and_details: initialData.trivia_and_details || '',
+                tags: initialData.tags || [],
+                aspects: { ...defaultAspects, ...(initialData.aspects || {}) }
+            };
+        }
+
+        return {
+            summary: '',
+            content: '',
+            verdict: 'Good',
+            status: 'published',
+            is_featured: false,
+            author: '',
+            watch_links: '',
+            movie_poster_url: '',
+            cast_performances: '',
+            director_trademarks: '',
+            viewing_context: '',
+            trivia_and_details: '',
+            tags: [],
+            aspects: defaultAspects
+        };
+    });
     const [newTag, setNewTag] = useState('')
     const [activeGroup, setActiveGroup] = useState(0)
     const [aiLoading, setAiLoading] = useState(false)
@@ -186,7 +212,8 @@ const ReviewForm = ({ movie, onSubmit, loading }) => {
             status,
             movie_id: parseInt(movie.id) || 0,
             movie_title: movie.title,
-            movie_poster_url: movie.poster_url,
+            movie_poster_url: formData.movie_poster_url || movie.poster_url,
+            watch_links: formData.watch_links,
             overall_rating: parseFloat(averageScore)
         };
 
@@ -196,8 +223,11 @@ const ReviewForm = ({ movie, onSubmit, loading }) => {
             } else {
                 await createReview(payload);
             }
-            if (onSubmit) onSubmit();
-            navigate('/dashboard');
+            if (onSubmit) {
+                onSubmit();
+            } else {
+                navigate('/dashboard');
+            }
         } catch (err) {
             console.error("Failed to save review:", err);
             const detail = err.response?.data?.detail;
@@ -306,6 +336,36 @@ const ReviewForm = ({ movie, onSubmit, loading }) => {
                             onChange={e => setFormData({ ...formData, summary: e.target.value })}
                             placeholder="Capture the soul..."
                             className="w-full bg-transparent border-b border-white/5 py-4 md:py-8 text-2xl md:text-4xl font-black text-white outline-none focus:border-amber-500/30 transition-all placeholder:text-white/5 tracking-tighter italic"
+                        />
+                    </div>
+
+                    <div className="space-y-6">
+                        <label className="text-[10px] font-black uppercase tracking-[0.6em] text-white/10">The Author</label>
+                        <input
+                            value={formData.author}
+                            onChange={e => setFormData({ ...formData, author: e.target.value })}
+                            placeholder="Written by..."
+                            className="w-full bg-transparent border-b border-white/5 py-4 text-xl md:text-2xl font-black text-amber-500/80 outline-none focus:border-amber-500/30 transition-all placeholder:text-white/5 tracking-tighter"
+                        />
+                    </div>
+
+                    <div className="space-y-6">
+                        <label className="text-[10px] font-black uppercase tracking-[0.6em] text-white/10">Custom Poster URL</label>
+                        <input
+                            value={formData.movie_poster_url}
+                            onChange={e => setFormData({ ...formData, movie_poster_url: e.target.value })}
+                            placeholder="Paste direct image URL to override default cover..."
+                            className="w-full bg-transparent border-b border-white/5 py-4 text-base md:text-lg font-mono text-white/60 outline-none focus:border-amber-500/30 transition-all placeholder:text-white/5"
+                        />
+                    </div>
+
+                    <div className="space-y-6">
+                        <label className="text-[10px] font-black uppercase tracking-[0.6em] text-white/10">Where to Watch</label>
+                        <input
+                            value={formData.watch_links}
+                            onChange={e => setFormData({ ...formData, watch_links: e.target.value })}
+                            placeholder="e.g. Netflix, Prime Video (comma separated or URL)"
+                            className="w-full bg-transparent border-b border-white/5 py-4 text-base md:text-xl font-bold text-blue-400 outline-none focus:border-blue-500/30 transition-all placeholder:text-white/5 tracking-tight"
                         />
                     </div>
 

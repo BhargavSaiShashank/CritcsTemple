@@ -63,6 +63,9 @@ class ReviewBase(BaseModel):
     aspects: AspectRatings
     tags: List[str] = []
     is_featured: bool = False
+    author: Optional[str] = None
+    watch_links: Optional[str] = None
+    claps: int = 0
 
 class ReviewCreate(ReviewBase):
     pass
@@ -73,8 +76,19 @@ class ReviewUpdate(BaseModel):
     verdict: Optional[Verdict] = None
     summary: Optional[str] = None
     content: Optional[str] = None
+    spoiler_section: Optional[str] = None
+    cast_performances: Optional[str] = None
+    director_trademarks: Optional[str] = None
+    viewing_context: Optional[str] = None
+    trivia_and_details: Optional[str] = None
+    favourite_dialogues: Optional[List[str]] = None
+    cinematic_moments: Optional[List[str]] = None
     aspects: Optional[AspectRatings] = None
+    tags: Optional[List[str]] = None
     is_featured: Optional[bool] = None
+    author: Optional[str] = None
+    movie_poster_url: Optional[str] = None
+    watch_links: Optional[str] = None
 
 class ReviewInDB(ReviewBase):
     id: Optional[str] = Field(None, alias="_id")

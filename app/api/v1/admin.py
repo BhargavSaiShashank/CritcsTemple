@@ -8,6 +8,9 @@ from app.db.mongodb import get_database
 from app.models.review import ReviewCreate, ReviewUpdate, ReviewInDB
 from app.models.movie import MovieCreate, MovieInDB
 from app.services.omdb import omdb_service
+from app.services.movie_service import movie_service
+from app.services.analytics_service import analytics_service
+from app.services.review_service import review_service
 from app.services.images import image_service
 from app.core.auth import get_current_admin
 from app.core.utils import calculate_overall_score
@@ -23,8 +26,7 @@ async def export_data_vault(db = Depends(get_database), admin = Depends(get_curr
     """Exports the entire library of reviews as a JSON Array."""
     cursor = db.reviews.find({})
     reviews = await cursor.to_list(length=None)
-    for r in reviews:
-        r["_id"] = str(r["_id"])
+    reviews = [review_service.serialize_doc(r) for r in reviews]
     
     response_data = json.dumps(reviews, default=str)
     return Response(
@@ -53,59 +55,7 @@ async def fetch_and_save_movie(
     db = Depends(get_database),
     admin = Depends(get_current_admin)
 ):
-    print(f"ADMIN: Fetching movie details for: {search_term}")
-    
-    if db is None:
-        print("ADMIN ERROR: Database connection is not available")
-        raise HTTPException(
-            status_code=503, 
-            detail="Sanctuary Database Offline. Please check MongoDB IP whitelist."
-        )
-    
-    try:
-        # Fetch from OMDb
-        movie_data = await omdb_service.fetch_movie_details(search_term)
-        
-        # Check if movie already exists by imdb_id
-        existing = await db.movies.find_one({"imdb_id": movie_data.imdb_id})
-        if existing:
-            print(f"ADMIN: Movie {movie_data.imdb_id} already exists in Sanctuary DB")
-            
-            # Proactive Poster Recovery: If DB has a placeholder or if it's potentially stale,
-            # we can decide to update it with the fresh one from movie_data
-            current_poster = existing.get("poster_url")
-            if not current_poster or "unsplash.com" in current_poster or "N/A" in current_poster:
-                 print(f"ADMIN: Refreshing poster for existing movie {movie_data.imdb_id}")
-                 await db.movies.update_one(
-                     {"imdb_id": movie_data.imdb_id},
-                     {"$set": {"poster_url": movie_data.poster_url}}
-                 )
-                 existing["poster_url"] = movie_data.poster_url
-
-            # Filter keys to only those expected by MovieCreate to avoid validation errors
-            expected_fields = MovieCreate.model_fields.keys() if hasattr(MovieCreate, "model_fields") else MovieCreate.__fields__.keys()
-            filtered_existing = {k: v for k, v in existing.items() if k in expected_fields}
-            
-            # Ensure required fields are present (Pydantic V2)
-            if "imdb_id" not in filtered_existing: filtered_existing["imdb_id"] = movie_data.imdb_id
-            if "title" not in filtered_existing: filtered_existing["title"] = movie_data.title
-            
-            return MovieCreate(**filtered_existing)
-
-        # Save to DB - ensure we use the model's dict for clean insertion
-        movie_dict = movie_data.model_dump() if hasattr(movie_data, "model_dump") else movie_data.dict()
-        await db.movies.insert_one(movie_dict)
-        print(f"ADMIN: Successfully saved movie {movie_data.imdb_id} to DB")
-        return movie_data
-
-    except HTTPException as he:
-        # Pass through expected HTTP exceptions (like 404 Movie Not Found)
-        raise he
-    except Exception as e:
-        print(f"ADMIN ERROR in fetch_and_save_movie: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"Sanctuary Fetch Engine Error: {str(e)}")
+    return await movie_service.fetch_and_save_movie(db, search_term)
 
 @router.post("/reviews", response_model=ReviewInDB)
 async def create_review(
@@ -170,6 +120,24 @@ async def update_review(
         updated["_id"] = str(updated["_id"])
     return updated
 
+@router.get("/reviews/{id}", response_model=ReviewInDB)
+async def get_review(
+    id: str,
+    db = Depends(get_database),
+    admin = Depends(get_current_admin)
+):
+    try:
+        obj_id = ObjectId(id)
+    except InvalidId:
+        obj_id = id
+
+    review = await db.reviews.find_one({"_id": obj_id})
+    if not review:
+        raise HTTPException(status_code=404, detail="Review not found")
+        
+    review["_id"] = str(review["_id"])
+    return review
+
 @router.delete("/reviews/{id}")
 async def delete_review(
     id: str,
@@ -205,13 +173,7 @@ async def list_reviews(
         
         # Sort by published_at or created_at
         reviews = await db.reviews.find(query).sort("created_at", -1).to_list(1000)
-        
-        # Convert ObjectIds to strings for JSON serialization
-        for review in reviews:
-            if "_id" in review:
-                review["_id"] = str(review["_id"])
-                
-        return reviews
+        return [review_service.serialize_doc(r) for r in reviews]
     except Exception as e:
         print(f"ADMIN ERROR in list_reviews: {str(e)}")
         import traceback
@@ -223,56 +185,7 @@ async def get_dna_analytics(
     db = Depends(get_database),
     admin = Depends(get_current_admin)
 ):
-    try:
-        # Fetch all published reviews to build the DNA profile
-        reviews = await db.reviews.find({"status": "published"}).to_list(1000)
-        
-        # Use a fixed order for the radar chart to keep it consistent
-        aspect_keys = [
-            "story", "screenplay", "direction", "acting", "cinematography",
-            "editing", "bg_score", "music", "production_design", "vfx",
-            "originality", "pacing", "dialogues", "climax", "opening",
-            "emotional_impact", "rewatch_value"
-        ]
-
-        if not reviews:
-            # Default empty aspects to show the chart structure at least
-            return [{"subject": k.replace("_", " ").title(), "A": 0, "fullMark": 10} for k in aspect_keys]
-            
-        aspect_totals = {}
-        aspect_counts = {}
-        
-        for r in reviews:
-            aspects = r.get("aspects", {})
-            if not aspects:
-                continue
-                
-            # Aspects is a dict where keys are aspect names and values are dicts with 'score'
-            # e.g., {'story': {'score': 8}, ...}, but DB could also have {'story': None}
-            for field, data in aspects.items():
-                if data and isinstance(data, dict) and "score" in data:
-                    score = data["score"]
-                    aspect_totals[field] = aspect_totals.get(field, 0) + score
-                    aspect_counts[field] = aspect_counts.get(field, 0) + 1
-                    
-        results: List[Dict[str, Any]] = []
-        
-        for k in aspect_keys:
-            total = aspect_totals.get(k, 0)
-            count = aspect_counts.get(k, 0)
-            avg = float(f"{total / count:.1f}") if count > 0 else 0.0
-            results.append({
-                "subject": k.replace("_", " ").title(),
-                "A": avg,
-                "fullMark": 10
-            })
-            
-        return results
-    except Exception as e:
-        print(f"ADMIN ERROR in get_dna_analytics: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"Analytics Engine Error: {str(e)}")
+    return await analytics_service.get_dna_analytics(db)
 
 @router.post("/ai/draft-verdict")
 async def draft_verdict(

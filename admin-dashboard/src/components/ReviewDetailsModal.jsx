@@ -41,6 +41,13 @@ const ReviewDetailsModal = ({ review, isOpen, onClose, onDelete }) => {
                                     <Trash2 size={20} className="group-hover:scale-110 transition-transform" />
                                 </button>
                                 <button
+                                    onClick={() => window.location.href = `/edit/${review._id || review.id}`}
+                                    className="p-3 bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 rounded-full backdrop-blur-md transition-colors group"
+                                    title="Edit Review"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:scale-110 transition-transform"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                </button>
+                                <button
                                     onClick={onClose}
                                     className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-md transition-colors"
                                 >

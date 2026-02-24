@@ -21,6 +21,7 @@ export const fetchMovieFromOMDb = (searchTerm) => api.post('/admin/movies/fetch'
 export const searchMovies = (title) => api.get(`/admin/movies/search?title=${title}`);
 export const getLatestMovies = (category = 'english') => api.get(`/admin/movies/latest?category=${category}`);
 export const getReviews = (params = {}) => api.get('/admin/reviews', { params });
+export const getReview = (id) => api.get(`/admin/reviews/${id}`);
 export const getDNAAnalytics = () => api.get('/admin/analytics/dna');
 export const draftVerdict = (aspects) => api.post('/admin/ai/draft-verdict', { aspects });
 export const createReview = (reviewData) => api.post('/admin/reviews', reviewData);

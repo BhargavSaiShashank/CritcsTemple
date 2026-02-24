@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Star, ChevronRight, Search, Film, TrendingUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { getLatestReviews } from '../services/api';
 import ReviewGrid from '../components/ReviewGrid';
 
@@ -98,30 +99,31 @@ export default function Home() {
                 display: 'flex',
                 alignItems: 'center',
             }}>
-                {/* Cinematic background image with filter */}
-                <div style={{ position: 'absolute', inset: 0 }}>
-                    <img
-                        src={hero?.movie_poster_url || FALLBACK}
-                        alt=""
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.22) saturate(0.7)' }}
-                    />
-                    {/* Gradient overlays */}
-                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(8,8,8,0.5) 0%, transparent 40%, rgba(8,8,8,0.4) 70%, #080808 100%)' }} />
-                    <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 50%, transparent 20%, rgba(8,8,8,0.4) 100%)' }} />
-                    {/* Ambient glow from verdict color */}
-                    <div style={{ position: 'absolute', bottom: '15%', left: '10%', width: '35%', height: '40%', background: `radial-gradient(ellipse, ${heroColor}12 0%, transparent 70%)`, filter: 'blur(60px)', pointerEvents: 'none' }} />
-                </div>
+                {/* Background Ken Burns */}
+                <AnimatePresence>
+                    {hero?.movie_poster_url && (
+                        <motion.div
+                            key={hero._id}
+                            initial={{ scale: 1.1, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 1.5, ease: "easeOut" }}
+                            style={{ position: 'absolute', inset: 0, zIndex: 0 }}
+                        >
+                            <img src={hero.movie_poster_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.12) saturate(0.6)' }} />
+                            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, #080808 0%, rgba(8,8,8,0.7) 50%, #080808 100%)' }} />
+                            <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at top right, rgba(245,166,35,0.05) 0%, transparent 60%)' }} />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
-                {/* Content Centered */}
-                <div style={{
-                    position: 'relative', zIndex: 2,
-                    maxWidth: '1200px', margin: '0 auto', width: '100%',
-                    padding: '0 48px',
-                    display: 'flex', alignItems: 'center',
-                    justifyContent: 'space-between', gap: '64px',
-                }}>
-                    {/* Left text block */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ position: 'relative', zIndex: 1, maxWidth: '1200px', margin: '0 auto', width: '100%', padding: '0 48px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '48px' }}>
+                    {/* Left: Text */}
+                    <motion.div
+                        initial={{ x: -20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ duration: 0.8, delay: 0.2 }}
+                        style={{ flex: '1 1 min(500px, 100%)' }}
+                    >
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', padding: '4px 12px', borderRadius: '99px', background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.14)', marginBottom: '24px' }}>
                             <TrendingUp size={11} color="#f5a623" />
                             <span style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(245,166,35,0.8)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>Latest Imprint</span>
@@ -156,13 +158,18 @@ export default function Home() {
                                 </Link>
                             )}
                         </div>
-                    </div>
+                    </motion.div>
 
                     {/* Right: floating poster card */}
                     {hero?.movie_poster_url && (
-                        <div style={{ width: '280px', flexShrink: 0, borderRadius: '20px', overflow: 'hidden', boxShadow: '0 40px 80px rgba(0,0,0,0.85)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0, rotate: 2 }}
+                            animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                            transition={{ duration: 1, delay: 0.4 }}
+                            style={{ width: '280px', flexShrink: 0, borderRadius: '20px', overflow: 'hidden', boxShadow: '0 40px 80px rgba(0,0,0,0.85)', border: '1px solid rgba(255,255,255,0.08)', margin: '0 auto' }}
+                        >
                             <img src={hero.movie_poster_url} alt={hero.movie_title} style={{ width: '100%', display: 'block' }} />
-                        </div>
+                        </motion.div>
                     )}
                 </div>
             </section>
@@ -197,29 +204,29 @@ export default function Home() {
                         <select
                             value={verdictFilter}
                             onChange={e => setVerdictFilter(e.target.value)}
-                            style={{ padding: '9px 14px', borderRadius: '10px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', fontSize: '12px', color: 'rgba(255,255,255,0.8)', outline: 'none', fontFamily: 'Outfit, sans-serif', cursor: 'pointer', appearance: 'none', WebkitAppearance: 'none' }}
+                            style={{ padding: '9px 14px', borderRadius: '10px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', fontSize: '12px', color: '#fff', outline: 'none', fontFamily: 'Outfit, sans-serif', cursor: 'pointer' }}
                         >
-                            <option value="All">All Verdicts</option>
-                            <option value="Legendary">Legendary</option>
-                            <option value="Masterpiece">Masterpiece</option>
-                            <option value="Essential">Essential</option>
-                            <option value="Elite">Elite</option>
-                            <option value="Great">Great</option>
-                            <option value="Good">Good</option>
-                            <option value="Decent">Decent</option>
-                            <option value="Average">Average</option>
-                            <option value="Mediocre">Mediocre</option>
-                            <option value="Poor">Poor</option>
+                            <option value="All" style={{ background: '#111', color: '#fff' }}>All Verdicts</option>
+                            <option value="Legendary" style={{ background: '#111', color: '#fff' }}>Legendary</option>
+                            <option value="Masterpiece" style={{ background: '#111', color: '#fff' }}>Masterpiece</option>
+                            <option value="Essential" style={{ background: '#111', color: '#fff' }}>Essential</option>
+                            <option value="Elite" style={{ background: '#111', color: '#fff' }}>Elite</option>
+                            <option value="Great" style={{ background: '#111', color: '#fff' }}>Great</option>
+                            <option value="Good" style={{ background: '#111', color: '#fff' }}>Good</option>
+                            <option value="Decent" style={{ background: '#111', color: '#fff' }}>Decent</option>
+                            <option value="Average" style={{ background: '#111', color: '#fff' }}>Average</option>
+                            <option value="Mediocre" style={{ background: '#111', color: '#fff' }}>Mediocre</option>
+                            <option value="Poor" style={{ background: '#111', color: '#fff' }}>Poor</option>
                         </select>
 
                         <select
                             value={sortOption}
                             onChange={e => setSortOption(e.target.value)}
-                            style={{ padding: '9px 14px', borderRadius: '10px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', fontSize: '12px', color: 'rgba(255,255,255,0.8)', outline: 'none', fontFamily: 'Outfit, sans-serif', cursor: 'pointer', appearance: 'none', WebkitAppearance: 'none' }}
+                            style={{ padding: '9px 14px', borderRadius: '10px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', fontSize: '12px', color: '#fff', outline: 'none', fontFamily: 'Outfit, sans-serif', cursor: 'pointer' }}
                         >
-                            <option value="date-desc">Newest First</option>
-                            <option value="score-desc">Highest Rated</option>
-                            <option value="score-asc">Lowest Rated</option>
+                            <option value="date-desc" style={{ background: '#111', color: '#fff' }}>Newest First</option>
+                            <option value="score-desc" style={{ background: '#111', color: '#fff' }}>Highest Rated</option>
+                            <option value="score-asc" style={{ background: '#111', color: '#fff' }}>Lowest Rated</option>
                         </select>
                     </div>
                 </div>

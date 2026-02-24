@@ -1,7 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ChevronLeft, Star, Calendar, Share2, Film, Check, Quote as QuoteIcon, Zap, Camera, Music, Heart } from 'lucide-react';
-import { getReviewBySlug } from '../services/api';
+import { ChevronLeft, Star, Calendar, Share2, Film, Check, Quote as QuoteIcon, Zap, Camera, Music, Heart, Info, Target, Sparkles, Download } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, PolarRadiusAxis } from 'recharts';
+import * as htmlToImage from 'html-to-image';
+import { getReviewBySlug, clapReview, unclapReview, getRelatedReviews } from '../services/api';
+import ReviewExportCard from '../components/ReviewExportCard';
 
 const FALLBACK = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=1200';
 
@@ -103,14 +107,84 @@ export default function ReviewDetail() {
     const [loading, setLoading] = useState(true);
     const [src, setSrc] = useState(null);
     const [copied, setCopied] = useState(false);
+    const exportRef = useRef(null);
+    const [exporting, setExporting] = useState(false);
+    const [claps, setClaps] = useState(0);
+    const [hasClapped, setHasClapped] = useState(false);
+    const [related, setRelated] = useState([]);
+
+    const handleDownloadCard = async () => {
+        if (!exportRef.current) return;
+        setExporting(true);
+        console.log("Starting html-to-image capture on element:", exportRef.current);
+        try {
+            const dataUrl = await htmlToImage.toPng(exportRef.current, {
+                cacheBust: true,
+                pixelRatio: 2,
+                backgroundColor: '#080808'
+            });
+            console.log("Canvas generated successfully");
+            const link = document.createElement('a');
+            link.download = `sanctuary-${review.slug}-card.png`;
+            link.href = dataUrl;
+            link.click();
+        } catch (error) {
+            console.error('Failed to generate sharing card:', error);
+            alert("Failed to generate the review card. Please try again.");
+        } finally {
+            setExporting(false);
+        }
+    };
 
     useEffect(() => {
         getReviewBySlug(slug)
-            .then(({ data }) => { setReview(data); setSrc(data?.movie_poster_url || FALLBACK); })
+            .then(({ data }) => {
+                setReview(data);
+                setSrc(data?.movie_poster_url || FALLBACK);
+                setClaps(data.claps || 0);
+                setHasClapped(localStorage.getItem(`clap_${data.slug}`) === 'true');
+            })
             .catch(console.error)
             .finally(() => setLoading(false));
+
+        getRelatedReviews(slug)
+            .then(({ data }) => setRelated(data))
+            .catch(console.error);
+
         window.scrollTo(0, 0);
     }, [slug]);
+
+    const handleClap = async () => {
+        if (hasClapped) {
+            // Unclap logic
+            setClaps(prev => Math.max(0, prev - 1));
+            setHasClapped(false);
+            localStorage.removeItem(`clap_${review?.slug}`);
+            try {
+                await unclapReview(review.slug);
+            } catch (e) {
+                console.error("Unclap failed", e);
+                // Rollback optimistic update
+                setClaps(prev => prev + 1);
+                setHasClapped(true);
+                localStorage.setItem(`clap_${review?.slug}`, 'true');
+            }
+        } else {
+            // Clap logic
+            setClaps(prev => prev + 1);
+            setHasClapped(true);
+            localStorage.setItem(`clap_${review?.slug}`, 'true');
+            try {
+                await clapReview(review.slug);
+            } catch (e) {
+                console.error("Clap failed", e);
+                // Rollback optimistic update
+                setClaps(prev => Math.max(0, prev - 1));
+                setHasClapped(false);
+                localStorage.removeItem(`clap_${review?.slug}`);
+            }
+        }
+    };
 
     const handleShare = () => {
         navigator.clipboard?.writeText(window.location.href);
@@ -135,6 +209,8 @@ export default function ReviewDetail() {
     const vc = getV(review.verdict);
     const aspects = review.aspects || {};
     const hasAspects = Object.values(aspects).some(a => a && parseFloat(a?.score) > 0);
+    const wordCount = review.content ? review.content.split(/\s+/).length : 0;
+    const readTime = Math.max(1, Math.ceil(wordCount / 200));
 
     const groupAverages = ASPECT_GROUPS.map(g => {
         const scores = g.aspects.map(k => aspects[k]).filter(a => a && parseFloat(a?.score) > 0).map(a => parseFloat(a.score));
@@ -144,14 +220,14 @@ export default function ReviewDetail() {
     return (
         <div style={{ background: '#080808', minHeight: '100vh' }}>
             {/* ── CINEMATIC BANNER ── */}
-            <div style={{ position: 'relative', height: '52vh', minHeight: '320px', overflow: 'hidden' }}>
+            <div style={{ position: 'relative', height: '35vh', minHeight: '220px', overflow: 'hidden' }}>
                 <img src={src} alt="" onError={() => setSrc(FALLBACK)} style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.2) saturate(0.6)' }} />
                 <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, #080808 0%, rgba(8,8,8,0.5) 60%, transparent 100%)' }} />
                 {/* Verdict glow */}
                 <div style={{ position: 'absolute', bottom: 0, left: '10%', width: '30%', height: '60%', background: `radial-gradient(ellipse, ${vc.glow !== 'transparent' ? vc.glow : 'rgba(245,166,35,0.05)'} 0%, transparent 70%)`, filter: 'blur(32px)', pointerEvents: 'none' }} />
 
                 {/* Banner content */}
-                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, maxWidth: '1200px', margin: '0 auto', padding: '0 28px 32px' }}>
+                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, maxWidth: '1200px', margin: '0 auto', padding: '0 28px 16px' }}>
                     <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: 'rgba(255,255,255,0.3)', fontSize: '11px', fontWeight: 600, textDecoration: 'none', letterSpacing: '0.05em', marginBottom: '14px', textTransform: 'uppercase' }}>
                         <ChevronLeft size={12} /> Archive
                     </Link>
@@ -163,11 +239,17 @@ export default function ReviewDetail() {
             </div>
 
             {/* ── BODY ── */}
-            <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '48px 28px 100px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '40px', alignItems: 'start' }}>
+            <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px 28px 100px' }}>
+                <div className="review-grid-container">
 
                     {/* ── LEFT SIDEBAR ── */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', position: 'sticky', top: '80px' }}>
+                    <motion.div
+                        initial={{ x: -20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ duration: 0.8 }}
+                        className="md:sticky md:top-[80px]"
+                        style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
+                    >
                         {/* Poster */}
                         <div style={{ borderRadius: '18px', overflow: 'hidden', boxShadow: '0 32px 80px rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.07)' }}>
                             <img src={src} alt={review.movie_title} onError={() => setSrc(FALLBACK)} style={{ width: '100%', display: 'block' }} />
@@ -215,9 +297,13 @@ export default function ReviewDetail() {
                         {/* Meta */}
                         <div style={{ background: '#111', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '14px', padding: '16px' }}>
                             {review.published_at && (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: 'rgba(255,255,255,0.3)', marginBottom: '10px' }}>
-                                    <Calendar size={12} />
-                                    {new Date(review.published_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', fontSize: '11px', color: 'rgba(255,255,255,0.3)', marginBottom: '10px' }}>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                        <Calendar size={12} />
+                                        {new Date(review.published_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                    </span>
+                                    <span style={{ color: 'rgba(255,255,255,0.1)' }}>•</span>
+                                    <span style={{ color: '#f5a623', fontWeight: 600 }}>{readTime} Min Read</span>
                                 </div>
                             )}
                             {review.tags?.length > 0 && (
@@ -229,27 +315,91 @@ export default function ReviewDetail() {
                                     ))}
                                 </div>
                             )}
-                            <button onClick={handleShare} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', cursor: 'pointer', color: copied ? '#4ade80' : 'rgba(255,255,255,0.25)', fontSize: '11px', fontWeight: 500, padding: 0, transition: 'color 0.2s' }}>
-                                {copied ? <Check size={12} /> : <Share2 size={12} />}
-                                {copied ? 'Copied!' : 'Copy link'}
-                            </button>
+                            <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginTop: '4px' }}>
+                                <button onClick={handleShare} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', cursor: 'pointer', color: copied ? '#4ade80' : 'rgba(255,255,255,0.3)', fontSize: '11px', fontWeight: 500, padding: 0, transition: 'color 0.2s' }}>
+                                    {copied ? <Check size={12} /> : <Share2 size={12} />}
+                                    {copied ? 'Copied!' : 'Copy link'}
+                                </button>
+                                <button
+                                    onClick={handleDownloadCard}
+                                    disabled={exporting}
+                                    style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', cursor: exporting ? 'not-allowed' : 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: '11px', fontWeight: 500, padding: 0, transition: 'color 0.2s', opacity: exporting ? 0.5 : 1 }}
+                                    onMouseEnter={e => !exporting && (e.currentTarget.style.color = '#fff')}
+                                    onMouseLeave={e => !exporting && (e.currentTarget.style.color = 'rgba(255,255,255,0.3)')}
+                                >
+                                    <Download size={12} />
+                                    {exporting ? 'Generating...' : 'Share Card'}
+                                </button>
+                            </div>
+
+                            {review.watch_links && (
+                                <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                                    <div style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '12px' }}>Where to Watch</div>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                        {review.watch_links.split(',').map((link, idx) => {
+                                            const url = link.trim();
+                                            let platform = 'Stream Now';
+                                            if (url.includes('netflix.com')) platform = 'Netflix';
+                                            else if (url.includes('primevideo.com') || url.includes('amazon.')) platform = 'Prime Video';
+                                            else if (url.includes('apple.com')) platform = 'Apple TV';
+                                            else if (url.includes('hbo.com') || url.includes('max.com')) platform = 'Max';
+                                            else if (url.includes('disneyplus.com')) platform = 'Disney+';
+                                            else if (url.includes('hulu.com')) platform = 'Hulu';
+
+                                            return (
+                                                <a key={idx} href={url.startsWith('http') ? url : `https://${url}`} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', padding: '6px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', textDecoration: 'none', transition: 'all 0.2s' }}
+                                                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#fff'; }}
+                                                    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; }}
+                                                >
+                                                    ▶ {platform}
+                                                </a>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
+                            )}
                         </div>
-                    </div>
+
+                        {/* Table of Contents */}
+                        <div style={{ background: '#111', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '14px', padding: '16px' }} className="hidden md:block">
+                            <div style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '12px' }}>Contents</div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                {review.summary && <a href="#summary" style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', textDecoration: 'none', opacity: 0.8 }} className="hover:text-amber-500 hover:opacity-100 transition-colors">The Essence</a>}
+                                {review.content && <a href="#critique" style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', textDecoration: 'none', opacity: 0.8 }} className="hover:text-amber-500 hover:opacity-100 transition-colors">The Critique</a>}
+                                {(review.cast_performances || review.director_trademarks || review.viewing_context || review.trivia_and_details) && <a href="#lore" style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', textDecoration: 'none', opacity: 0.8 }} className="hover:text-amber-500 hover:opacity-100 transition-colors">Deep Lore</a>}
+                                {hasAspects && <a href="#dna" style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', textDecoration: 'none', opacity: 0.8 }} className="hover:text-amber-500 hover:opacity-100 transition-colors">Structural DNA</a>}
+                                {review.spoiler_section && <a href="#spoilers" style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', textDecoration: 'none', opacity: 0.8 }} className="hover:text-amber-500 hover:opacity-100 transition-colors">Spoilers</a>}
+                            </div>
+                        </div>
+                    </motion.div>
 
                     {/* ── RIGHT CONTENT ── */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '36px' }}>
                         {/* Summary quote */}
                         {review.summary && (
-                            <div style={{ position: 'relative', padding: '28px 32px', background: 'rgba(245,166,35,0.04)', border: '1px solid rgba(245,166,35,0.12)', borderRadius: '16px', borderLeft: '3px solid #f5a623' }}>
+                            <motion.div
+                                id="summary"
+                                initial={{ y: 20, opacity: 0 }}
+                                whileInView={{ y: 0, opacity: 1 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.8 }}
+                                style={{ position: 'relative', padding: '28px 32px', background: 'rgba(245,166,35,0.04)', border: '1px solid rgba(245,166,35,0.12)', borderRadius: '16px', borderLeft: '3px solid #f5a623' }}
+                            >
                                 <div style={{ fontSize: '19px', fontStyle: 'italic', fontWeight: 300, color: 'rgba(255,255,255,0.7)', lineHeight: 1.75, fontFamily: 'Playfair Display, Georgia, serif' }}>
                                     "{review.summary}"
                                 </div>
-                            </div>
+                            </motion.div>
                         )}
 
                         {/* Written critique */}
                         {review.content && (
-                            <div>
+                            <motion.div
+                                id="critique"
+                                initial={{ y: 20, opacity: 0 }}
+                                whileInView={{ y: 0, opacity: 1 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.8 }}
+                            >
                                 <div style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.06)' }} />
                                     The Critique
@@ -258,12 +408,12 @@ export default function ReviewDetail() {
                                 <div style={{ fontSize: '15px', fontWeight: 300, color: 'rgba(255,255,255,0.52)', lineHeight: 1.9, whiteSpace: 'pre-wrap', letterSpacing: '0.01em' }}>
                                     {review.content}
                                 </div>
-                            </div>
+                            </motion.div>
                         )}
 
                         {/* Cinematic Lore */}
                         {(review.cast_performances || review.director_trademarks || review.viewing_context || review.trivia_and_details) && (
-                            <div>
+                            <div id="lore">
                                 <div style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.06)' }} />
                                     Deep Cinematic Lore
@@ -300,14 +450,43 @@ export default function ReviewDetail() {
 
                         {/* Aspect breakdown */}
                         {hasAspects && (
-                            <div>
+                            <motion.div
+                                id="dna"
+                                initial={{ y: 20, opacity: 0 }}
+                                whileInView={{ y: 0, opacity: 1 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.8 }}
+                            >
                                 <div style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.06)' }} />
-                                    Cinematic Breakdown
+                                    Structural DNA
                                     <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.06)' }} />
                                 </div>
+
+                                {/* Radar Chart Integration */}
+                                <div style={{ height: '320px', background: '#111', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '32px', padding: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <RadarChart cx="50%" cy="50%" outerRadius="80%" data={
+                                            Object.keys(aspects)
+                                                .filter(k => aspects[k]?.score > 0)
+                                                .map(k => ({ subject: toLabel(k), A: parseFloat(aspects[k].score), fullMark: 10 }))
+                                        }>
+                                            <PolarGrid stroke="rgba(255,255,255,0.1)" />
+                                            <PolarAngleAxis dataKey="subject" tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 10, fontWeight: 600 }} />
+                                            <PolarRadiusAxis angle={30} domain={[0, 10]} axisLine={false} tick={false} />
+                                            <Radar
+                                                name="Score"
+                                                dataKey="A"
+                                                stroke={vc.color}
+                                                fill={vc.color}
+                                                fillOpacity={0.35}
+                                            />
+                                        </RadarChart>
+                                    </ResponsiveContainer>
+                                </div>
+
                                 {ASPECT_GROUPS.map(g => <GroupSection key={g.name} group={g} aspects={aspects} />)}
-                            </div>
+                            </motion.div>
                         )}
 
                         {/* Dialogues + Moments */}
@@ -338,7 +517,7 @@ export default function ReviewDetail() {
 
                         {/* Spoiler */}
                         {review.spoiler_section && (
-                            <details style={{ background: 'rgba(239,68,68,0.04)', border: '1px solid rgba(239,68,68,0.12)', borderRadius: '14px' }}>
+                            <details id="spoilers" style={{ background: 'rgba(239,68,68,0.04)', border: '1px solid rgba(239,68,68,0.12)', borderRadius: '14px' }}>
                                 <summary style={{ padding: '15px 18px', cursor: 'pointer', fontSize: '11px', fontWeight: 700, color: 'rgba(239,68,68,0.6)', letterSpacing: '0.1em', textTransform: 'uppercase', listStyle: 'none' }}>
                                     ⚠ Spoiler Section — click to reveal
                                 </summary>
@@ -346,6 +525,60 @@ export default function ReviewDetail() {
                                     {review.spoiler_section}
                                 </div>
                             </details>
+                        )}
+
+                        {/* Claps */}
+                        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '40px', marginBottom: '20px' }}>
+                            <button
+                                onClick={handleClap}
+                                style={{ display: 'flex', alignItems: 'center', gap: '8px', background: hasClapped ? 'rgba(239,68,68,0.1)' : '#111', border: `1px solid ${hasClapped ? 'rgba(239,68,68,0.3)' : 'rgba(255,255,255,0.1)'}`, padding: '12px 24px', borderRadius: '99px', color: hasClapped ? '#ef4444' : 'rgba(255,255,255,0.6)', fontSize: '14px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.3s' }}
+                                onMouseEnter={e => {
+                                    if (!hasClapped) {
+                                        e.currentTarget.style.background = 'rgba(239,68,68,0.05)';
+                                        e.currentTarget.style.borderColor = 'rgba(239,68,68,0.3)';
+                                        e.currentTarget.style.color = '#ef4444';
+                                    } else {
+                                        e.currentTarget.style.background = 'transparent';
+                                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                                        e.currentTarget.style.color = 'rgba(255,255,255,0.6)';
+                                    }
+                                }}
+                                onMouseLeave={e => {
+                                    if (!hasClapped) {
+                                        e.currentTarget.style.background = '#111';
+                                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                                        e.currentTarget.style.color = 'rgba(255,255,255,0.6)';
+                                    } else {
+                                        e.currentTarget.style.background = 'rgba(239,68,68,0.1)';
+                                        e.currentTarget.style.borderColor = 'rgba(239,68,68,0.3)';
+                                        e.currentTarget.style.color = '#ef4444';
+                                    }
+                                }}
+                            >
+                                <Heart size={18} fill={hasClapped ? '#ef4444' : 'none'} color={hasClapped ? '#ef4444' : 'currentColor'} style={{ transform: hasClapped ? 'scale(1.1)' : 'scale(1)', transition: 'transform 0.3s' }} />
+                                {claps} {claps === 1 ? 'Resonance' : 'Resonances'}
+                            </button>
+                        </div>
+
+                        {/* More Like This */}
+                        {related.length > 0 && (
+                            <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '40px', marginTop: '40px' }}>
+                                <div style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '20px' }}>Sanctuary Recommendations</div>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
+                                    {related.map(r => (
+                                        <Link key={r.slug} to={`/review/${r.slug}`} style={{ textDecoration: 'none', background: '#111', borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.06)', transition: 'transform 0.2s, border-color 0.2s' }} className="group hover:-translate-y-1 hover:border-amber-500/30 font-premium">
+                                            <div style={{ height: '120px', overflow: 'hidden', position: 'relative' }}>
+                                                <img src={r.movie_poster_url || FALLBACK} style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.5)' }} />
+                                                <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', padding: '4px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 800, color: '#f5a623' }}>{parseFloat(r.overall_rating).toFixed(1)}</div>
+                                            </div>
+                                            <div style={{ padding: '16px' }}>
+                                                <div style={{ fontSize: '14px', fontWeight: 800, color: '#f2f2f2', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.movie_title}</div>
+                                                <div style={{ fontSize: '11px', color: getV(r.verdict).color, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{r.verdict}</div>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
                         )}
 
                         {/* Back link */}
@@ -356,11 +589,16 @@ export default function ReviewDetail() {
                             >
                                 <ChevronLeft size={13} /> All Reviews
                             </Link>
-                            <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.12)' }}>The Sanctuary · Cinema Archive</span>
+                            <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.2)', fontStyle: 'italic' }}>
+                                {review.author ? `Penned by ${review.author} · ` : ''}The Sanctuary Archive
+                            </span>
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* Hidden Export Component */}
+            <ReviewExportCard ref={exportRef} review={review} />
         </div>
     );
 }

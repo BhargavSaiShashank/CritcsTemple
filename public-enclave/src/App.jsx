@@ -1,7 +1,7 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
-import PublicHeader from './components/PublicHeader'
+import Navbar from './components/Navbar'
 import Home from './pages/Home'
 import ReviewDetail from './pages/ReviewDetail'
 import HallOfFame from './pages/HallOfFame'
@@ -11,7 +11,7 @@ const App = () => {
     <HelmetProvider>
       <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <div className="min-h-screen bg-[#0c0c0c] text-white">
-          <PublicHeader />
+          <Navbar />
           <main>
             <Routes>
               <Route path="/" element={<Home />} />

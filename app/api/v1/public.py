@@ -1,17 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
-from fastapi.responses import JSONResponse
-from typing import List, Optional
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
+import httpx
+from typing import Optional
 from app.db.mongodb import get_database
-from app.models.review import Verdict
-from pymongo import DESCENDING, ASCENDING
+from app.services.review_service import review_service
 
 router = APIRouter()
-
-def serialize_doc(doc: dict) -> dict:
-    """Convert MongoDB document _id ObjectId to string."""
-    if doc and "_id" in doc:
-        doc["_id"] = str(doc["_id"])
-    return doc
 
 @router.get("/reviews")
 async def get_latest_reviews(
@@ -24,44 +18,45 @@ async def get_latest_reviews(
     order: Optional[str] = "desc",
     db = Depends(get_database)
 ):
-    query: dict = {"status": "published"}
-    if tag:
-        query["tags"] = tag
-    
-    # Check if verdict is a single string or multiple
-    if verdict and verdict.strip():
-        query["verdict"] = verdict.strip()
-        
-    if search and search.strip():
-        query["$or"] = [
-            {"movie_title": {"$regex": search.strip(), "$options": "i"}},
-            {"verdict": {"$regex": search.strip(), "$options": "i"}},
-            {"tags": {"$regex": search.strip(), "$options": "i"}}
-        ]
-        
-    sort_field = "overall_rating" if sort_by == "score" else "published_at"
-    sort_direction = ASCENDING if (order or "desc").lower() == "asc" else DESCENDING
-    
-    cursor = db.reviews.find(query).sort(sort_field, sort_direction).skip(offset).limit(limit)
-    reviews = await cursor.to_list(length=limit)
-    return [serialize_doc(r) for r in reviews]
+    return await review_service.get_latest_reviews(
+        db, limit, offset, tag, verdict, search, sort_by, order
+    )
 
 @router.get("/reviews/{slug}")
 async def get_review_by_slug(slug: str, db = Depends(get_database)):
-    review = await db.reviews.find_one({"slug": slug, "status": "published"})
-    if not review:
-        raise HTTPException(status_code=404, detail="Review not found")
-    return serialize_doc(review)
+    return await review_service.get_review_by_slug(db, slug)
+
+@router.post("/reviews/{slug}/clap")
+async def clap_for_review(slug: str, db = Depends(get_database)):
+    return await review_service.increment_claps(db, slug)
+
+@router.delete("/reviews/{slug}/clap")
+async def unclap_for_review(slug: str, db = Depends(get_database)):
+    return await review_service.decrement_claps(db, slug)
+
+@router.get("/reviews/{slug}/related")
+async def get_related_reviews(slug: str, db = Depends(get_database)):
+    return await review_service.get_related_reviews(db, slug)
 
 @router.get("/masterpieces")
 async def get_masterpieces(db = Depends(get_database)):
-    cursor = db.reviews.find({"verdict": Verdict.MASTERPIECE.value, "status": "published"}).sort("published_at", DESCENDING)
-    reviews = await cursor.to_list(length=20)
-    return [serialize_doc(r) for r in reviews]
+    return await review_service.get_masterpieces(db)
 
 @router.get("/movie/{imdb_id}")
 async def get_movie_details(imdb_id: str, db = Depends(get_database)):
     movie = await db.movies.find_one({"imdb_id": imdb_id})
     if not movie:
         raise HTTPException(status_code=404, detail="Movie not found in our database")
-    return serialize_doc(movie)
+    return review_service.serialize_doc(movie)
+
+@router.get("/proxy-image")
+async def proxy_image(url: str):
+    """Proxy an external image to bypass CORS limits for html2canvas downloading."""
+    async def stream_image():
+        async with httpx.AsyncClient() as client:
+            async with client.stream("GET", url) as response:
+                if response.status_code != 200:
+                    raise HTTPException(status_code=response.status_code, detail="Failed to fetch image")
+                async for chunk in response.aiter_bytes():
+                    yield chunk
+    return StreamingResponse(stream_image(), media_type="image/jpeg")
