@@ -28,6 +28,7 @@ jobs:
       run: |
         pytest
       env:
+        PYTHONPATH: .
         ENVIRONMENT: "testing"
         MONGODB_URI: "mongodb://localhost:27017/testdb"
         TMDB_API_KEY: "dummy"
@@ -51,11 +52,11 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 18.x
-        cache: 'npm'
-        cache-dependency-path: './public-enclave/package-lock.json'
         
     - name: Install dependencies
-      run: npm install --legacy-peer-deps
+      run: |
+        rm -rf node_modules package-lock.json
+        npm install --legacy-peer-deps
       
     - name: Build
       run: npm run build
@@ -72,11 +73,11 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 18.x
-        cache: 'npm'
-        cache-dependency-path: './admin-dashboard/package-lock.json'
         
     - name: Install dependencies
-      run: npm install --legacy-peer-deps
+      run: |
+        rm -rf node_modules package-lock.json
+        npm install --legacy-peer-deps
       
     - name: Build
       run: npm run build
