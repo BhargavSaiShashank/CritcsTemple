@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Trophy } from 'lucide-react';
-import { getHallOfFameReviews } from '../services/api';
+import { getCategories } from '../services/api';
 import { motion } from 'framer-motion';
 import ReviewGrid from '../components/ReviewGrid';
 
 export default function HallOfFame() {
-    const [reviews, setReviews] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        getHallOfFameReviews().then(({ data }) => setReviews(data || [])).catch(console.error).finally(() => setLoading(false));
+        getCategories().then(({ data }) => setCategories(data || [])).catch(console.error).finally(() => setLoading(false));
     }, []);
 
-    const hero = reviews[0];
+    // Get the first item of the first ranked category as the hero image (if available)
+    const hero = categories.length > 0 && categories[0].items && categories[0].items.length > 0
+        ? categories[0].items[0]
+        : null;
 
     return (
         <div style={{ minHeight: '100vh', background: '#080808' }}>
@@ -58,7 +61,33 @@ export default function HallOfFame() {
             </div>
 
             <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '48px 28px 100px' }}>
-                <ReviewGrid reviews={reviews} loading={loading} />
+                {loading ? (
+                    <div style={{ padding: '100px 0', textAlign: 'center', color: '#f5a623' }}>Loading curated categories...</div>
+                ) : categories.length === 0 ? (
+                    <div style={{ padding: '100px 0', textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>No categories found in the Hall of Fame.</div>
+                ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '80px' }}>
+                        {categories.map((category, idx) => (
+                            <div key={category._id || idx}>
+                                <div style={{ marginBottom: '32px', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '16px' }}>
+                                    <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#f2f2f2', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                                        {category.title}
+                                    </h2>
+                                    {category.description && (
+                                        <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.4)', marginTop: '8px', maxWidth: '600px' }}>
+                                            {category.description}
+                                        </p>
+                                    )}
+                                </div>
+                                {category.items && category.items.length > 0 ? (
+                                    <ReviewGrid reviews={category.items} loading={false} />
+                                ) : (
+                                    <p style={{ color: 'rgba(255,255,255,0.2)', fontStyle: 'italic', fontSize: '14px' }}>No items added to this category yet.</p>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

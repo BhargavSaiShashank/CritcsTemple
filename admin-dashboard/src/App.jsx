@@ -3,6 +3,7 @@ import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Intelligence from './pages/Intelligence'
 import EditReview from './pages/EditReview'
+import HallOfFame from './pages/HallOfFame'
 import PrivateRoute from './components/PrivateRoute'
 import { auth } from './services/firebase'
 
@@ -33,6 +34,14 @@ const App = () => {
                         element={
                             <PrivateRoute>
                                 <EditReview />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/hall-of-fame"
+                        element={
+                            <PrivateRoute>
+                                <HallOfFame />
                             </PrivateRoute>
                         }
                     />

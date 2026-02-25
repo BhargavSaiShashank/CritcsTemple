@@ -7,11 +7,13 @@ from typing import List, Any, Optional, Dict
 from app.db.mongodb import get_database
 from app.models.review import ReviewCreate, ReviewUpdate, ReviewInDB
 from app.models.movie import MovieCreate, MovieInDB
+from app.models.category import CategoryCreate, CategoryUpdate, CategoryInDB
 from app.services.omdb import omdb_service
 from app.services.movie_service import movie_service
 from app.services.analytics_service import analytics_service
 from app.services.review_service import review_service
 from app.services.images import image_service
+from app.services.category_service import category_service
 from app.core.auth import get_current_admin
 from app.core.utils import calculate_overall_score
 import os
@@ -230,3 +232,35 @@ async def upload_file(
     finally:
         if os.path.exists(temp_path):
             os.remove(temp_path)
+
+@router.post("/categories", response_model=CategoryInDB)
+async def create_category(
+    data: CategoryCreate, 
+    db = Depends(get_database),
+    admin = Depends(get_current_admin)
+):
+    return await category_service.create_category(db, data)
+
+@router.get("/categories")
+async def get_all_categories(
+    db = Depends(get_database),
+    admin = Depends(get_current_admin)
+):
+    return await category_service.get_all_categories(db)
+
+@router.put("/categories/{category_id}", response_model=CategoryInDB)
+async def update_category(
+    category_id: str,
+    data: CategoryUpdate,
+    db = Depends(get_database),
+    admin = Depends(get_current_admin)
+):
+    return await category_service.update_category(db, category_id, data)
+
+@router.delete("/categories/{category_id}")
+async def delete_category(
+    category_id: str,
+    db = Depends(get_database),
+    admin = Depends(get_current_admin)
+):
+    return await category_service.delete_category(db, category_id)

@@ -32,4 +32,10 @@ export const uploadImage = (formData) => api.post('/admin/upload', formData, {
 });
 export const exportDataVault = () => api.get('/admin/export/vault', { responseType: 'blob' });
 
+// Category Management
+export const getCategories = () => api.get('/admin/categories');
+export const createCategory = (data) => api.post('/admin/categories', data);
+export const updateCategory = (id, data) => api.put(`/admin/categories/${id}`, data);
+export const deleteCategory = (id) => api.delete(`/admin/categories/${id}`);
+
 export default api;

@@ -3,7 +3,10 @@ import { auth } from '../services/firebase'
 import { fetchMovieFromOMDb, searchMovies, createReview, exportDataVault } from '../services/api'
 import { useNavigate, Link } from 'react-router-dom';
 import ReviewForm from '../components/ReviewForm'
-import { Search, Film, Loader2, Info, Sparkles, LogOut, Clapperboard, ChevronRight, LayoutGrid, List, TrendingUp, Star, Clock, Calendar, Plus, CheckCircle2, X, DownloadCloud } from 'lucide-react'
+import {
+    Search, Plus, LogOut, TrendingUp, Sparkles, Image as ImageIcon,
+    Clock, Calendar, DownloadCloud, Loader2, Play, BookOpen, Star, Clapperboard
+} from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
 
@@ -135,6 +138,14 @@ const Dashboard = () => {
                 </div>
 
                 <div className="flex items-center gap-4">
+                    <Link
+                        to="/hall-of-fame"
+                        className="p-3 bg-white/5 hover:bg-white/10 border border-white/5 rounded-2xl transition-all group"
+                        title="Hall of Fame Details"
+                    >
+                        <Star size={18} className="text-amber-500/50 group-hover:text-amber-500 transition-colors" />
+                    </Link>
+
                     <Link
                         to="/intelligence"
                         className="p-3 bg-white/5 hover:bg-white/10 border border-white/5 rounded-2xl transition-all group"

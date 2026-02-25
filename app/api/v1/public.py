@@ -4,6 +4,7 @@ import httpx
 from typing import Optional
 from app.db.mongodb import get_database
 from app.services.review_service import review_service
+from app.services.category_service import category_service
 
 router = APIRouter()
 
@@ -41,6 +42,10 @@ async def get_related_reviews(slug: str, db = Depends(get_database)):
 @router.get("/masterpieces")
 async def get_masterpieces(db = Depends(get_database)):
     return await review_service.get_masterpieces(db)
+
+@router.get("/categories")
+async def get_public_categories(db = Depends(get_database)):
+    return await category_service.get_populated_categories(db)
 
 @router.get("/movie/{imdb_id}")
 async def get_movie_details(imdb_id: str, db = Depends(get_database)):

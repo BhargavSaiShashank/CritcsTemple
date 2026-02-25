@@ -18,6 +18,7 @@ export const unclapReview = (slug) => api.delete(`/reviews/${slug}/clap`);
 export const getRelatedReviews = (slug) => api.get(`/reviews/${slug}/related`);
 export const getMasterpieces = () => api.get('/masterpieces');
 export const getHallOfFameReviews = () => api.get('/masterpieces');
+export const getCategories = () => api.get('/categories');
 export const getMovieDetails = (imdbId) => api.get(`/movie/${imdbId}`);
 
 export default api;
