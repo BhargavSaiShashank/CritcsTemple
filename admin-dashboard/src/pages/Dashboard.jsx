@@ -5,7 +5,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import ReviewForm from '../components/ReviewForm'
 import {
     Search, Plus, LogOut, TrendingUp, Sparkles, Image as ImageIcon,
-    Clock, Calendar, DownloadCloud, Loader2, Play, BookOpen, Star, Clapperboard
+    Clock, Calendar, DownloadCloud, Loader2, Play, BookOpen, Star, Clapperboard, ChevronRight
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
