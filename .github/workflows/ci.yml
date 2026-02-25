@@ -62,6 +62,12 @@ jobs:
     - name: Build
       run: npm run build
 
+    - name: Trigger Vercel Deploy (Public Enclave)
+      if: env.VERCEL_PUBLIC_HOOK != ''
+      run: curl -X POST ${{ secrets.VERCEL_PUBLIC_HOOK }}
+      env:
+        VERCEL_PUBLIC_HOOK: ${{ secrets.VERCEL_PUBLIC_HOOK }}
+
   frontend-admin-build:
     runs-on: ubuntu-latest
     defaults:
@@ -82,3 +88,9 @@ jobs:
       
     - name: Build
       run: npm run build
+
+    - name: Trigger Vercel Deploy (Admin Dashboard)
+      if: env.VERCEL_ADMIN_HOOK != ''
+      run: curl -X POST ${{ secrets.VERCEL_ADMIN_HOOK }}
+      env:
+        VERCEL_ADMIN_HOOK: ${{ secrets.VERCEL_ADMIN_HOOK }}
