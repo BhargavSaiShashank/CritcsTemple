@@ -63,7 +63,7 @@ const Dashboard = () => {
 
     const debouncedSearch = useCallback(
         debounce(async (term) => {
-            if (!term || term.length < 2) {
+            if (!term || term.length < 3) {
                 setSearchResults([])
                 setSearchLoading(false)
                 return
@@ -77,7 +77,7 @@ const Dashboard = () => {
             } finally {
                 setSearchLoading(false)
             }
-        }, 300),
+        }, 600),
         []
     )
 
@@ -213,7 +213,25 @@ const Dashboard = () => {
 
                             {/* Dynamic Grid */}
                             <div className="space-y-12">
-                                {searchTerm ? (
+                                {searchTerm && searchTerm.length < 3 && !searchLoading && searchResults.length === 0 && (
+                                    <div className="h-[40vh] flex flex-col items-center justify-center border border-white/5 rounded-3xl bg-white/[0.02] backdrop-blur-sm mt-8">
+                                        <Search size={48} className="text-white/10 mb-4" />
+                                        <p className="text-lg font-medium tracking-widest uppercase text-white/30">Enter at least 3 characters</p>
+                                    </div>
+                                )}
+
+                                {searchLoading && searchTerm.length >= 3 && (
+                                    <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-10">
+                                        {[1, 2, 3, 4, 5].map((i) => (
+                                            <div key={i} className="animate-pulse bg-white/5 rounded-[32px] border border-white/10 aspect-[2/3] overflow-hidden flex flex-col justify-end p-8">
+                                                <div className="h-4 bg-white/10 rounded w-1/4 mb-4"></div>
+                                                <div className="h-6 bg-white/10 rounded w-3/4 mb-2"></div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {searchTerm && searchTerm.length >= 3 && !searchLoading ? (
                                     <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-10">
                                         {searchResults.map((res, idx) => (
                                             <motion.div

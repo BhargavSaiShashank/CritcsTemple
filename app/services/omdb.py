@@ -33,7 +33,19 @@ class OMDBService:
                 if data.get("Response") == "False":
                     return []
                 
-                return data.get("Search", [])
+                results = data.get("Search", [])
+                
+                # Sanctuary Quality Check & Title Cleaning
+                clean_results = []
+                for res in results:
+                    poster = res.get("Poster", "")
+                    if poster == "N/A" or "BMjA3Njg2NjYxM15BMl5BanBnXkFtZTYwNjc3NjA5" in poster or "W15BMl5BanBnXkFtZTYwNlc3NjA5" in poster:
+                        continue
+                    
+                    res["Title"] = self._clean_title(res["Title"])
+                    clean_results.append(res)
+                    
+                return clean_results
             except Exception as e:
                 print(f"Error searching OMDb: {str(e)}")
                 return []
