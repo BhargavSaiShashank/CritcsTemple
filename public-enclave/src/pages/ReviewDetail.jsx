@@ -612,20 +612,18 @@ export default function ReviewDetail() {
                                 {[
                                     { id: 'agree', label: 'Agree', color: '#4ade80' },
                                     { id: 'disagree', label: 'Disagree', color: '#f87171' },
-                                    { id: 'havent_seen', label: 'Haven\'t Seen', color: 'rgba(255,255,255,0.4)' }
+                                    { id: 'havent_seen', label: 'Haven\'t Seen', color: '#94a3b8' }
                                 ].map(r => {
                                     const count = review.reactions?.[r.id] || 0;
                                     const hasReacted = localStorage.getItem(`react_${review.slug}`) === r.id;
-                                    const anyReacted = !!localStorage.getItem(`react_${review.slug}`);
 
                                     return (
                                         <button
                                             key={r.id}
                                             onClick={() => handleReaction(r.id)}
-
                                             style={{
-                                                background: hasReacted ? `${r.color}15` : 'rgba(255,255,255,0.03)',
-                                                border: `1px solid ${hasReacted ? `${r.color}40` : 'rgba(255,255,255,0.06)'}`,
+                                                background: hasReacted ? `${r.color}20` : 'rgba(255,255,255,0.03)',
+                                                border: `1px solid ${hasReacted ? `${r.color}50` : 'rgba(255,255,255,0.06)'}`,
                                                 padding: '16px 8px',
                                                 borderRadius: '16px',
                                                 cursor: 'pointer',
@@ -633,7 +631,8 @@ export default function ReviewDetail() {
                                                 display: 'flex',
                                                 flexDirection: 'column',
                                                 alignItems: 'center',
-                                                gap: '8px'
+                                                gap: '8px',
+                                                boxShadow: hasReacted ? `0 0 20px ${r.color}15` : 'none'
                                             }}
                                         >
                                             <span style={{ fontSize: '14px', fontWeight: 900, color: hasReacted ? r.color : 'rgba(255,255,255,0.8)' }}>{count}</span>
