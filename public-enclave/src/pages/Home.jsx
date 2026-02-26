@@ -16,6 +16,7 @@ export default function Home() {
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
+    const [featuredReview, setFeaturedReview] = useState(null);
 
     // Filters
     const [verdictFilter, setVerdictFilter] = useState('All');
@@ -47,6 +48,15 @@ export default function Home() {
         }
     };
 
+    // Fetch Featured Review once on mount
+    useEffect(() => {
+        getLatestReviews(1, 0, '', 'All', 'date', 'desc')
+            .then(({ data }) => {
+                if (data && data.length > 0) setFeaturedReview(data[0]);
+            })
+            .catch(console.error);
+    }, []);
+
     useEffect(() => {
         setLoading(true);
         setPage(0);
@@ -73,7 +83,7 @@ export default function Home() {
         if (node) observer.current.observe(node);
     }, [loading, loadingMore, hasMore, search, verdictFilter, sortOption]);
 
-    const hero = reviews[0];
+    const hero = featuredReview;
     const heroColor = VERDICT_COLOR[hero?.verdict] || '#f5a623';
 
     // The backend now natively filters via MongoDB `$regex` so we pass reviews directly
@@ -100,12 +110,13 @@ export default function Home() {
                 alignItems: 'center',
             }}>
                 {/* Background Ken Burns */}
-                <AnimatePresence>
+                <AnimatePresence mode="wait">
                     {hero?.movie_poster_url && (
                         <motion.div
                             key={hero._id}
                             initial={{ scale: 1.1, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
+                            exit={{ opacity: 0 }}
                             transition={{ duration: 1.5, ease: "easeOut" }}
                             style={{ position: 'absolute', inset: 0, zIndex: 0 }}
                         >
