@@ -4,7 +4,7 @@ import {
     Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer
 } from 'recharts';
 import {
-    TrendingUp, History, LayoutDashboard, Loader2, Star, ChevronRight, Filter, Search
+    TrendingUp, History, LayoutDashboard, Loader2, Star, ChevronRight, Filter, Search, Sparkles
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { getReviews, getDNAAnalytics, getEngagementAnalytics, deleteReview } from '../services/api';
