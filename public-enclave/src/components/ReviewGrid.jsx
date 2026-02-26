@@ -157,7 +157,7 @@ export default function ReviewGrid({ reviews, loading }) {
         );
     }
     return (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 240px), 1fr))', gap: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 150px), 1fr))', gap: '20px' }}>
             {reviews.map((r, i) => <ReviewCard key={r._id || r.id || i} review={r} index={i} />)}
         </div>
     );
