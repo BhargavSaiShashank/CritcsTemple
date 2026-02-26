@@ -4,7 +4,7 @@ import { ChevronLeft, Star, Calendar, Share2, Film, Check, Quote as QuoteIcon, Z
 import { motion, AnimatePresence } from 'framer-motion';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, PolarRadiusAxis } from 'recharts';
 import * as htmlToImage from 'html-to-image';
-import { getReviewBySlug, clapReview, unclapReview, getRelatedReviews } from '../services/api';
+import { getReviewBySlug, clapReview, unclapReview, reactReview, getRelatedReviews } from '../services/api';
 import ReviewExportCard from '../components/ReviewExportCard';
 
 const FALLBACK = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=1200';
@@ -153,6 +153,36 @@ export default function ReviewDetail() {
 
         window.scrollTo(0, 0);
     }, [slug]);
+
+    const handleReaction = async (type) => {
+        const key = `react_${review?.slug}`;
+        if (localStorage.getItem(key)) return;
+
+        // Optimistic update
+        setReview(prev => ({
+            ...prev,
+            reactions: {
+                ...prev.reactions,
+                [type]: (prev.reactions?.[type] || 0) + 1
+            }
+        }));
+        localStorage.setItem(key, type);
+
+        try {
+            await reactReview(review.slug, type);
+        } catch (e) {
+            console.error("Reaction failed", e);
+            // Rollback
+            setReview(prev => ({
+                ...prev,
+                reactions: {
+                    ...prev.reactions,
+                    [type]: Math.max(0, (prev.reactions?.[type] || 1) - 1)
+                }
+            }));
+            localStorage.removeItem(key);
+        }
+    };
 
     const handleClap = async () => {
         if (hasClapped) {
@@ -558,6 +588,45 @@ export default function ReviewDetail() {
                                 <Heart size={18} fill={hasClapped ? '#ef4444' : 'none'} color={hasClapped ? '#ef4444' : 'currentColor'} style={{ transform: hasClapped ? 'scale(1.1)' : 'scale(1)', transition: 'transform 0.3s' }} />
                                 {claps} {claps === 1 ? 'Resonance' : 'Resonances'}
                             </button>
+                        </div>
+
+                        {/* Reactions Widget */}
+                        <div style={{ marginTop: '20px', padding: '24px', background: '#111', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '24px', textAlign: 'center' }}>
+                            <div style={{ fontSize: '10px', fontWeight: 800, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: '20px' }}>Community Consensus</div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
+                                {[
+                                    { id: 'agree', label: 'Agree', color: '#4ade80' },
+                                    { id: 'disagree', label: 'Disagree', color: '#f87171' },
+                                    { id: 'havent_seen', label: 'Haven\'t Seen', color: 'rgba(255,255,255,0.4)' }
+                                ].map(r => {
+                                    const count = review.reactions?.[r.id] || 0;
+                                    const hasReacted = localStorage.getItem(`react_${review.slug}`) === r.id;
+                                    const anyReacted = !!localStorage.getItem(`react_${review.slug}`);
+
+                                    return (
+                                        <button
+                                            key={r.id}
+                                            onClick={() => handleReaction(r.id)}
+                                            disabled={anyReacted}
+                                            style={{
+                                                background: hasReacted ? `${r.color}15` : 'rgba(255,255,255,0.03)',
+                                                border: `1px solid ${hasReacted ? `${r.color}40` : 'rgba(255,255,255,0.06)'}`,
+                                                padding: '16px 8px',
+                                                borderRadius: '16px',
+                                                cursor: anyReacted ? 'default' : 'pointer',
+                                                transition: 'all 0.3s',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'center',
+                                                gap: '8px'
+                                            }}
+                                        >
+                                            <span style={{ fontSize: '14px', fontWeight: 900, color: hasReacted ? r.color : 'rgba(255,255,255,0.8)' }}>{count}</span>
+                                            <span style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: hasReacted ? r.color : 'rgba(255,255,255,0.3)' }}>{r.label}</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
 
                         {/* More Like This */}
