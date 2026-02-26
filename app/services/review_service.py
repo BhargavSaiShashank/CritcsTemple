@@ -118,7 +118,7 @@ class ReviewService:
         ]
         
         cursor = db.reviews.find(query).sort("published_at", DESCENDING).limit(3)
-        related = await cursor.to_list(length=3)
+        related: list = await cursor.to_list(length=3)
         
         # If we didn't get enough related, pad with latest
         if len(related) < 3:
@@ -128,7 +128,7 @@ class ReviewService:
                 "status": "published"
             }
             fallback_cursor = db.reviews.find(fallback_query).sort("published_at", DESCENDING).limit(3 - len(related))
-            fallback = await fallback_cursor.to_list(length=3 - len(related))
+            fallback: list = await fallback_cursor.to_list(length=3 - len(related))
             related.extend(fallback)
             
         return [self.serialize_doc(r) for r in related]
