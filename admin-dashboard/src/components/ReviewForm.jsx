@@ -61,6 +61,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                 viewing_context: initialData.viewing_context || '',
                 trivia_and_details: initialData.trivia_and_details || '',
                 tags: initialData.tags || [],
+                scheduled_date: initialData.scheduled_date ? initialData.scheduled_date.slice(0, 16) : '',
                 aspects: { ...defaultAspects, ...(initialData.aspects || {}) }
             };
         }
@@ -79,6 +80,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             viewing_context: '',
             trivia_and_details: '',
             tags: [],
+            scheduled_date: '',
             aspects: defaultAspects
         };
     });
@@ -214,6 +216,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             movie_title: movie.title,
             movie_poster_url: formData.movie_poster_url || movie.poster_url,
             watch_links: formData.watch_links,
+            scheduled_date: formData.status === 'scheduled' ? formData.scheduled_date : null,
             overall_rating: parseFloat(averageScore)
         };
 
@@ -465,10 +468,49 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                                             : 'bg-white/5 border-white/10 text-white/20 hover:border-white/30 hover:text-white'
                                             }`}
                                     >
-                                        {v}
                                     </button>
                                 ))}
                             </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                            <div className="space-y-8">
+                                <label className="text-[10px] font-black uppercase tracking-[0.6em] text-amber-500/40">Publication Status</label>
+                                <div className="flex flex-wrap gap-3">
+                                    {['draft', 'published', 'scheduled'].map(s => (
+                                        <button
+                                            key={s}
+                                            type="button"
+                                            onClick={() => setFormData({ ...formData, status: s })}
+                                            className={`px-6 py-4 rounded-xl border text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-300 ${formData.status === s
+                                                ? 'bg-white/10 border-amber-500/50 text-amber-500'
+                                                : 'bg-white/5 border-white/10 text-white/20 hover:text-white/40'
+                                                }`}
+                                        >
+                                            {s}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <AnimatePresence>
+                                {formData.status === 'scheduled' && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 10 }}
+                                        className="space-y-8"
+                                    >
+                                        <label className="text-[10px] font-black uppercase tracking-[0.6em] text-amber-500/40">Scheduled Date</label>
+                                        <input
+                                            type="datetime-local"
+                                            value={formData.scheduled_date}
+                                            onChange={e => setFormData({ ...formData, scheduled_date: e.target.value })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-amber-500/30 transition-all text-xs"
+                                        />
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
 
                         <label className="flex items-center gap-8 cursor-pointer group w-fit">
@@ -506,14 +548,14 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                             Export Sanctuary Card
                         </button>
                         <button
-                            onClick={() => handleImprinting('published')}
+                            onClick={() => handleImprinting(formData.status)}
                             disabled={submitting}
                             className="flex-[2] py-8 bg-gradient-to-r from-amber-500 to-amber-700 text-black rounded-[32px] font-black uppercase tracking-[0.4em] text-xs transition-all shadow-[0_20px_60px_rgba(245,158,11,0.3)] hover:shadow-[0_20px_80px_rgba(245,158,11,0.5)] transform hover:-translate-y-2 active:translate-y-0 disabled:opacity-50 flex items-center justify-center gap-4 group"
                         >
                             {submitting ? <Loader2 className="animate-spin" /> : (
                                 <>
                                     <Sparkles size={20} className="group-hover:animate-spin" />
-                                    IMPRINT ON THE TEMPLE
+                                    {formData.status === 'scheduled' ? 'SCHEDULE IMPRINT' : 'IMPRINT ON THE TEMPLE'}
                                 </>
                             )}
                         </button>

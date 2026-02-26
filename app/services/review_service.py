@@ -11,6 +11,20 @@ class ReviewService:
             doc["_id"] = str(doc["_id"])
         return doc
 
+    def _get_publication_query(self) -> dict:
+        """Helper to get the query for reviews that should be visible to public."""
+        from datetime import datetime
+        now = datetime.utcnow()
+        return {
+            "$or": [
+                {"status": "published"},
+                {
+                    "status": "scheduled",
+                    "scheduled_date": {"$lte": now}
+                }
+            ]
+        }
+
     async def get_latest_reviews(
         self, 
         db: AsyncIOMotorDatabase,
@@ -22,7 +36,7 @@ class ReviewService:
         sort_by: Optional[str] = "date",
         order: Optional[str] = "desc"
     ) -> List[Dict[str, Any]]:
-        query: dict = {"status": "published"}
+        query = self._get_publication_query()
         if tag:
             query["tags"] = tag
         
@@ -44,19 +58,25 @@ class ReviewService:
         return [self.serialize_doc(r) for r in reviews]
 
     async def get_review_by_slug(self, db: AsyncIOMotorDatabase, slug: str) -> Dict[str, Any]:
-        review = await db.reviews.find_one({"slug": slug, "status": "published"})
+        query = self._get_publication_query()
+        query["slug"] = slug
+        review = await db.reviews.find_one(query)
         if not review:
             raise HTTPException(status_code=404, detail="Review not found")
         return self.serialize_doc(review)
 
     async def get_masterpieces(self, db: AsyncIOMotorDatabase) -> List[Dict[str, Any]]:
-        cursor = db.reviews.find({"verdict": Verdict.MASTERPIECE.value, "status": "published"}).sort("published_at", DESCENDING)
+        query = self._get_publication_query()
+        query["verdict"] = Verdict.MASTERPIECE.value
+        cursor = db.reviews.find(query).sort("published_at", DESCENDING)
         reviews = await cursor.to_list(length=20)
         return [self.serialize_doc(r) for r in reviews]
 
     async def increment_claps(self, db: AsyncIOMotorDatabase, slug: str) -> Dict[str, Any]:
+        query = self._get_publication_query()
+        query["slug"] = slug
         result = await db.reviews.update_one(
-            {"slug": slug, "status": "published"},
+            query,
             {"$inc": {"claps": 1}}
         )
         if result.modified_count == 0:
@@ -66,9 +86,12 @@ class ReviewService:
         return self.serialize_doc(review)
 
     async def decrement_claps(self, db: AsyncIOMotorDatabase, slug: str) -> Dict[str, Any]:
+        query = self._get_publication_query()
+        query["slug"] = slug
+        query["claps"] = {"$gt": 0}
         # Only decrement if current claps > 0 to prevent negative values
         result = await db.reviews.update_one(
-            {"slug": slug, "status": "published", "claps": {"$gt": 0}},
+            query,
             {"$inc": {"claps": -1}}
         )
         # We don't throw 404 if it didn't modify, maybe it was already at 0.
@@ -78,21 +101,21 @@ class ReviewService:
         return self.serialize_doc(review)
 
     async def get_related_reviews(self, db: AsyncIOMotorDatabase, slug: str) -> List[Dict[str, Any]]:
-        target = await db.reviews.find_one({"slug": slug, "status": "published"})
+        target_query = self._get_publication_query()
+        target_query["slug"] = slug
+        target = await db.reviews.find_one(target_query)
         if not target:
             raise HTTPException(status_code=404, detail="Review not found")
         
         tags = target.get("tags", [])
         verdict = target.get("verdict")
         
-        query = {
-            "slug": {"$ne": slug},
-            "status": "published",
-            "$or": [
-                {"tags": {"$in": tags}},
-                {"verdict": verdict}
-            ]
-        }
+        query = self._get_publication_query()
+        query["slug"] = {"$ne": slug}
+        query["$or"] = [
+            {"tags": {"$in": tags}},
+            {"verdict": verdict}
+        ]
         
         cursor = db.reviews.find(query).sort("published_at", DESCENDING).limit(3)
         related = await cursor.to_list(length=3)
@@ -109,5 +132,28 @@ class ReviewService:
             related.extend(fallback)
             
         return [self.serialize_doc(r) for r in related]
+
+    async def submit_reaction(self, db: AsyncIOMotorDatabase, slug: str, reaction_type: str) -> Dict[str, Any]:
+        query = self._get_publication_query()
+        query["slug"] = slug
+        
+        result = await db.reviews.update_one(
+            query,
+            {"$inc": {f"reactions.{reaction_type}": 1}}
+        )
+        
+        if result.modified_count == 0:
+            # Maybe the reactions object doesn't exist yet (for older reviews)
+            await db.reviews.update_one(
+                query,
+                {"$set": {"reactions": {"agree": 0, "disagree": 0, "havent_seen": 0}}}
+            )
+            await db.reviews.update_one(
+                query,
+                {"$inc": {f"reactions.{reaction_type}": 1}}
+            )
+            
+        review = await db.reviews.find_one({"slug": slug})
+        return self.serialize_doc(review)
 
 review_service = ReviewService()

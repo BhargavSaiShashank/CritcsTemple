@@ -76,6 +76,9 @@ async def create_review(
     
     if review.status == "published":
         review_dict["published_at"] = datetime.utcnow()
+    elif review.status == "scheduled":
+        # Ensure published_at is None for scheduled
+        review_dict["published_at"] = None
 
     result = await db.reviews.insert_one(review_dict)
     review_dict["_id"] = str(result.inserted_id)
@@ -109,8 +112,19 @@ async def update_review(
         "changes": {k: existing.get(k) for k in update_dict.keys() if k != "updated_at"}
     }
     
-    if update_data.status == "published" and existing.get("status") != "published":
+    # Logic for setting published_at when status changes
+    new_status = update_data.status
+    old_status = existing.get("status")
+
+    if new_status == "published" and old_status != "published":
+        # If moving TO published, set published_at to now
         update_dict["published_at"] = datetime.utcnow()
+    elif new_status in ["draft", "scheduled"] and old_status == "published":
+        # If moving AWAY from published, clear published_at
+        update_dict["published_at"] = None
+    elif new_status == "scheduled":
+        # If explicitly setting/updating scheduled status, ensure published_at is None
+        update_dict["published_at"] = None
 
     await db.reviews.update_one(
         {"_id": obj_id},
@@ -139,6 +153,13 @@ async def get_review(
         
     review["_id"] = str(review["_id"])
     return review
+
+@router.get("/analytics/engagement")
+async def get_engagement_intelligence(
+    db = Depends(get_database), 
+    admin = Depends(get_current_admin)
+):
+    return await analytics_service.get_engagement_intelligence(db)
 
 @router.delete("/reviews/{id}")
 async def delete_review(
