@@ -16,6 +16,10 @@ export const getReviewBySlug = (slug) => api.get(`/reviews/${slug}`);
 export const clapReview = (slug) => api.post(`/reviews/${slug}/clap`);
 export const unclapReview = (slug) => api.delete(`/reviews/${slug}/clap`);
 export const getRelatedReviews = (slug) => api.get(`/reviews/${slug}/related`);
+export const reactReview = (slug, type, previousType = null) => api.post(`/reviews/${slug}/react`, {
+    reaction_type: type,
+    previous_type: previousType
+});
 export const getMasterpieces = () => api.get('/masterpieces');
 export const getHallOfFameReviews = () => api.get('/masterpieces');
 export const getCategories = () => api.get('/categories');

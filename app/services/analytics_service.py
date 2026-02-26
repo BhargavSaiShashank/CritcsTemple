@@ -55,4 +55,64 @@ class AnalyticsService:
             traceback.print_exc()
             raise HTTPException(status_code=500, detail=f"Analytics Service Error: {str(e)}")
 
+    async def get_engagement_intelligence(self, db: AsyncIOMotorDatabase) -> Dict[str, Any]:
+        """
+        Returns trending data and reaction consensus metrics.
+        """
+        if db is None:
+            raise HTTPException(status_code=503, detail="Database Offline")
+
+        try:
+            # Top 5 Trending by Claps
+            trending_cursor = db.reviews.find({"status": "published"}).sort("claps", -1).limit(5)
+            trending_list = await trending_cursor.to_list(5)
+            trending = [
+                {
+                    "title": r.get("movie_title"),
+                    "slug": r.get("slug"),
+                    "claps": r.get("claps", 0),
+                    "verdict": r.get("verdict"),
+                    "poster": r.get("movie_poster_url")
+                } for r in trending_list
+            ]
+
+            # Top 5 Reaction Consensus
+            # We calculate total reactions: agree + disagree + havent_seen
+            pipeline = [
+                {"$match": {"status": "published"}},
+                {
+                    "$addFields": {
+                        "total_reactions": {
+                            "$add": [
+                                {"$ifNull": ["$reactions.agree", 0]},
+                                {"$ifNull": ["$reactions.disagree", 0]},
+                                {"$ifNull": ["$reactions.havent_seen", 0]}
+                            ]
+                        }
+                    }
+                },
+                {"$sort": {"total_reactions": -1}},
+                {"$limit": 5}
+            ]
+            
+            consensus_cursor = db.reviews.aggregate(pipeline)
+            consensus_list = await consensus_cursor.to_list(5)
+            consensus = [
+                {
+                    "title": r.get("movie_title"),
+                    "slug": r.get("slug"),
+                    "reactions": r.get("reactions", {"agree": 0, "disagree": 0, "havent_seen": 0}),
+                    "total": r.get("total_reactions", 0),
+                    "poster": r.get("movie_poster_url")
+                } for r in consensus_list
+            ]
+
+            return {
+                "trending": trending,
+                "consensus": consensus
+            }
+        except Exception as e:
+            traceback.print_exc()
+            raise HTTPException(status_code=500, detail=f"Engagement Analytics Error: {str(e)}")
+
 analytics_service = AnalyticsService()
