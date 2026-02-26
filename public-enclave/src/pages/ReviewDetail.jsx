@@ -156,7 +156,6 @@ export default function ReviewDetail() {
 
     const handleReaction = async (type) => {
         const key = `react_${review?.slug}`;
-<<<<<<< HEAD
         const currentReaction = localStorage.getItem(key);
 
         // Determine the action
@@ -197,33 +196,6 @@ export default function ReviewDetail() {
             } else {
                 localStorage.removeItem(key);
             }
-=======
-        if (localStorage.getItem(key)) return;
-
-        // Optimistic update
-        setReview(prev => ({
-            ...prev,
-            reactions: {
-                ...prev.reactions,
-                [type]: (prev.reactions?.[type] || 0) + 1
-            }
-        }));
-        localStorage.setItem(key, type);
-
-        try {
-            await reactReview(review.slug, type);
-        } catch (e) {
-            console.error("Reaction failed", e);
-            // Rollback
-            setReview(prev => ({
-                ...prev,
-                reactions: {
-                    ...prev.reactions,
-                    [type]: Math.max(0, (prev.reactions?.[type] || 1) - 1)
-                }
-            }));
-            localStorage.removeItem(key);
->>>>>>> 92339b316786a5f174f406f49387b7d349e1d812
         }
     };
 
@@ -650,20 +622,13 @@ export default function ReviewDetail() {
                                         <button
                                             key={r.id}
                                             onClick={() => handleReaction(r.id)}
-<<<<<<< HEAD
-=======
-                                            disabled={anyReacted}
->>>>>>> 92339b316786a5f174f406f49387b7d349e1d812
+
                                             style={{
                                                 background: hasReacted ? `${r.color}15` : 'rgba(255,255,255,0.03)',
                                                 border: `1px solid ${hasReacted ? `${r.color}40` : 'rgba(255,255,255,0.06)'}`,
                                                 padding: '16px 8px',
                                                 borderRadius: '16px',
-<<<<<<< HEAD
                                                 cursor: 'pointer',
-=======
-                                                cursor: anyReacted ? 'default' : 'pointer',
->>>>>>> 92339b316786a5f174f406f49387b7d349e1d812
                                                 transition: 'all 0.3s',
                                                 display: 'flex',
                                                 flexDirection: 'column',

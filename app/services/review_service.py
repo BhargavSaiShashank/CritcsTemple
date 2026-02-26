@@ -133,7 +133,6 @@ class ReviewService:
             
         return [self.serialize_doc(r) for r in related]
 
-<<<<<<< HEAD
     async def submit_reaction(self, db: AsyncIOMotorDatabase, slug: str, reaction_type: Optional[str] = None, previous_type: Optional[str] = None) -> Dict[str, Any]:
         query = self._get_publication_query()
         query["slug"] = slug
@@ -150,15 +149,7 @@ class ReviewService:
         result = await db.reviews.update_one(
             query,
             {"$inc": updates}
-=======
-    async def submit_reaction(self, db: AsyncIOMotorDatabase, slug: str, reaction_type: str) -> Dict[str, Any]:
-        query = self._get_publication_query()
-        query["slug"] = slug
-        
-        result = await db.reviews.update_one(
-            query,
-            {"$inc": {f"reactions.{reaction_type}": 1}}
->>>>>>> 92339b316786a5f174f406f49387b7d349e1d812
+        )
         )
         
         if result.modified_count == 0:
