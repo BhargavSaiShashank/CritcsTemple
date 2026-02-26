@@ -27,13 +27,12 @@ export default function Navbar() {
             backdropFilter: scrolled ? 'blur(20px)' : 'none',
             borderBottom: scrolled ? '1px solid rgba(255, 255, 255, 0.05)' : '1px solid transparent',
         }}>
-            <div style={{
-                maxWidth: '1200px',
-                margin: '0 auto',
-                padding: '0 48px',
+            <div className="max-w-container" style={{
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'space-between'
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '16px'
             }}>
                 {/* Logo */}
                 <Link to="/" style={{

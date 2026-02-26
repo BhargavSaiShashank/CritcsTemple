@@ -28,6 +28,31 @@
   --radius-sm: 8px;
   --radius: 14px;
   --radius-lg: 20px;
+
+  /* Responsive foundations */
+  --page-padding: clamp(1.5rem, 5vw, 3rem);
+  --max-width: 1400px;
+}
+
+.max-w-container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding-left: var(--page-padding);
+  padding-right: var(--page-padding);
+}
+
+.fluid-text-lg {
+  font-size: clamp(2rem, 8vw, 6rem);
+}
+
+.mobile-hidden {
+  display: none !important;
+}
+
+@media (min-width: 768px) {
+  .mobile-hidden {
+    display: flex !important;
+  }
 }
 
 html {

@@ -19,9 +19,10 @@ export default function PublicHeader() {
             WebkitBackdropFilter: 'blur(20px)',
             borderBottom: '1px solid rgba(255,255,255,0.05)',
         }}>
-            <div style={{
-                maxWidth: '1200px', margin: '0 auto', height: '100%',
-                padding: '0 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            <div className="max-w-container" style={{
+                height: '100%',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                flexWrap: 'wrap', gap: '10px'
             }}>
                 {/* Brand */}
                 <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px' }}>

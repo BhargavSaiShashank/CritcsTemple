@@ -63,7 +63,7 @@ function ReviewCard({ review, index }) {
                     }}
                 >
                     {/* Poster */}
-                    <div style={{ position: 'relative', paddingTop: '56.25%', overflow: 'hidden', background: '#181818' }}>
+                    <div style={{ position: 'relative', aspectRatio: '2 / 3', overflow: 'hidden', background: '#181818' }}>
                         <img
                             src={src}
                             alt={review.movie_title}
@@ -130,7 +130,7 @@ function ReviewCard({ review, index }) {
 function SkeletonCard() {
     return (
         <div style={{ borderRadius: '16px', overflow: 'hidden', background: '#111', border: '1px solid rgba(255,255,255,0.05)' }}>
-            <div className="skeleton" style={{ paddingTop: '56.25%' }} />
+            <div className="skeleton" style={{ aspectRatio: '2 / 3' }} />
             <div style={{ padding: '14px 16px' }}>
                 <div className="skeleton" style={{ height: '14px', borderRadius: '99px', width: '35%', marginBottom: '10px' }} />
                 <div className="skeleton" style={{ height: '18px', borderRadius: '6px', width: '75%', marginBottom: '7px' }} />
@@ -157,7 +157,7 @@ export default function ReviewGrid({ reviews, loading }) {
         );
     }
     return (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '18px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 240px), 1fr))', gap: '20px' }}>
             {reviews.map((r, i) => <ReviewCard key={r._id || r.id || i} review={r} index={i} />)}
         </div>
     );
