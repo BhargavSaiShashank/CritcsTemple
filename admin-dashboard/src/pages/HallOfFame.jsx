@@ -153,9 +153,9 @@ export default function HallOfFame() {
                                     <div
                                         key={cat._id}
                                         onClick={() => handleSelectCategory(cat)}
-                                        className={`p-4 rounded-2xl border cursor-pointer transition-all duration-300 ${selectedCategory?._id === cat._id
-                                                ? 'bg-amber-500/10 border-amber-500/30'
-                                                : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/10'
+                                        className={`group p-4 rounded-2xl border cursor-pointer transition-all duration-300 ${selectedCategory?._id === cat._id
+                                            ? 'bg-amber-500/10 border-amber-500/30'
+                                            : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/10'
                                             }`}
                                     >
                                         <div className="flex justify-between items-start">
@@ -195,13 +195,24 @@ export default function HallOfFame() {
                                                 {isEditing ? (selectedCategory ? 'Edit Category' : 'Create Category') : 'Category Details'}
                                             </h2>
                                             {!isEditing ? (
-                                                <button
-                                                    onClick={() => setIsEditing(true)}
-                                                    className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl transition-colors"
-                                                >
-                                                    <Edit3 size={16} />
-                                                    <span className="text-sm font-bold">Edit</span>
-                                                </button>
+                                                <div className="flex items-center gap-2">
+                                                    {selectedCategory && (
+                                                        <button
+                                                            onClick={() => handleDelete(selectedCategory._id)}
+                                                            className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl transition-colors"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                            <span className="text-sm font-bold">Delete</span>
+                                                        </button>
+                                                    )}
+                                                    <button
+                                                        onClick={() => setIsEditing(true)}
+                                                        className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl transition-colors"
+                                                    >
+                                                        <Edit3 size={16} />
+                                                        <span className="text-sm font-bold">Edit</span>
+                                                    </button>
+                                                </div>
                                             ) : (
                                                 <div className="flex items-center gap-2">
                                                     <button
