@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Body
 from fastapi.responses import StreamingResponse
 import httpx
 from typing import Optional
@@ -34,6 +34,21 @@ async def clap_for_review(slug: str, db = Depends(get_database)):
 @router.delete("/reviews/{slug}/clap")
 async def unclap_for_review(slug: str, db = Depends(get_database)):
     return await review_service.decrement_claps(db, slug)
+
+@router.post("/reviews/{slug}/react")
+async def react_to_review(
+    slug: str, 
+    payload: dict = Body(...), 
+    db = Depends(get_database)
+):
+    reaction_type = payload.get("reaction_type")
+    previous_type = payload.get("previous_type")
+    
+    valid_reactions = ["agree", "disagree", "havent_seen", None]
+    if reaction_type not in valid_reactions or previous_type not in valid_reactions:
+        raise HTTPException(status_code=400, detail="Invalid reaction type")
+        
+    return await review_service.submit_reaction(db, slug, reaction_type, previous_type)
 
 @router.get("/reviews/{slug}/related")
 async def get_related_reviews(slug: str, db = Depends(get_database)):

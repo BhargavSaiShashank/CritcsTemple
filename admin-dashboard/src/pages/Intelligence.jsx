@@ -4,15 +4,16 @@ import {
     Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer
 } from 'recharts';
 import {
-    TrendingUp, History, LayoutDashboard, Loader2, Star, ChevronRight, Filter, Search
+    TrendingUp, History, LayoutDashboard, Loader2, Star, ChevronRight, Filter, Search, Sparkles
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { getReviews, getDNAAnalytics, deleteReview } from '../services/api';
+import { getReviews, getDNAAnalytics, getEngagementAnalytics, deleteReview } from '../services/api';
 import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
 import ReviewDetailsModal from '../components/ReviewDetailsModal';
 
 const Intelligence = () => {
     const [dnaData, setDnaData] = useState([]);
+    const [engagementData, setEngagementData] = useState({ trending: [], consensus: [] });
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
@@ -39,11 +40,13 @@ const Intelligence = () => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const [dnaRes, reviewsRes] = await Promise.all([
+                const [dnaRes, engagementRes, reviewsRes] = await Promise.all([
                     getDNAAnalytics(),
+                    getEngagementAnalytics(),
                     getReviews()
                 ]);
                 setDnaData(dnaRes.data || []);
+                setEngagementData(engagementRes.data || { trending: [], consensus: [] });
                 setReviews(reviewsRes.data || []);
             } catch (err) {
                 console.error("Failed to fetch intelligence data:", err);
@@ -155,12 +158,74 @@ const Intelligence = () => {
                     </div>
                 </motion.div>
 
+                {/* Engagement Section */}
+                <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="lg:col-span-12 xl:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-8"
+                >
+                    {/* Trending Card */}
+                    <div className="bg-white/5 backdrop-blur-3xl rounded-[40px] border border-white/10 p-8 space-y-6">
+                        <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 bg-amber-500/10 rounded-xl flex items-center justify-center">
+                                <TrendingUp className="text-amber-500" size={20} />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-black italic uppercase">Trending</h3>
+                                <p className="text-[8px] font-black uppercase tracking-widest text-white/30">Top Claps</p>
+                            </div>
+                        </div>
+                        <div className="space-y-4">
+                            {engagementData.trending.map((item, i) => (
+                                <div key={item.slug} className="flex items-center gap-4 group cursor-default">
+                                    <div className="w-8 h-10 rounded-lg bg-white/5 overflow-hidden">
+                                        <img src={item.poster || "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&q=80&w=800"} className="w-full h-full object-cover grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-[10px] font-bold text-white/70 truncate uppercase">{item.title}</p>
+                                        <p className="text-[8px] font-black text-amber-500/60 uppercase tracking-widest">{item.claps} CLAPS</p>
+                                    </div>
+                                    <div className="text-[10px] font-black text-white/10 group-hover:text-amber-500 transition-colors italic">#{i + 1}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Consensus Card */}
+                    <div className="bg-white/5 backdrop-blur-3xl rounded-[40px] border border-white/10 p-8 space-y-6">
+                        <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center">
+                                <Sparkles className="text-blue-500" size={20} />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-black italic uppercase">Consensus</h3>
+                                <p className="text-[8px] font-black uppercase tracking-widest text-white/30">Reaction Totals</p>
+                            </div>
+                        </div>
+                        <div className="space-y-4">
+                            {engagementData.consensus.map((item) => (
+                                <div key={item.slug} className="space-y-2">
+                                    <div className="flex justify-between items-end">
+                                        <p className="text-[10px] font-bold text-white/70 truncate uppercase">{item.title}</p>
+                                        <p className="text-[8px] font-bold text-white/30">{item.total} REAX</p>
+                                    </div>
+                                    <div className="flex h-1.5 rounded-full overflow-hidden bg-white/5">
+                                        <div style={{ width: `${(item.reactions.agree / item.total) * 100 || 0}%` }} className="bg-green-500/50" />
+                                        <div style={{ width: `${(item.reactions.disagree / item.total) * 100 || 0}%` }} className="bg-red-500/50" />
+                                        <div style={{ width: `${(item.reactions.havent_seen / item.total) * 100 || 0}%` }} className="bg-white/20" />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </motion.div>
+
                 {/* History Gallery Section */}
                 <motion.div
                     initial={{ opacity: 0, y: 40 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="lg:col-span-12 xl:col-span-7 space-y-8"
+                    className="lg:col-span-12 space-y-8 mt-12"
                 >
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4">
                         <div>

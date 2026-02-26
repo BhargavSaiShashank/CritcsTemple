@@ -43,6 +43,11 @@ class AspectRatings(BaseModel):
     emotional_impact: Optional[AspectRating] = None
     rewatch_value: Optional[AspectRating] = None
 
+class Reactions(BaseModel):
+    agree: int = 0
+    disagree: int = 0
+    havent_seen: int = 0
+
 class ReviewBase(BaseModel):
     movie_id: int # TMDB ID for easy mapping
     movie_title: Optional[str] = None
@@ -66,6 +71,8 @@ class ReviewBase(BaseModel):
     author: Optional[str] = None
     watch_links: Optional[str] = None
     claps: int = 0
+    scheduled_date: Optional[datetime] = None
+    reactions: Reactions = Field(default_factory=Reactions)
 
 class ReviewCreate(ReviewBase):
     pass
@@ -89,6 +96,7 @@ class ReviewUpdate(BaseModel):
     author: Optional[str] = None
     movie_poster_url: Optional[str] = None
     watch_links: Optional[str] = None
+    scheduled_date: Optional[datetime] = None
 
 class ReviewInDB(ReviewBase):
     id: Optional[str] = Field(None, alias="_id")
