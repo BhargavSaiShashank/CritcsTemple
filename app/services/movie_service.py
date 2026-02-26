@@ -28,7 +28,7 @@ class MovieService:
 
                 # Filter expected fields
                 expected_fields = MovieCreate.model_fields.keys() if hasattr(MovieCreate, "model_fields") else MovieCreate.__fields__.keys()
-                filtered_existing = {k: v for k, v in existing.items() if k in expected_fields}
+                filtered_existing: dict = {k: v for k, v in existing.items() if k in expected_fields}
                 
                 # Ensure core fields
                 if "imdb_id" not in filtered_existing: filtered_existing["imdb_id"] = movie_data.imdb_id

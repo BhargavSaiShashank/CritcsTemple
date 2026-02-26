@@ -35,6 +35,6 @@ async def test_get_dna_analytics_empty(db):
     # Clear reviews for test
     await db.reviews.delete_many({})
     
-    results = await analytics_service.get_dna_analytics(db)
+    results: list = await analytics_service.get_dna_analytics(db)
     assert len(results) > 0
     assert all(r["A"] == 0 for r in results)
