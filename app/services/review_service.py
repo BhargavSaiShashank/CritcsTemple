@@ -150,7 +150,6 @@ class ReviewService:
             query,
             {"$inc": updates}
         )
-        )
         
         if result.modified_count == 0:
             # Maybe the reactions object doesn't exist yet (for older reviews)
