@@ -120,7 +120,7 @@ export default function Home() {
                             transition={{ duration: 1.5, ease: "easeOut" }}
                             style={{ position: 'absolute', inset: 0, zIndex: 0 }}
                         >
-                            <img src={hero.movie_poster_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.12) saturate(0.6)' }} />
+                            <img src={hero.movie_poster_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.12) saturate(0.6) blur(20px)', transform: 'scale(1.1)' }} />
                             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, #080808 0%, rgba(8,8,8,0.7) 50%, #080808 100%)' }} />
                             <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at top right, rgba(245,166,35,0.05) 0%, transparent 60%)' }} />
                         </motion.div>
@@ -176,11 +176,10 @@ export default function Home() {
                             initial={{ scale: 0.9, opacity: 0, rotate: 2 }}
                             animate={{ scale: 1, opacity: 1, rotate: 0 }}
                             transition={{ duration: 1, delay: 0.4 }}
-                            className="mobile-hidden"
-                            style={{ width: 'min(320px, 100%)', justifySelf: 'center', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 40px 80px rgba(0,0,0,0.85)', border: '1px solid rgba(255,255,255,0.08)' }}
+                            style={{ width: '100%', maxWidth: '320px', justifySelf: 'center', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 40px 80px rgba(0,0,0,0.85)', border: '1px solid rgba(255,255,255,0.08)' }}
                         >
-                            <div style={{ aspectRatio: '2 / 3', overflow: 'hidden' }}>
-                                <img src={hero.movie_poster_url} alt={hero.movie_title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            <div style={{ aspectRatio: '2 / 3', width: '100%', overflow: 'hidden' }}>
+                                <img src={hero.movie_poster_url} alt={hero.movie_title} style={{ width: '100%', height: '100%', minHeight: '100%', minWidth: '100%', objectFit: 'cover' }} />
                             </div>
                         </motion.div>
                     )}

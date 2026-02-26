@@ -70,7 +70,9 @@ export default function Navbar() {
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '32px'
+                    gap: '24px',
+                    flexWrap: 'wrap',
+                    justifyContent: 'center'
                 }}>
                     <NavLink to="/" active={isActive('/')} icon={<Archive size={14} />}>Archive</NavLink>
                     <NavLink to="/hall-of-fame" active={isActive('/hall-of-fame')} icon={<Award size={14} />}>Hall of Fame</NavLink>
