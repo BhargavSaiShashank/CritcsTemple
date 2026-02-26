@@ -36,7 +36,7 @@ export default function HallOfFame() {
                     </div>
                 )}
 
-                <div style={{ position: 'relative', maxWidth: '1200px', margin: '0 auto', height: '100%', padding: '0 48px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <div className="max-w-container" style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     <motion.div
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
@@ -60,7 +60,7 @@ export default function HallOfFame() {
                 <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(to right, transparent, rgba(245,166,35,0.1), transparent)' }} />
             </div>
 
-            <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '48px 28px 100px' }}>
+            <div className="max-w-container" style={{ paddingTop: '48px', paddingBottom: '100px' }}>
                 {loading ? (
                     <div style={{ padding: '100px 0', textAlign: 'center', color: '#f5a623' }}>Loading curated categories...</div>
                 ) : categories.length === 0 ? (

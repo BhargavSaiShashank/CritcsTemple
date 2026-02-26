@@ -272,11 +272,11 @@ export default function ReviewDetail() {
                 <div style={{ position: 'absolute', bottom: 0, left: '10%', width: '30%', height: '60%', background: `radial-gradient(ellipse, ${vc.glow !== 'transparent' ? vc.glow : 'rgba(245,166,35,0.05)'} 0%, transparent 70%)`, filter: 'blur(32px)', pointerEvents: 'none' }} />
 
                 {/* Banner content */}
-                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, maxWidth: '1200px', margin: '0 auto', padding: '0 28px 16px' }}>
+                <div className="max-w-container" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, paddingBottom: '16px' }}>
                     <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: 'rgba(255,255,255,0.3)', fontSize: '11px', fontWeight: 600, textDecoration: 'none', letterSpacing: '0.05em', marginBottom: '14px', textTransform: 'uppercase' }}>
                         <ChevronLeft size={12} /> Archive
                     </Link>
-                    <h1 className="display" style={{ fontSize: 'clamp(2rem, 5vw, 3.8rem)', fontWeight: 800, color: '#f2f2f2', lineHeight: 1.08, letterSpacing: '-0.025em', marginBottom: '8px' }}>
+                    <h1 className="display" style={{ fontSize: 'clamp(2rem, 8vw, 4.2rem)', fontWeight: 800, color: '#f2f2f2', lineHeight: 1.05, letterSpacing: '-0.025em', marginBottom: '8px' }}>
                         {review.movie_title}
                     </h1>
                     {review.movie_year && <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)', fontWeight: 400 }}>{review.movie_year}</div>}
@@ -284,7 +284,7 @@ export default function ReviewDetail() {
             </div>
 
             {/* ── BODY ── */}
-            <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px 28px 100px' }}>
+            <div className="max-w-container" style={{ paddingTop: '24px', paddingBottom: '100px' }}>
                 <div className="review-grid-container">
 
                     {/* ── LEFT SIDEBAR ── */}
@@ -464,7 +464,7 @@ export default function ReviewDetail() {
                                     Deep Cinematic Lore
                                     <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.06)' }} />
                                 </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '20px' }}>
                                     {review.cast_performances && (
                                         <div style={{ background: '#111', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '14px', padding: '20px' }}>
                                             <div style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(245,166,35,0.8)', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '8px' }}>Cast Performances</div>
@@ -536,7 +536,7 @@ export default function ReviewDetail() {
 
                         {/* Dialogues + Moments */}
                         {(review.favourite_dialogues?.length > 0 || review.cinematic_moments?.length > 0) && (
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '14px' }}>
                                 {review.favourite_dialogues?.length > 0 && (
                                     <div style={{ background: '#111', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '14px', padding: '18px' }}>
                                         <div style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '12px' }}>Favourite Dialogues</div>

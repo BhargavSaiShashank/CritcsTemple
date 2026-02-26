@@ -99,11 +99,11 @@ export default function Home() {
                 <meta name="twitter:card" content="summary_large_image" />
             </Helmet>
 
-            {/* ── HERO: Flexible height to prevent massive gaps ── */}
+            {/* ── HERO ── */}
             <section style={{
                 position: 'relative',
-                minHeight: '70vh',
-                paddingTop: '120px',
+                minHeight: '85vh',
+                paddingTop: 'clamp(100px, 12vh, 160px)',
                 paddingBottom: '80px',
                 overflow: 'hidden',
                 display: 'flex',
@@ -127,25 +127,24 @@ export default function Home() {
                     )}
                 </AnimatePresence>
 
-                <div style={{ position: 'relative', zIndex: 1, maxWidth: '1200px', margin: '0 auto', width: '100%', padding: '0 48px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '48px' }}>
+                <div className="max-w-container" style={{ position: 'relative', zIndex: 1, width: '100%', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', alignItems: 'center', gap: 'clamp(2rem, 8vw, 6rem)' }}>
                     {/* Left: Text */}
                     <motion.div
                         initial={{ x: -20, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ duration: 0.8, delay: 0.2 }}
-                        style={{ flex: '1 1 min(500px, 100%)' }}
                     >
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', padding: '4px 12px', borderRadius: '99px', background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.14)', marginBottom: '24px' }}>
                             <TrendingUp size={11} color="#f5a623" />
                             <span style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(245,166,35,0.8)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>Latest Imprint</span>
                         </div>
 
-                        <h1 className="display" style={{ fontSize: 'clamp(2.8rem, 6.5vw, 5.5rem)', fontWeight: 800, color: '#f2f2f2', lineHeight: 1.05, letterSpacing: '-0.02em', marginBottom: '18px' }}>
+                        <h1 className="display" style={{ fontSize: 'clamp(2.5rem, 8vw, 5.5rem)', fontWeight: 800, color: '#f2f2f2', lineHeight: 1.05, letterSpacing: '-0.02em', marginBottom: '18px' }}>
                             {hero?.movie_title || 'The Sanctuary'}
                         </h1>
 
                         {hero?.summary && hero.summary.length > 6 && (
-                            <p style={{ fontSize: '16px', fontWeight: 300, color: 'rgba(255,255,255,0.45)', lineHeight: 1.8, maxWidth: '500px', marginBottom: '32px' }}>
+                            <p style={{ fontSize: 'clamp(14px, 1.5vw, 16px)', fontWeight: 300, color: 'rgba(255,255,255,0.45)', lineHeight: 1.8, maxWidth: '500px', marginBottom: '32px' }}>
                                 {hero.summary}
                             </p>
                         )}
@@ -177,22 +176,25 @@ export default function Home() {
                             initial={{ scale: 0.9, opacity: 0, rotate: 2 }}
                             animate={{ scale: 1, opacity: 1, rotate: 0 }}
                             transition={{ duration: 1, delay: 0.4 }}
-                            style={{ width: '280px', flexShrink: 0, borderRadius: '20px', overflow: 'hidden', boxShadow: '0 40px 80px rgba(0,0,0,0.85)', border: '1px solid rgba(255,255,255,0.08)', margin: '0 auto' }}
+                            className="mobile-hidden"
+                            style={{ width: 'min(320px, 100%)', justifySelf: 'center', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 40px 80px rgba(0,0,0,0.85)', border: '1px solid rgba(255,255,255,0.08)' }}
                         >
-                            <img src={hero.movie_poster_url} alt={hero.movie_title} style={{ width: '100%', display: 'block' }} />
+                            <div style={{ aspectRatio: '2 / 3', overflow: 'hidden' }}>
+                                <img src={hero.movie_poster_url} alt={hero.movie_title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            </div>
                         </motion.div>
                     )}
                 </div>
             </section>
 
-            {/* ── ARCHIVE GRID ──────────────────────────────────── */}
-            <section style={{ maxWidth: '1200px', margin: '0 auto', padding: '64px 48px 100px' }}>
-                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
+            {/* ── ARCHIVE GRID ── */}
+            <section className="max-w-container" style={{ paddingTop: '64px', paddingBottom: '100px' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '32px', flexWrap: 'wrap', gap: '24px' }}>
                     <div>
                         <div style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(245,166,35,0.6)', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <Film size={10} /> Cinema Archive
                         </div>
-                        <h2 style={{ fontSize: '28px', fontWeight: 800, color: '#f2f2f2', letterSpacing: '-0.02em', lineHeight: 1 }}>
+                        <h2 style={{ fontSize: 'clamp(24px, 4vw, 32px)', fontWeight: 800, color: '#f2f2f2', letterSpacing: '-0.02em', lineHeight: 1 }}>
                             All Reviews
                         </h2>
                         {!loading && <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.25)', marginTop: '5px' }}>{filtered.length} imprints in the archive</div>}
@@ -206,7 +208,7 @@ export default function Home() {
                                 placeholder="Search title, verdict, tag…"
                                 value={search}
                                 onChange={e => setSearch(e.target.value)}
-                                style={{ padding: '9px 14px 9px 34px', borderRadius: '10px', width: '230px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', fontSize: '12px', color: '#f2f2f2', outline: 'none', fontFamily: 'Outfit, sans-serif' }}
+                                style={{ padding: '9px 14px 9px 34px', borderRadius: '10px', width: 'clamp(200px, 20vw, 260px)', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', fontSize: '12px', color: '#f2f2f2', outline: 'none', fontFamily: 'Outfit, sans-serif' }}
                                 onFocus={e => e.target.style.borderColor = 'rgba(245,166,35,0.25)'}
                                 onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
                             />
