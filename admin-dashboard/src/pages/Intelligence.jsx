@@ -79,17 +79,17 @@ const Intelligence = () => {
     };
 
     return (
-        <div className="min-h-screen p-6 md:p-12 relative overflow-hidden">
+        <div className="min-h-screen relative overflow-hidden overflow-y-auto">
             <BackgroundAtmosphere imageUrl={reviews[0]?.movie_id ? `https://images.unsplash.com/photo-1485846234645-a62644f84728?q=30&w=1000` : null} />
 
             {/* Header / Nav */}
-            <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-16 relative z-10">
+            <div className="max-w-container pt-8 md:pt-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-16 relative z-10">
                 <div className="space-y-2">
                     <div className="flex items-center gap-3 text-amber-500/60 mb-2">
                         <TrendingUp size={20} />
                         <span className="text-[10px] font-black uppercase tracking-[0.5em]">Sanctuary Intelligence</span>
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-black italic tracking-tighter">
+                    <h1 className="text-3xl md:text-5xl font-black italic tracking-tighter">
                         CINEMATIC <span className="text-amber-500">DNA</span>
                     </h1>
                 </div>
@@ -97,15 +97,15 @@ const Intelligence = () => {
                 <div className="flex gap-4">
                     <Link
                         to="/dashboard"
-                        className="flex items-center gap-3 bg-white/5 hover:bg-white/10 px-8 py-4 rounded-2xl border border-white/5 transition-all group"
+                        className="flex items-center gap-3 bg-white/5 hover:bg-white/10 px-6 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl border border-white/5 transition-all group"
                     >
-                        <LayoutDashboard size={18} className="group-hover:text-amber-500 transition-colors" />
-                        <span className="text-xs font-bold uppercase tracking-widest">Dashboard</span>
+                        <LayoutDashboard size={16} className="group-hover:text-amber-500 transition-colors md:w-[18px] md:h-[18px]" />
+                        <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest">Dashboard</span>
                     </Link>
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 relative z-10">
+            <div className="max-w-container grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 relative z-10">
                 {/* Radar Chart Section */}
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
@@ -124,7 +124,7 @@ const Intelligence = () => {
                         </div>
                     </div>
 
-                    <div className="h-[450px] min-h-[450px] w-full mt-4 transform group-hover:scale-105 transition-transform duration-1000 relative">
+                    <div className="h-[300px] md:h-[450px] w-full mt-4 transform group-hover:scale-105 transition-transform duration-1000 relative">
                         {loading ? (
                             <div className="h-full flex items-center justify-center">
                                 <Loader2 className="animate-spin text-amber-500" size={40} />

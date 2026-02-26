@@ -127,17 +127,17 @@ const Dashboard = () => {
             <div className="fixed top-[-10%] left-[-10%] w-[50%] h-[50%] bg-amber-500/5 blur-[120px] rounded-full pointer-events-none animate-pulse" />
 
             <header className="relative z-50 flex justify-between items-center px-4 md:px-12 py-6 md:py-8 border-b border-white/5 backdrop-blur-xl">
-                <div className="flex items-center gap-4 md:gap-6">
-                    <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-amber-500 to-amber-700 rounded-xl md:rounded-2xl flex items-center justify-center shadow-2xl shadow-amber-500/20">
-                        <Clapperboard className="text-black w-5 h-5 md:w-6 md:h-6" />
+                <div className="flex items-center gap-3 md:gap-6">
+                    <div className="w-9 h-9 md:w-12 md:h-12 bg-gradient-to-br from-amber-500 to-amber-700 rounded-xl md:rounded-2xl flex items-center justify-center shadow-2xl shadow-amber-500/20 flex-shrink-0">
+                        <Clapperboard className="text-black w-4 h-4 md:w-6 md:h-6" />
                     </div>
-                    <div>
-                        <h1 className="text-xl md:text-2xl font-black italic tracking-tighter">THE TEMPLE</h1>
-                        <p className="text-[7px] md:text-[8px] font-black uppercase tracking-[0.4em] text-amber-500/50">Admin Sanctorum</p>
+                    <div className="min-w-0">
+                        <h1 className="text-lg md:text-2xl font-black italic tracking-tighter truncate">THE TEMPLE</h1>
+                        <p className="text-[6px] md:text-[8px] font-black uppercase tracking-[0.4em] text-amber-500/50">Admin Sanctorum</p>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 md:gap-4">
                     <Link
                         to="/hall-of-fame"
                         className="p-3 bg-white/5 hover:bg-white/10 border border-white/5 rounded-2xl transition-all group"
@@ -148,10 +148,10 @@ const Dashboard = () => {
 
                     <Link
                         to="/intelligence"
-                        className="p-3 bg-white/5 hover:bg-white/10 border border-white/5 rounded-2xl transition-all group"
+                        className="p-2 md:p-3 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl md:rounded-2xl transition-all group"
                         title="Cinematic Intelligence"
                     >
-                        <TrendingUp size={18} className="text-gray-400 group-hover:text-amber-500 transition-colors" />
+                        <TrendingUp size={16} className="text-gray-400 group-hover:text-amber-500 transition-colors md:w-[18px] md:h-[18px]" />
                     </Link>
 
                     <button
@@ -171,14 +171,14 @@ const Dashboard = () => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => auth.signOut()}
-                        className="p-3 bg-white/5 hover:bg-white/10 border border-white/5 rounded-2xl transition-all"
+                        className="p-2 md:p-3 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl md:rounded-2xl transition-all"
                     >
-                        <LogOut size={18} className="text-gray-400" />
+                        <LogOut size={16} className="text-gray-400 md:w-[18px] md:h-[18px]" />
                     </motion.button>
                 </div>
             </header>
 
-            <main className="relative z-10 p-8 md:p-12 lg:p-20 max-w-[1800px] mx-auto">
+            <main className="relative z-10 max-w-container py-8 md:py-12 lg:py-20">
                 <AnimatePresence mode="wait">
                     {!movie ? (
                         <motion.div
@@ -193,7 +193,7 @@ const Dashboard = () => {
                                 <motion.h2
                                     initial={{ y: 20, opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
-                                    className="text-5xl md:text-7xl font-black italic tracking-tighter leading-tight"
+                                    className="text-4xl md:text-7xl font-black italic tracking-tighter leading-tight"
                                 >
                                     SUMMON YOUR <br />
                                     <span className="bg-gradient-to-r from-amber-200 via-amber-500 to-amber-700 bg-clip-text text-transparent underline decoration-amber-500/20 underline-offset-8">NEXT CRITIQUE</span>
@@ -337,7 +337,7 @@ const Dashboard = () => {
                                         <div className="flex items-center gap-4 text-amber-500/60 text-[10px] font-black uppercase tracking-[0.5em]">
                                             <Sparkles size={14} /> Intelligence Decrypted
                                         </div>
-                                        <h2 className="text-7xl md:text-9xl font-black italic tracking-tighter leading-[0.8]">
+                                        <h2 className="text-5xl md:text-9xl font-black italic tracking-tighter leading-[0.85]">
                                             {movie.title.split(' ').map((word, i) => (
                                                 <span key={i} className={i % 2 === 1 ? 'text-amber-500' : 'text-white'}>{word} </span>
                                             ))}
