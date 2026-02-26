@@ -22,7 +22,7 @@ const ReviewDetailsModal = ({ review, isOpen, onClose, onDelete }) => {
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="fixed top-[5%] left-[5%] right-[5%] bottom-[5%] md:top-[10%] md:left-[15%] md:right-[15%] md:bottom-[10%] bg-[#080808] border border-white/10 rounded-[32px] md:rounded-[40px] z-[101] overflow-hidden flex flex-col shadow-2xl"
+                        className="fixed inset-4 md:inset-[10%] bg-[#080808] border border-white/10 rounded-[32px] md:rounded-[40px] z-[101] overflow-hidden flex flex-col shadow-2xl"
                     >
                         {/* Header Image */}
                         <div className="relative h-48 md:h-64 flex-shrink-0 bg-black">
@@ -30,6 +30,9 @@ const ReviewDetailsModal = ({ review, isOpen, onClose, onDelete }) => {
                                 src={review.movie_poster_url || "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&q=80&w=800"}
                                 alt={review.movie_title}
                                 className="w-full h-full object-cover opacity-60"
+                                onError={(e) => {
+                                    e.target.src = "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&q=80&w=800";
+                                }}
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-[#080808] to-transparent" />
                             <div className="absolute top-6 right-6 flex gap-4">
@@ -68,7 +71,7 @@ const ReviewDetailsModal = ({ review, isOpen, onClose, onDelete }) => {
                                         {new Date(review.created_at).toLocaleDateString()}
                                     </div>
                                 </div>
-                                <h2 className="text-4xl md:text-5xl font-black italic tracking-tighter text-white">
+                                <h2 className="text-3xl md:text-5xl font-black italic tracking-tighter text-white line-clamp-2 md:line-clamp-none">
                                     {review.movie_title || 'Untitled Critique'}
                                 </h2>
                             </div>

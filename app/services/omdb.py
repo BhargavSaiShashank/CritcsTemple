@@ -222,7 +222,7 @@ class OMDBService:
                 poster_url = data.get("Poster")
                 if poster_url and poster_url != "N/A":
                     try:
-                        poster_check = await client.head(poster_url, timeout=5.0)
+                        poster_check = await client.head(poster_url, timeout=3.0)
                         if poster_check.status_code != 200:
                             print(f"OMDb Poster 404 for {poster_url}, using placeholder")
                             poster_url = "https://images.unsplash.com/photo-1485846234645-a62644f84728?q=30&w=1000"
