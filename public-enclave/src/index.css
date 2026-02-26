@@ -12,6 +12,15 @@
   padding: 0;
 }
 
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
 :root {
   --bg: #080808;
   --surface: #101010;
@@ -35,6 +44,7 @@
 }
 
 .max-w-container {
+  width: 100%;
   max-width: var(--max-width);
   margin: 0 auto;
   padding-left: var(--page-padding);
