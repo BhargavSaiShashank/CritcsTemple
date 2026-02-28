@@ -13,3 +13,5 @@ pytest
 gunicorn
 aiocache
 certifi
+dnspython
+pymongo

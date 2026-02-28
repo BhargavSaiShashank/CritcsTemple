@@ -2,7 +2,7 @@ import React, { useState, useMemo, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronRight, Star, Quote, AlignLeft, Layout, Zap, Heart, Music, Camera, Plus, Loader2, Sparkles, Download, Eye } from 'lucide-react'
-import { draftVerdict, createReview, updateReview } from '../services/api'
+import { createReview, updateReview } from '../services/api'
 import SanctuaryCard from './SanctuaryCard';
 import html2canvas from 'html2canvas';
 
@@ -41,7 +41,22 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
     const [submitting, setSubmitting] = useState(false);
     const [exportLoading, setExportLoading] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
+    const draftKey = useMemo(() => {
+        if (id && id !== 'new') return `review_draft_edit_${id}`;
+        if (movie && (movie.imdb_id || movie.id)) return `review_draft_movie_${movie.imdb_id || movie.id}`;
+        return 'review_draft_new';
+    }, [id, movie]);
+
     const [formData, setFormData] = useState(() => {
+        const savedDraft = localStorage.getItem(draftKey);
+        if (savedDraft) {
+            try {
+                return JSON.parse(savedDraft);
+            } catch (e) {
+                console.error("Failed to parse draft", e);
+            }
+        }
+
         const defaultAspects = aspectGroups.flatMap(g => g.aspects).reduce((acc, aspect) => ({
             ...acc, [aspect]: { score: 0, comment: '' }
         }), {});
@@ -69,8 +84,8 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
         return {
             summary: '',
             content: '',
-            verdict: 'Good',
-            status: 'published',
+            verdict: '',
+            status: '',
             is_featured: false,
             author: '',
             watch_links: '',
@@ -84,28 +99,13 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             aspects: defaultAspects
         };
     });
+
+    React.useEffect(() => {
+        localStorage.setItem(draftKey, JSON.stringify(formData));
+    }, [formData, draftKey]);
+
     const [newTag, setNewTag] = useState('')
     const [activeGroup, setActiveGroup] = useState(0)
-    const [aiLoading, setAiLoading] = useState(false)
-
-    const handleAIDraft = async () => {
-        setAiLoading(true)
-        try {
-            const payload = {
-                aspects: formData.aspects,
-                cast_performances: formData.cast_performances,
-                director_trademarks: formData.director_trademarks,
-                viewing_context: formData.viewing_context,
-                trivia_and_details: formData.trivia_and_details
-            }
-            const { data } = await draftVerdict(payload)
-            setFormData(prev => ({ ...prev, content: data.draft }))
-        } catch (err) {
-            console.error("AI Drafting failed:", err)
-        } finally {
-            setAiLoading(false)
-        }
-    }
 
     const handleExportCard = async () => {
         if (!cardRef.current) return;
@@ -226,6 +226,9 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             } else {
                 await createReview(payload);
             }
+
+            localStorage.removeItem(draftKey);
+
             if (onSubmit) {
                 onSubmit();
             } else {
@@ -376,14 +379,6 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
                             <label className="text-[10px] font-black uppercase tracking-[0.6em] text-white/10">The Ritual (Critique)</label>
                             <div className="flex flex-wrap items-center gap-4">
-                                <button
-                                    onClick={handleAIDraft}
-                                    disabled={aiLoading}
-                                    className="flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 text-amber-500 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-amber-500/20 transition-all disabled:opacity-50"
-                                >
-                                    {aiLoading ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
-                                    Generate AI Verdict
-                                </button>
                                 <span className="text-[8px] font-bold text-white/10 uppercase tracking-[0.5em]">Markdown Engaged</span>
                             </div>
                         </div>
@@ -462,12 +457,13 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                                     <button
                                         key={v}
                                         type="button"
-                                        onClick={() => setFormData({ ...formData, verdict: v })}
+                                        onClick={() => setFormData({ ...formData, verdict: formData.verdict === v ? '' : v })}
                                         className={`py-6 rounded-2xl border text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-500 ${formData.verdict === v
                                             ? 'bg-amber-500 border-amber-500 text-black shadow-[0_0_40px_rgba(245,158,11,0.3)] scale-105 z-10'
                                             : 'bg-white/5 border-white/10 text-white/20 hover:border-white/30 hover:text-white'
                                             }`}
                                     >
+                                        {v}
                                     </button>
                                 ))}
                             </div>
@@ -481,7 +477,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                                         <button
                                             key={s}
                                             type="button"
-                                            onClick={() => setFormData({ ...formData, status: s })}
+                                            onClick={() => setFormData({ ...formData, status: formData.status === s ? '' : s })}
                                             className={`px-6 py-4 rounded-xl border text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-300 ${formData.status === s
                                                 ? 'bg-white/10 border-amber-500/50 text-amber-500'
                                                 : 'bg-white/5 border-white/10 text-white/20 hover:text-white/40'
@@ -567,8 +563,8 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                 className="w-full flex justify-center"
                 style={{
                     position: 'absolute',
-                    top: '-10000px',
-                    left: '0',
+                    top: '0',
+                    left: '-10000px',
                     opacity: '0',
                     pointerEvents: 'none',
                     zIndex: -1

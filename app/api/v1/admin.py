@@ -8,7 +8,7 @@ from app.db.mongodb import get_database
 from app.models.review import ReviewCreate, ReviewUpdate, ReviewInDB
 from app.models.movie import MovieCreate, MovieInDB
 from app.models.category import CategoryCreate, CategoryUpdate, CategoryInDB
-from app.services.omdb import omdb_service
+from app.services.tmdb import tmdb_service
 from app.services.movie_service import movie_service
 from app.services.analytics_service import analytics_service
 from app.services.review_service import review_service
@@ -42,14 +42,14 @@ async def search_movies(
     title: str = Query(...), 
     admin = Depends(get_current_admin)
 ):
-    return await omdb_service.search_movies(title)
+    return await tmdb_service.search_movies(title)
 
 @router.get("/movies/latest")
 async def get_latest_movies(
     category: str = Query("english"),
     admin = Depends(get_current_admin)
 ):
-    return await omdb_service.get_discovery(category)
+    return await tmdb_service.get_discovery(category)
 
 @router.post("/movies/fetch", response_model=MovieCreate)
 async def fetch_and_save_movie(
@@ -210,31 +210,7 @@ async def get_dna_analytics(
 ):
     return await analytics_service.get_dna_analytics(db)
 
-@router.post("/ai/draft-verdict")
-async def draft_verdict(
-    payload: dict = Body(...),
-    admin = Depends(get_current_admin)
-):
-    """
-    The Sanctuary Oracle (AI LLM Engine).
-    Passes Structural DNA + Cinematic Lore to Gemini for a highly bespoke draft critique.
-    """
-    aspects = payload.get("aspects", {})
-    lore = {
-        "cast_performances": payload.get("cast_performances", ""),
-        "director_trademarks": payload.get("director_trademarks", ""),
-        "viewing_context": payload.get("viewing_context", ""),
-        "trivia_and_details": payload.get("trivia_and_details", "")
-    }
-    
-    # Prune empty lore
-    active_lore = {k: v for k, v in lore.items() if v and v.strip()}
-    
-    # We call the external Oracle Service 
-    from app.services.ai import generate_verdict_draft
-    final_draft = await generate_verdict_draft(aspect_scores=aspects, cinematic_lore=active_lore)
-    
-    return {"draft": final_draft}
+
 
 @router.post("/upload")
 async def upload_file(
