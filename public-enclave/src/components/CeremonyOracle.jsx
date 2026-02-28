@@ -8,7 +8,7 @@ const CeremonyOracle = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [query, setQuery] = useState('');
     const [messages, setMessages] = useState([
-        { role: 'oracle', content: 'Approach, Seeker. What knowledge do you desire from the Sanctuary archives?' }
+        { role: 'oracle', content: 'Approach, Seeker. The cinematic winds have brought you to The Sanctuary. What lost vision or etched imprint do you wish to unearth from our archives today?' }
     ]);
     const [loading, setLoading] = useState(false);
     const scrollRef = useRef(null);
