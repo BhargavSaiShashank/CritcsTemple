@@ -22,6 +22,24 @@ const Dashboard = () => {
     })
     const navigate = useNavigate();
     const [exporting, setExporting] = useState(false);
+    const [showDrafts, setShowDrafts] = useState(false);
+    const [localDrafts, setLocalDrafts] = useState([]);
+
+    const loadDrafts = () => {
+        const drafts = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith('review_draft_')) {
+                try {
+                    const data = JSON.parse(localStorage.getItem(key));
+                    drafts.push({ key, ...data });
+                } catch (e) {
+                    console.error("Failed parsing draft", e);
+                }
+            }
+        }
+        setLocalDrafts(drafts);
+    };
 
     const handleExportVault = async () => {
         if (exporting) return;
@@ -145,6 +163,77 @@ const Dashboard = () => {
                     >
                         <Star size={18} className="text-amber-500/50 group-hover:text-amber-500 transition-colors" />
                     </Link>
+
+                    <div className="relative">
+                        <button
+                            onClick={() => {
+                                if (!showDrafts) loadDrafts();
+                                setShowDrafts(!showDrafts);
+                            }}
+                            className={`p-3 border rounded-2xl transition-all group ${showDrafts ? 'bg-amber-500/10 border-amber-500/30' : 'bg-white/5 hover:bg-white/10 border-white/5'}`}
+                            title="Uncompleted Drafts"
+                        >
+                            <BookOpen size={18} className={`${showDrafts ? 'text-amber-500' : 'text-gray-400 group-hover:text-amber-500'} transition-colors`} />
+                        </button>
+
+                        <AnimatePresence>
+                            {showDrafts && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                    className="absolute right-0 top-full mt-4 w-72 md:w-96 bg-[#0a0a0a]/90 backdrop-blur-3xl border border-white/10 rounded-3xl p-4 shadow-2xl z-50 overflow-hidden"
+                                >
+                                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/40 mb-4 px-2">Local Drafts Unfinished</h3>
+                                    <div className="max-h-[300px] overflow-y-auto pr-2 space-y-2">
+                                        {localDrafts.length === 0 ? (
+                                            <p className="text-sm text-white/30 italic px-2 py-4">No drafts found drifting in the void.</p>
+                                        ) : (
+                                            localDrafts.map((draft, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    onClick={() => {
+                                                        setShowDrafts(false);
+                                                        if (draft.key.startsWith('review_draft_edit_')) {
+                                                            const editId = draft.key.replace('review_draft_edit_', '');
+                                                            navigate(`/edit/${editId}`);
+                                                        } else if (draft.key.startsWith('review_draft_movie_')) {
+                                                            const movieId = draft.key.replace('review_draft_movie_', '');
+                                                            handleSelectMovie(movieId);
+                                                            setTimeout(() => {
+                                                                window.scrollTo({ top: 800, behavior: 'smooth' });
+                                                            }, 600);
+                                                        }
+                                                    }}
+                                                    className="p-4 bg-white/5 border border-white/5 rounded-2xl hover:border-amber-500/30 transition-all flex flex-col gap-2 relative group flex-shrink-0 cursor-pointer"
+                                                >
+                                                    <div className="flex justify-between items-start">
+                                                        <h4 className="font-bold text-sm text-white/90 truncate pr-4">{draft.movie_title || draft.key.replace('review_draft_', '')}</h4>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                localStorage.removeItem(draft.key);
+                                                                loadDrafts();
+                                                            }}
+                                                            className="text-white/20 hover:text-red-500 transition-colors z-10"
+                                                            title="Delete Draft"
+                                                        >
+                                                            ×
+                                                        </button>
+                                                    </div>
+                                                    <p className="text-xs text-white/40 italic truncate">{draft.summary || 'No essence written...'}</p>
+
+                                                    <span className="mt-2 text-[9px] font-black uppercase tracking-widest text-amber-500 opacity-0 group-hover:opacity-100 transition-opacity w-fit">
+                                                        RESUME IMPRINTING &rarr;
+                                                    </span>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
 
                     <Link
                         to="/intelligence"
@@ -291,13 +380,13 @@ const Dashboard = () => {
                             animate={{ opacity: 1 }}
                             className="space-y-20 pb-40"
                         >
-                            <div className="flex flex-col xl:flex-row gap-20 items-start">
+                            <div className="flex flex-col xl:flex-row gap-8 xl:gap-20 items-start">
                                 {/* The Spotlight Card */}
-                                <div className="w-full xl:w-[450px] space-y-8 xl:sticky xl:top-20">
+                                <div className="w-full xl:w-[450px] space-y-6 md:space-y-8 xl:sticky xl:top-20">
                                     <motion.div
                                         initial={{ x: -40, opacity: 0 }}
                                         animate={{ x: 0, opacity: 1 }}
-                                        className="relative aspect-[2/3] md:w-full rounded-[40px] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.8)] animate-gold-pulse group"
+                                        className="relative aspect-[2/3] w-full max-w-sm xl:max-w-full mx-auto rounded-[32px] md:rounded-[40px] overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.6)] animate-gold-pulse group"
                                     >
                                         <img
                                             src={failedPosters.has(movie.poster_url)
@@ -317,11 +406,11 @@ const Dashboard = () => {
                                     </motion.div>
 
                                     {/* Critic Metas */}
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="flex flex-wrap justify-center gap-4">
                                         {movie.ratings?.map(r => (
-                                            <div key={r.Source} className="glass-obsidian p-6 rounded-3xl text-center space-y-1 group hover:border-amber-500/20 transition-all">
-                                                <p className="text-[8px] font-black uppercase text-white/30 tracking-[0.4em]">{r.Source}</p>
-                                                <p className="text-2xl font-black text-amber-500 tracking-tighter">{r.Value}</p>
+                                            <div key={r.Source} className="glass-obsidian w-full max-w-[160px] p-4 sm:p-6 rounded-2xl sm:rounded-3xl text-center space-y-1 group hover:border-amber-500/20 transition-all flex flex-col justify-center">
+                                                <p className="text-[7px] sm:text-[8px] font-black uppercase text-white/30 tracking-[0.2em] sm:tracking-[0.4em] mb-1">{r.Source}</p>
+                                                <p className="text-xl sm:text-2xl font-black text-amber-500 tracking-tighter">{r.Value}</p>
                                             </div>
                                         ))}
                                     </div>
@@ -337,7 +426,7 @@ const Dashboard = () => {
                                         <div className="flex items-center gap-4 text-amber-500/60 text-[10px] font-black uppercase tracking-[0.5em]">
                                             <Sparkles size={14} /> Intelligence Decrypted
                                         </div>
-                                        <h2 className="text-5xl md:text-9xl font-black italic tracking-tighter leading-[0.85]">
+                                        <h2 className="text-4xl sm:text-5xl md:text-9xl font-black italic tracking-tighter leading-[0.85] break-words">
                                             {movie.title.split(' ').map((word, i) => (
                                                 <span key={i} className={i % 2 === 1 ? 'text-amber-500' : 'text-white'}>{word} </span>
                                             ))}

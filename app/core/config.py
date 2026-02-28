@@ -11,8 +11,9 @@ class Settings(BaseSettings):
     MONGODB_URL: str
     DATABASE_NAME: str
     
-    # OMDb
-    OMDB_API_KEY: str
+    # TMDb
+    TMDB_API_KEY: str
+    TMDB_READ_TOKEN: str
     
     # Firebase
     FIREBASE_SERVICE_ACCOUNT_PATH: str

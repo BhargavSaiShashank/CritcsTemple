@@ -1,5 +1,5 @@
 from motor.motor_asyncio import AsyncIOMotorDatabase
-from app.services.omdb import omdb_service
+from app.services.tmdb import tmdb_service
 from app.models.movie import MovieCreate
 from fastapi import HTTPException
 import traceback
@@ -13,7 +13,9 @@ class MovieService:
             raise HTTPException(status_code=503, detail="Database Offline")
             
         try:
-            movie_data = await omdb_service.fetch_movie_details(search_term)
+            print(f"MovieService: Fetching details for term: {search_term}")
+            movie_data = await tmdb_service.fetch_movie_details(search_term)
+            print(f"MovieService: Successfully fetched details for: {movie_data.title}")
             
             existing = await db.movies.find_one({"imdb_id": movie_data.imdb_id})
             if existing:
@@ -37,8 +39,16 @@ class MovieService:
                 return MovieCreate(**filtered_existing)
 
             # Save to DB
-            movie_dict = movie_data.model_dump() if hasattr(movie_data, "model_dump") else movie_data.dict()
+            print(f"MovieService: Saving {movie_data.title} to database...")
+            # Use mode='json' in Pydantic v2 to ensure no special objects (like datetime or models) remain
+            if hasattr(movie_data, "model_dump"):
+                movie_dict = movie_data.model_dump(mode='json')
+            else:
+                import json
+                movie_dict = json.loads(movie_data.json())
+                
             await db.movies.insert_one(movie_dict)
+            print(f"MovieService: Finished saving {movie_data.title}")
             return movie_data
 
         except HTTPException as he:

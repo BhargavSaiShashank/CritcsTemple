@@ -24,7 +24,6 @@ export const getReviews = (params = {}) => api.get('/admin/reviews', { params })
 export const getReview = (id) => api.get(`/admin/reviews/${id}`);
 export const getDNAAnalytics = () => api.get('/admin/analytics/dna');
 export const getEngagementAnalytics = () => api.get('/admin/analytics/engagement');
-export const draftVerdict = (aspects) => api.post('/admin/ai/draft-verdict', { aspects });
 export const createReview = (reviewData) => api.post('/admin/reviews', reviewData);
 export const updateReview = (id, reviewData) => api.put(`/admin/reviews/${id}`, reviewData);
 export const deleteReview = (id) => api.delete(`/admin/reviews/${id}`);

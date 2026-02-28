@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 import traceback
+from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
 from app.db.mongodb import connect_to_mongo, close_mongo_connection, get_database
 from app.api.v1 import public, admin
@@ -40,8 +41,14 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 
 @app.exception_handler(Exception)
 async def generic_exception_handler(request: Request, exc: Exception):
-    print(f"GLOBAL ERROR: {str(exc)}")
-    traceback.print_exc()
+    error_msg = f"GLOBAL ERROR: {str(exc)}\n{traceback.format_exc()}"
+    print(error_msg)
+    try:
+        with open("server_errors.log", "a") as f:
+            f.write(f"\n--- {datetime.now()} ---\n{error_msg}\n")
+    except:
+        pass
+        
     return JSONResponse(
         status_code=500,
         content={"success": False, "error": "Internal Server Error", "details": str(exc)},
