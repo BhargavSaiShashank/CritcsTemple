@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Star, ArrowRight } from 'lucide-react';
+import { Capacitor } from '@capacitor/core';
 
 const FALLBACK = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=1200';
 
@@ -28,7 +29,7 @@ const scoreColor = (score) => {
     return '#f87171';
 };
 
-function ReviewCard({ review, index }) {
+const ReviewCard = React.memo(({ review, index }) => {
     const [src, setSrc] = useState(review.movie_poster_url || FALLBACK);
     const vc = getV(review.verdict);
 
@@ -77,8 +78,6 @@ function ReviewCard({ review, index }) {
                                 objectFit: 'cover',
                                 transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
                             }}
-                            onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
-                            onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
                         />
                         {/* Gradient overlay */}
                         <div style={{
@@ -135,7 +134,7 @@ function ReviewCard({ review, index }) {
             </Link>
         </motion.div>
     );
-}
+});
 
 function SkeletonCard() {
     return (
@@ -167,8 +166,15 @@ export default function ReviewGrid({ reviews, loading }) {
         );
     }
     return (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 150px), 1fr))', gap: '20px' }}>
-            {reviews.map((r, i) => <ReviewCard key={r._id || r.id || i} review={r} index={i} />)}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+                gap: '20px'
+            }}>
+                {reviews.map((r, i) => <ReviewCard key={r._id || r.id || i} review={r} index={i} />)}
+            </div>
         </div>
     );
 }

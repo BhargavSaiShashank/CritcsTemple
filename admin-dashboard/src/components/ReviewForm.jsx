@@ -171,7 +171,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
     const averageScore = useMemo(() => {
         const scores = Object.values(formData.aspects)
             .map(a => parseFloat(a.score))
-            .filter(isFinite);
+            .filter(s => isFinite(s) && s > 0);
         if (scores.length === 0) return "0.0";
         return (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1);
     }, [formData.aspects])
@@ -217,7 +217,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             movie_poster_url: formData.movie_poster_url || movie.poster_url,
             watch_links: formData.watch_links,
             scheduled_date: formData.status === 'scheduled' ? formData.scheduled_date : null,
-            overall_rating: parseFloat(averageScore)
+            overall_rating: parseFloat(averageScore) || 0.0
         };
 
         try {

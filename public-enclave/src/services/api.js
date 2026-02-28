@@ -1,10 +1,55 @@
 import axios from 'axios';
+import { Capacitor } from '@capacitor/core';
 
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+const BASE_URL = 'https://temple-backend-zgu3.onrender.com/api/v1';
+
+/**
+ * CONNECTIVITY:
+ * The app is now pointing to a LIVE GLOBAL backend on Render.
+ * This APK will work anywhere with an internet connection.
+ */
+
+export const API_URL = BASE_URL;
+
+if (Capacitor.isNativePlatform()) {
+    console.log('[Native Connectivity] Global Backend Active:', API_URL);
+}
 
 const api = axios.create({
     baseURL: API_URL,
 });
+
+// Detailed Logging Interceptors
+api.interceptors.request.use(request => {
+    if (Capacitor.isNativePlatform()) {
+        console.log(`[API Request] ${request.method?.toUpperCase()} ${request.url}`);
+    }
+    return request;
+});
+
+api.interceptors.response.use(
+    response => {
+        if (Capacitor.isNativePlatform()) {
+            console.log(`[API Response] Success: ${response.status} for ${response.config.url}`);
+            console.log(`[API Response Content] ${JSON.stringify(response.data).substring(0, 500)}`);
+        }
+        return response;
+    },
+    error => {
+        if (Capacitor.isNativePlatform()) {
+            console.error('[API Error] Full Object:', JSON.stringify(error, null, 2));
+            if (error.response) {
+                console.error(`[API Error] Status: ${error.response.status}`);
+                console.error(`[API Error] Data:`, error.response.data);
+            } else if (error.request) {
+                console.error(`[API Error] No response received. Request details:`, error.request);
+            } else {
+                console.error(`[API Error] Message: ${error.message}`);
+            }
+        }
+        return Promise.reject(error);
+    }
+);
 
 export const getLatestReviews = (limit = 12, offset = 0, search = '', verdict = '', sortBy = 'date', order = 'desc') => {
     const params = new URLSearchParams({ limit, offset, sort_by: sortBy, order });

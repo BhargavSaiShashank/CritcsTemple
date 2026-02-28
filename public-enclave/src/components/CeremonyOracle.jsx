@@ -110,7 +110,14 @@ const CeremonyOracle = () => {
                             }}
                         >
                             {/* Header */}
-                            <div style={{ padding: '24px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <div style={{
+                                padding: '24px',
+                                paddingTop: 'calc(24px + env(safe-area-inset-top, 0px))',
+                                borderBottom: '1px solid rgba(255,255,255,0.05)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between'
+                            }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                     <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(245,166,35,0.1)', border: '1px solid rgba(245,166,35,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                         <Sparkles size={18} color="#f5a623" />
@@ -165,7 +172,12 @@ const CeremonyOracle = () => {
                             </div>
 
                             {/* Input Area */}
-                            <div style={{ padding: '24px', borderTop: '1px solid rgba(255,255,255,0.05)', background: 'rgba(10,10,10,0.5)' }}>
+                            <div style={{
+                                padding: '24px',
+                                paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))',
+                                borderTop: '1px solid rgba(255,255,255,0.05)',
+                                background: 'rgba(10,10,10,0.5)'
+                            }}>
                                 <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                                     <input
                                         type="text"
