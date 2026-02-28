@@ -65,7 +65,7 @@ async def create_review(
     db = Depends(get_database),
     admin = Depends(get_current_admin)
 ):
-    review_dict = review.dict()
+    review_dict = review.model_dump()
     
     # Auto-calculate overall rating if not provided or to ensure accuracy
     if review_dict.get("overall_rating") is None or review_dict.get("overall_rating") == 0:
@@ -261,3 +261,29 @@ async def delete_category(
     admin = Depends(get_current_admin)
 ):
     return await category_service.delete_category(db, category_id)
+
+import httpx
+from fastapi.responses import StreamingResponse
+
+@router.get("/proxy-image")
+async def proxy_image(url: str = Query(...)):
+    """Proxies an image to bypass CORS and network blocks."""
+    # Safety check - only allow TMDb images
+    if not url.startswith("https://image.tmdb.org/t/p/"):
+        raise HTTPException(status_code=400, detail="Invalid image source")
+
+    async with httpx.AsyncClient(verify=False) as client:
+        try:
+            response = await client.get(url, timeout=10.0)
+            response.raise_for_status()
+            
+            return StreamingResponse(
+                iter([response.content]), 
+                media_type=response.headers.get("content-type", "image/jpeg"),
+                headers={
+                    "Cache-Control": "public, max-age=86400",
+                    "Access-Control-Allow-Origin": "*"
+                }
+            )
+        except Exception as e:
+            raise HTTPException(status_code=502, detail=f"Failed to fetch image: {str(e)}")

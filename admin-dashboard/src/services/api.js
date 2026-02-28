@@ -38,4 +38,11 @@ export const createCategory = (data) => api.post('/admin/categories', data);
 export const updateCategory = (id, data) => api.put(`/admin/categories/${id}`, data);
 export const deleteCategory = (id) => api.delete(`/admin/categories/${id}`);
 
+// Image Proxy
+export const getProxyImageUrl = (url) => {
+    if (!url) return '';
+    const baseUrl = import.meta.env.VITE_API_URL || '/api/v1';
+    return `${baseUrl}/admin/proxy-image?url=${encodeURIComponent(url)}`;
+};
+
 export default api;

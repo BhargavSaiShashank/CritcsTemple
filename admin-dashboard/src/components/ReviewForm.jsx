@@ -2,7 +2,7 @@ import React, { useState, useMemo, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronRight, Star, Quote, AlignLeft, Layout, Zap, Heart, Music, Camera, Plus, Loader2, Sparkles, Download, Eye } from 'lucide-react'
-import { createReview, updateReview } from '../services/api'
+import { createReview, updateReview, getProxyImageUrl } from '../services/api'
 import SanctuaryCard from './SanctuaryCard';
 import html2canvas from 'html2canvas';
 
@@ -574,7 +574,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                     <SanctuaryCard
                         movie={{
                             title: movie.title,
-                            poster: movie.poster_url,
+                            poster: getProxyImageUrl(formData.movie_poster_url || movie.poster_url),
                             year: movie.release_year,
                             director: movie.director || 'Visionary',
                             runtime: movie.runtime,
