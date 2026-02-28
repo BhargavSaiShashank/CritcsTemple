@@ -6,6 +6,8 @@ import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, Pola
 import * as htmlToImage from 'html-to-image';
 import { getReviewBySlug, clapReview, unclapReview, reactReview, getRelatedReviews } from '../services/api';
 import ReviewExportCard from '../components/ReviewExportCard';
+import SanctuaryTicket from '../components/SanctuaryTicket';
+import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
 
 const FALLBACK = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=1200';
 
@@ -112,27 +114,47 @@ export default function ReviewDetail() {
     const [claps, setClaps] = useState(0);
     const [hasClapped, setHasClapped] = useState(false);
     const [related, setRelated] = useState([]);
+    const ticketRef = useRef(null);
+    const [exportingTicket, setExportingTicket] = useState(false);
 
     const handleDownloadCard = async () => {
         if (!exportRef.current) return;
         setExporting(true);
-        console.log("Starting html-to-image capture on element:", exportRef.current);
         try {
             const dataUrl = await htmlToImage.toPng(exportRef.current, {
                 cacheBust: true,
                 pixelRatio: 2,
                 backgroundColor: '#080808'
             });
-            console.log("Canvas generated successfully");
             const link = document.createElement('a');
-            link.download = `sanctuary-${review.slug}-card.png`;
+            link.download = `sanctuary-${review.slug}-square.png`;
             link.href = dataUrl;
             link.click();
         } catch (error) {
-            console.error('Failed to generate sharing card:', error);
-            alert("Failed to generate the review card. Please try again.");
+            console.error('Failed to generate square card:', error);
         } finally {
             setExporting(false);
+        }
+    };
+
+    const handleDownloadTicket = async () => {
+        if (!ticketRef.current) return;
+        setExportingTicket(true);
+        try {
+            const dataUrl = await htmlToImage.toPng(ticketRef.current, {
+                cacheBust: true,
+                pixelRatio: 2,
+                backgroundColor: '#0a0a0a'
+            });
+            const link = document.createElement('a');
+            link.download = `sanctuary-${review.slug}-ticket.png`;
+            link.href = dataUrl;
+            link.click();
+        } catch (error) {
+            console.error('Failed to generate ticket:', error);
+            alert("Failed to generate your ticket.");
+        } finally {
+            setExportingTicket(false);
         }
     };
 
@@ -263,7 +285,8 @@ export default function ReviewDetail() {
     }).filter(g => g.avg !== null);
 
     return (
-        <div style={{ background: '#080808', minHeight: '100vh' }}>
+        <div style={{ background: '#080808', minHeight: '100vh', position: 'relative' }}>
+            <BackgroundAtmosphere activeColor={activeColor} />
             {/* ── CINEMATIC BANNER ── */}
             <div style={{ position: 'relative', height: '35vh', minHeight: '220px', overflow: 'hidden' }}>
                 <img src={src} alt="" onError={() => setSrc(FALLBACK)} style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.2) saturate(0.6)' }} />
@@ -366,6 +389,16 @@ export default function ReviewDetail() {
                                     {copied ? 'Copied!' : 'Copy link'}
                                 </button>
                                 <button
+                                    onClick={handleDownloadTicket}
+                                    disabled={exportingTicket}
+                                    style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.2)', cursor: exportingTicket ? 'not-allowed' : 'pointer', color: '#f5a623', fontSize: '11px', fontWeight: 700, padding: '6px 14px', borderRadius: '8px', transition: 'all 0.2s', opacity: exportingTicket ? 0.5 : 1 }}
+                                    onMouseEnter={e => !exportingTicket && (e.currentTarget.style.background = 'rgba(245,166,35,0.15)')}
+                                    onMouseLeave={e => !exportingTicket && (e.currentTarget.style.background = 'rgba(245,166,35,0.08)')}
+                                >
+                                    <Sparkles size={11} />
+                                    {exportingTicket ? 'Minting...' : 'Sanctuary Ticket'}
+                                </button>
+                                <button
                                     onClick={handleDownloadCard}
                                     disabled={exporting}
                                     style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', cursor: exporting ? 'not-allowed' : 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: '11px', fontWeight: 500, padding: 0, transition: 'color 0.2s', opacity: exporting ? 0.5 : 1 }}
@@ -373,7 +406,7 @@ export default function ReviewDetail() {
                                     onMouseLeave={e => !exporting && (e.currentTarget.style.color = 'rgba(255,255,255,0.3)')}
                                 >
                                     <Download size={12} />
-                                    {exporting ? 'Generating...' : 'Share Card'}
+                                    {exporting ? 'Square...' : 'Square Card'}
                                 </button>
                             </div>
 
@@ -680,8 +713,9 @@ export default function ReviewDetail() {
                 </div>
             </div>
 
-            {/* Hidden Export Component */}
+            {/* Hidden Export Components */}
             <ReviewExportCard ref={exportRef} review={review} />
+            <SanctuaryTicket ref={ticketRef} review={review} />
         </div>
     );
 }

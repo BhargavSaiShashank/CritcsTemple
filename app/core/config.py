@@ -24,6 +24,8 @@ class Settings(BaseSettings):
     CLOUDINARY_API_SECRET: str = ""
     CLOUDINARY_URL: str = ""
 
+    GROQ_API_KEY: str = ""
+
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")

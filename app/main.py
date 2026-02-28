@@ -4,7 +4,7 @@ import traceback
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
 from app.db.mongodb import connect_to_mongo, close_mongo_connection, get_database
-from app.api.v1 import public, admin
+from app.api.v1 import public, admin, oracle
 
 app = FastAPI(title="The Critic's Temple")
 
@@ -61,6 +61,7 @@ async def shutdown_db_client():
 # Include Routers
 app.include_router(public.router, prefix="/api/v1", tags=["Public"])
 app.include_router(admin.router, prefix="/api/v1/admin", tags=["Admin"])
+app.include_router(oracle.router, prefix="/api/v1/oracle", tags=["Oracle"])
 
 @app.get("/")
 async def root():

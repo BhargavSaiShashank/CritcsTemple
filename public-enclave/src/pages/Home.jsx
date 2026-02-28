@@ -5,6 +5,7 @@ import { Star, ChevronRight, Search, Film, TrendingUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getLatestReviews } from '../services/api';
 import ReviewGrid from '../components/ReviewGrid';
+import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
 
 const FALLBACK = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=1200';
 const VERDICT_COLOR = {
@@ -17,6 +18,13 @@ export default function Home() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [featuredReview, setFeaturedReview] = useState(null);
+    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+    const handleMouseMove = (e) => {
+        const x = (e.clientX - window.innerWidth / 2) / 50;
+        const y = (e.clientY - window.innerHeight / 2) / 50;
+        setMousePos({ x, y });
+    };
 
     // Filters
     const [verdictFilter, setVerdictFilter] = useState('All');
@@ -90,7 +98,7 @@ export default function Home() {
     const filtered = reviews;
 
     return (
-        <div style={{ background: '#080808', minHeight: '100vh' }}>
+        <div onMouseMove={handleMouseMove} style={{ background: '#080808', minHeight: '100vh', position: 'relative' }}>
             <Helmet>
                 <title>The Sanctuary: Cinema Archive</title>
                 <meta property="og:title" content="The Sanctuary: Cinema Archive" />
@@ -99,10 +107,12 @@ export default function Home() {
                 <meta name="twitter:card" content="summary_large_image" />
             </Helmet>
 
+            <BackgroundAtmosphere activeColor={heroColor} />
+
             {/* ── HERO ── */}
             <section style={{
                 position: 'relative',
-                minHeight: '85vh',
+                minHeight: '90vh',
                 paddingTop: 'clamp(100px, 12vh, 160px)',
                 paddingBottom: '80px',
                 overflow: 'hidden',
@@ -114,15 +124,34 @@ export default function Home() {
                     {hero?.movie_poster_url && (
                         <motion.div
                             key={hero._id}
-                            initial={{ scale: 1.1, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            transition={{ duration: 1.5, ease: "easeOut" }}
+                            transition={{ duration: 2 }}
                             style={{ position: 'absolute', inset: 0, zIndex: 0 }}
                         >
-                            <img src={hero.movie_poster_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.12) saturate(0.6) blur(20px)', transform: 'scale(1.1)' }} />
-                            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, #080808 0%, rgba(8,8,8,0.7) 50%, #080808 100%)' }} />
-                            <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at top right, rgba(245,166,35,0.05) 0%, transparent 60%)' }} />
+                            <motion.img
+                                src={hero.movie_poster_url}
+                                alt=""
+                                animate={{
+                                    scale: [1, 1.15],
+                                    x: [0, -20],
+                                    y: [0, -10]
+                                }}
+                                transition={{
+                                    duration: 30,
+                                    repeat: Infinity,
+                                    repeatType: "reverse",
+                                    ease: "linear"
+                                }}
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover',
+                                    filter: 'brightness(0.12) saturate(0.6) blur(15px)'
+                                }}
+                            />
+                            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, #080808 0%, rgba(8,8,8,0.6) 50%, #080808 100%)' }} />
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -130,16 +159,33 @@ export default function Home() {
                 <div className="max-w-container" style={{ position: 'relative', zIndex: 1, width: '100%', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', alignItems: 'center', gap: 'clamp(2rem, 8vw, 6rem)' }}>
                     {/* Left: Text */}
                     <motion.div
-                        initial={{ x: -20, opacity: 0 }}
+                        initial={{ x: -30, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
+                        transition={{ duration: 1, delay: 0.2 }}
+                        style={{
+                            transform: `translate(${mousePos.x}px, ${mousePos.y}px)`,
+                            transition: 'transform 0.1s ease-out'
+                        }}
                     >
-                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', padding: '4px 12px', borderRadius: '99px', background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.14)', marginBottom: '24px' }}>
-                            <TrendingUp size={11} color="#f5a623" />
-                            <span style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(245,166,35,0.8)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>Latest Imprint</span>
-                        </div>
+                        <motion.div
+                            initial={{ y: 10, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: 0.4 }}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', padding: '4px 12px', borderRadius: '99px', background: `${heroColor}14`, border: `1px solid ${heroColor}25`, marginBottom: '24px' }}
+                        >
+                            <TrendingUp size={11} color={heroColor} />
+                            <span style={{ fontSize: '10px', fontWeight: 700, color: heroColor, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Latest Imprint</span>
+                        </motion.div>
 
-                        <h1 className="display" style={{ fontSize: 'clamp(2.5rem, 8vw, 5.5rem)', fontWeight: 800, color: '#f2f2f2', lineHeight: 1.05, letterSpacing: '-0.02em', marginBottom: '18px' }}>
+                        <h1 className="display" style={{
+                            fontSize: 'clamp(2.5rem, 8vw, 6.5rem)',
+                            fontWeight: 900,
+                            color: '#f2f2f2',
+                            lineHeight: 0.95,
+                            letterSpacing: '-0.04em',
+                            marginBottom: '18px',
+                            textShadow: '0 20px 40px rgba(0,0,0,0.5)'
+                        }}>
                             {hero?.movie_title || 'The Sanctuary'}
                         </h1>
 
@@ -173,13 +219,28 @@ export default function Home() {
                     {/* Right: floating poster card */}
                     {hero?.movie_poster_url && (
                         <motion.div
-                            initial={{ scale: 0.9, opacity: 0, rotate: 2 }}
-                            animate={{ scale: 1, opacity: 1, rotate: 0 }}
-                            transition={{ duration: 1, delay: 0.4 }}
-                            style={{ width: '100%', maxWidth: '320px', justifySelf: 'center', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 40px 80px rgba(0,0,0,0.85)', border: '1px solid rgba(255,255,255,0.08)' }}
+                            initial={{ scale: 0.8, opacity: 0, rotateY: 20 }}
+                            animate={{ scale: 1, opacity: 1, rotateY: 0 }}
+                            transition={{ duration: 1.2, delay: 0.4 }}
+                            style={{
+                                perspective: '1000px',
+                                transform: `translate(${-mousePos.x}px, ${-mousePos.y}px)`,
+                                transition: 'transform 0.1s ease-out'
+                            }}
                         >
-                            <div style={{ aspectRatio: '2 / 3', width: '100%', overflow: 'hidden' }}>
-                                <img src={hero.movie_poster_url} alt={hero.movie_title} style={{ width: '100%', height: '100%', minHeight: '100%', minWidth: '100%', objectFit: 'cover' }} />
+                            <div style={{
+                                width: '100%',
+                                maxWidth: '340px',
+                                justifySelf: 'center',
+                                borderRadius: '24px',
+                                overflow: 'hidden',
+                                boxShadow: '0 50px 100px rgba(0,0,0,0.9)',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                background: '#111'
+                            }}>
+                                <div style={{ aspectRatio: '2 / 3', width: '100%', overflow: 'hidden' }}>
+                                    <img src={hero.movie_poster_url} alt={hero.movie_title} style={{ width: '100%', height: '100%', minHeight: '100%', minWidth: '100%', objectFit: 'cover' }} />
+                                </div>
                             </div>
                         </motion.div>
                     )}
