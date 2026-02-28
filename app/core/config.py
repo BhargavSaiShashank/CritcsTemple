@@ -12,17 +12,17 @@ class Settings(BaseSettings):
     DATABASE_NAME: str
     
     # TMDb
-    TMDB_API_KEY: str
-    TMDB_READ_TOKEN: str
+    TMDB_API_KEY: str = ""
+    TMDB_READ_TOKEN: str = ""
     
     # Firebase
     FIREBASE_SERVICE_ACCOUNT_PATH: str
     
     # Cloudinary
-    CLOUDINARY_CLOUD_NAME: str
-    CLOUDINARY_API_KEY: str
-    CLOUDINARY_API_SECRET: str
-    CLOUDINARY_URL: str
+    CLOUDINARY_CLOUD_NAME: str = ""
+    CLOUDINARY_API_KEY: str = ""
+    CLOUDINARY_API_SECRET: str = ""
+    CLOUDINARY_URL: str = ""
 
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
