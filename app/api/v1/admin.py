@@ -103,8 +103,19 @@ async def update_review(
     if not existing:
         raise HTTPException(status_code=404, detail="Review not found")
     
-    update_dict = update_data.dict(exclude_unset=True)
+    update_dict = update_data.model_dump(exclude_unset=True)
     update_dict["updated_at"] = datetime.utcnow()
+    
+    # Auto-calculate overall rating if aspects are updated but rating is not explicitly provided
+    if "aspects" in update_dict and "overall_rating" not in update_dict:
+        from app.models.review import AspectRatings
+        aspects_obj = AspectRatings(**update_dict["aspects"])
+        update_dict["overall_rating"] = calculate_overall_score(aspects_obj)
+    elif update_dict.get("overall_rating") == 0 and "aspects" in update_dict:
+        # If rating is explicitly 0 but aspects are provided, recalculate
+        from app.models.review import AspectRatings
+        aspects_obj = AspectRatings(**update_dict["aspects"])
+        update_dict["overall_rating"] = calculate_overall_score(aspects_obj)
     
     # Track history
     history_entry = {

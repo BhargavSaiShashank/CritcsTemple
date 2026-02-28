@@ -18,18 +18,60 @@ export default function Home() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [featuredReview, setFeaturedReview] = useState(null);
+    const [error, setError] = useState(null);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-    const handleMouseMove = (e) => {
+    const handleMouseMove = useCallback((e) => {
         if (window.innerWidth < 768) return; // Disable parallax on mobile
         const x = (e.clientX - window.innerWidth / 2) / 50;
         const y = (e.clientY - window.innerHeight / 2) / 50;
         setMousePos({ x, y });
-    };
+    }, []);
 
     // Filters
     const [verdictFilter, setVerdictFilter] = useState('All');
     const [sortOption, setSortOption] = useState('date-desc');
+
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    const [pullDistance, setPullDistance] = useState(0);
+    const startY = useRef(0);
+    const isPulling = useRef(false);
+
+    const handleTouchStart = (e) => {
+        if (window.scrollY > 5) return; // Only allow pull if at the top
+        startY.current = e.touches[0].pageY;
+        isPulling.current = true;
+    };
+
+    const handleTouchMove = (e) => {
+        if (!isPulling.current) return;
+        const currentY = e.touches[0].pageY;
+        const diff = currentY - startY.current;
+        if (diff > 0) {
+            // Apply resistance: distance = log-ish or just factor
+            const distance = Math.min(diff * 0.4, 80);
+            setPullDistance(distance);
+            if (distance > 10) e.preventDefault(); // Prevent native bounce
+        }
+    };
+
+    const handleTouchEnd = () => {
+        if (!isPulling.current) return;
+        isPulling.current = false;
+        if (pullDistance > 60) {
+            // Trigger Refresh
+            setIsRefreshing(true);
+            setPullDistance(70); // Keep it visible during loading
+            fetchReviews(0, true).finally(() => {
+                setTimeout(() => {
+                    setIsRefreshing(false);
+                    setPullDistance(0);
+                }, 600);
+            });
+        } else {
+            setPullDistance(0);
+        }
+    };
 
     // Infinite Scroll State
     const [page, setPage] = useState(0);
@@ -53,6 +95,7 @@ export default function Home() {
             }
         } catch (err) {
             console.error("Failed to fetch archives", err);
+            setError(err.message || "Failed to fetch content");
             setHasMore(false); // Prevent infinite IntersectionObserver retry loops
         }
     };
@@ -98,8 +141,16 @@ export default function Home() {
     // The backend now natively filters via MongoDB `$regex` so we pass reviews directly
     const filtered = reviews;
 
+    console.log(`[RENDER] Home State - Reviews: ${reviews.length}, Loading: ${loading}, Error: ${error}`);
+
     return (
-        <div onMouseMove={handleMouseMove} style={{ background: '#080808', minHeight: '100vh', position: 'relative' }}>
+        <div
+            onMouseMove={handleMouseMove}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            style={{ background: '#080808', minHeight: '100vh', position: 'relative', touchAction: pullDistance > 0 ? 'none' : 'auto' }}
+        >
             <Helmet>
                 <title>The Sanctuary: Cinema Archive</title>
                 <meta property="og:title" content="The Sanctuary: Cinema Archive" />
@@ -108,7 +159,34 @@ export default function Home() {
                 <meta name="twitter:card" content="summary_large_image" />
             </Helmet>
 
-            <BackgroundAtmosphere activeColor={heroColor} />
+            {/* Refresh Indicator */}
+            <motion.div
+                style={{
+                    position: 'fixed',
+                    top: pullDistance - 40,
+                    left: '50%',
+                    x: '-50%',
+                    zIndex: 2000,
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    background: '#f5a623',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                    opacity: pullDistance > 10 ? 1 : 0,
+                }}
+            >
+                <motion.div
+                    animate={isRefreshing ? { rotate: 360 } : { rotate: pullDistance * 5 }}
+                    transition={isRefreshing ? { duration: 1, repeat: Infinity, ease: "linear" } : { duration: 0 }}
+                >
+                    <TrendingUp size={16} color="#000" />
+                </motion.div>
+            </motion.div>
+
+            {/* <BackgroundAtmosphere activeColor={heroColor} /> */}
 
             {/* ── HERO ── */}
             <section style={{
@@ -175,7 +253,9 @@ export default function Home() {
                             style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', padding: '4px 12px', borderRadius: '99px', background: `${heroColor}14`, border: `1px solid ${heroColor}25`, marginBottom: '24px' }}
                         >
                             <TrendingUp size={11} color={heroColor} />
-                            <span style={{ fontSize: '10px', fontWeight: 700, color: heroColor, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Latest Imprint</span>
+                            <span style={{ fontSize: '10px', fontWeight: 700, color: heroColor, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+                                Latest Imprint
+                            </span>
                         </motion.div>
 
                         <h1 className="display" style={{
