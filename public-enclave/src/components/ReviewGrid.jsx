@@ -38,14 +38,18 @@ function ReviewCard({ review, index }) {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: index * 0.05 }}
             whileHover={{ y: -6, scale: 1.02 }}
+            style={{ height: '100%' }}
         >
             <Link
                 to={`/review/${review.slug}`}
-                style={{ textDecoration: 'none', display: 'block' }}
+                style={{ textDecoration: 'none', display: 'block', height: '100%' }}
             >
                 <div
                     className="group"
                     style={{
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
                         borderRadius: '16px',
                         overflow: 'hidden',
                         background: '#111',
@@ -63,7 +67,7 @@ function ReviewCard({ review, index }) {
                     }}
                 >
                     {/* Poster */}
-                    <div style={{ position: 'relative', aspectRatio: '2 / 3', overflow: 'hidden', background: '#181818' }}>
+                    <div style={{ position: 'relative', aspectRatio: '2 / 3', overflow: 'hidden', background: '#181818', flexShrink: 0 }}>
                         <img
                             src={src}
                             alt={review.movie_title}
@@ -96,28 +100,34 @@ function ReviewCard({ review, index }) {
                     </div>
 
                     {/* Info */}
-                    <div style={{ padding: '16px 18px 18px' }}>
+                    <div style={{ padding: '16px 18px 18px', flex: 1, display: 'flex', flexDirection: 'column' }}>
                         {/* Verdict */}
-                        <span style={{
-                            display: 'inline-block', marginBottom: '10px',
-                            padding: '2px 10px', borderRadius: '99px',
-                            fontSize: '9px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
-                            background: vc.bg, color: vc.color, border: `1px solid ${vc.border}`,
-                        }}>
-                            {review.verdict}
-                        </span>
+                        <div style={{ height: '24px', marginBottom: '10px' }}>
+                            {review.verdict && (
+                                <span style={{
+                                    display: 'inline-block',
+                                    padding: '2px 10px', borderRadius: '99px',
+                                    fontSize: '9px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
+                                    background: vc.bg, color: vc.color, border: `1px solid ${vc.border}`,
+                                }}>
+                                    {review.verdict}
+                                </span>
+                            )}
+                        </div>
 
-                        <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#f2f2f2', marginBottom: '8px', lineHeight: 1.3, letterSpacing: '-0.015em' }}>
+                        <h3 className="line-clamp-2" style={{ fontSize: '16px', fontWeight: 700, color: '#f2f2f2', marginBottom: '8px', lineHeight: 1.3, letterSpacing: '-0.015em', height: '2.6em', overflow: 'hidden' }}>
                             {review.movie_title}
                         </h3>
 
-                        {review.summary && (
-                            <p className="line-clamp-2" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', lineHeight: 1.6, marginBottom: '14px' }}>
-                                {review.summary}
-                            </p>
-                        )}
+                        <div style={{ flex: 1 }}>
+                            {review.summary && (
+                                <p className="line-clamp-2" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', lineHeight: 1.6, marginBottom: '14px' }}>
+                                    {review.summary}
+                                </p>
+                            )}
+                        </div>
 
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 700, color: '#f5a623' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 700, color: '#f5a623', marginTop: 'auto' }}>
                             Read review <ArrowRight size={13} />
                         </div>
                     </div>
