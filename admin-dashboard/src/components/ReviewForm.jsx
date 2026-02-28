@@ -85,7 +85,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             summary: '',
             content: '',
             verdict: '',
-            status: '',
+            status: 'published',
             is_featured: false,
             author: '',
             watch_links: '',
@@ -477,7 +477,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                                         <button
                                             key={s}
                                             type="button"
-                                            onClick={() => setFormData({ ...formData, status: formData.status === s ? '' : s })}
+                                            onClick={() => setFormData({ ...formData, status: s })}
                                             className={`px-6 py-4 rounded-xl border text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-300 ${formData.status === s
                                                 ? 'bg-white/10 border-amber-500/50 text-amber-500'
                                                 : 'bg-white/5 border-white/10 text-white/20 hover:text-white/40'
