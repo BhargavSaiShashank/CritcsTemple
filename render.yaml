@@ -14,5 +14,7 @@ services:
         sync: false # Set in the Render dashboard manually
       - key: TMDB_API_KEY
         sync: false # Set in the Render dashboard manually
+      - key: TMDB_READ_TOKEN
+        sync: false
       - key: OMDB_API_KEY
         sync: false # Set in the Render dashboard manually
