@@ -286,7 +286,7 @@ export default function ReviewDetail() {
 
     return (
         <div style={{ background: '#080808', minHeight: '100vh', position: 'relative' }}>
-            <BackgroundAtmosphere activeColor={activeColor} />
+            <BackgroundAtmosphere activeColor={vc.color} />
             {/* ── CINEMATIC BANNER ── */}
             <div style={{ position: 'relative', height: '35vh', minHeight: '220px', overflow: 'hidden' }}>
                 <img src={src} alt="" onError={() => setSrc(FALLBACK)} style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.2) saturate(0.6)' }} />
