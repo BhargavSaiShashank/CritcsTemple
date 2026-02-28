@@ -10,6 +10,7 @@ cloudinary
 python-multipart
 python-slugify
 pytest
+pytest-asyncio
 gunicorn
 aiocache
 certifi
