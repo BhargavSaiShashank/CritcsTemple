@@ -5,6 +5,7 @@ import Navbar from './components/Navbar'
 import Home from './pages/Home'
 import ReviewDetail from './pages/ReviewDetail'
 import HallOfFame from './pages/HallOfFame'
+import CeremonyOracle from './components/CeremonyOracle'
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
               <Route path="/hall-of-fame" element={<HallOfFame />} />
             </Routes>
           </main>
+          <CeremonyOracle />
         </div>
       </Router>
     </HelmetProvider>
@@ -26,4 +28,4 @@ const App = () => {
 }
 
 export default App
- 
+

@@ -165,4 +165,18 @@ class ReviewService:
         review = await db.reviews.find_one({"slug": slug})
         return self.serialize_doc(review)
 
+    async def get_all_review_context(self, db: AsyncIOMotorDatabase) -> List[Dict[str, Any]]:
+        query = self._get_publication_query()
+        cursor = db.reviews.find(query, {
+            "movie_title": 1,
+            "verdict": 1,
+            "overall_rating": 1,
+            "summary": 1,
+            "tags": 1,
+            "slug": 1,
+            "movie_year": 1
+        })
+        reviews = await cursor.to_list(length=100)
+        return [self.serialize_doc(r) for r in reviews]
+
 review_service = ReviewService()
