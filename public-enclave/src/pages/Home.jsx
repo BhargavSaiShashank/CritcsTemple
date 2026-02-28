@@ -21,6 +21,7 @@ export default function Home() {
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
     const handleMouseMove = (e) => {
+        if (window.innerWidth < 768) return; // Disable parallax on mobile
         const x = (e.clientX - window.innerWidth / 2) / 50;
         const y = (e.clientY - window.innerHeight / 2) / 50;
         setMousePos({ x, y });

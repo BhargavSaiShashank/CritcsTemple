@@ -1,51 +1,59 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { memo } from 'react';
 
-const BackgroundAtmosphere = ({ activeColor = '#f5a623' }) => {
+// Use React.memo to prevent unnecessary re-renders when parent states (like mouse position) change
+const BackgroundAtmosphere = memo(({ activeColor = '#f5a623' }) => {
     return (
-        <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }}>
-            {/* Subtle ambient glow top-left */}
-            <motion.div
-                animate={{
-                    background: `radial-gradient(circle, ${activeColor}08 0%, transparent 70%)`
-                }}
-                transition={{ duration: 2, ease: "easeInOut" }}
+        <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0, overflow: 'hidden' }}>
+            {/* 
+                Top-left ambient glow. 
+                Using standard CSS transition for opacity/color is more performant than Framer Motion 
+                for high-frequency background updates. 
+            */}
+            <div
                 style={{
                     position: 'absolute',
-                    top: '-10%',
-                    left: '-5%',
+                    top: '-15%',
+                    left: '-10%',
+                    width: '80%',
+                    height: '80%',
+                    borderRadius: '50%',
+                    background: `radial-gradient(circle, ${activeColor}08 0%, transparent 70%)`,
+                    transition: 'background 1.5s ease-in-out, opacity 1s',
+                    filter: 'blur(60px)',
+                }}
+            />
+
+            {/* Bottom-right ambient glow */}
+            <div
+                style={{
+                    position: 'absolute',
+                    bottom: '-20%',
+                    right: '-10%',
                     width: '70%',
                     height: '70%',
                     borderRadius: '50%',
+                    background: `radial-gradient(circle, ${activeColor}05 0%, transparent 70%)`,
+                    transition: 'background 2s ease-in-out, opacity 1s',
+                    filter: 'blur(80px)',
+                    transitionDelay: '0.2s'
                 }}
             />
 
-            {/* Subtle ambient glow bottom-right */}
-            <motion.div
-                animate={{
-                    background: `radial-gradient(circle, ${activeColor}05 0%, transparent 70%)`
-                }}
-                transition={{ duration: 2, ease: "easeInOut", delay: 0.2 }}
-                style={{
-                    position: 'absolute',
-                    bottom: '-15%',
-                    right: '-5%',
-                    width: '60%',
-                    height: '60%',
-                    borderRadius: '50%',
-                }}
-            />
-
-            {/* Global grain/noise overlay for texture */}
+            {/* 
+                LIGHTEST NOISE OVERLAY:
+                Using a very simple repeating pattern instead of complex SVG filters.
+                This significantly reduces paint times during scroll.
+            */}
             <div style={{
                 position: 'absolute',
                 inset: 0,
-                opacity: 0.02,
-                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                pointerEvents: 'none'
+                opacity: 0.015,
+                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+                pointerEvents: 'none',
+                mixBlendMode: 'overlay'
             }} />
         </div>
     );
-};
+});
 
 export default BackgroundAtmosphere;
