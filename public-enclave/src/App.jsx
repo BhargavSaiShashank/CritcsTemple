@@ -9,6 +9,17 @@ import ReviewDetail from './pages/ReviewDetail'
 import HallOfFame from './pages/HallOfFame'
 import CeremonyOracle from './components/CeremonyOracle'
 
+import { API_URL } from './services/api'
+
+const PrimalPulse = () => {
+  useEffect(() => {
+    // Ping the backend immediately to wake it up from Render sleep phase
+    console.log('[Primal Pulse] Waking up the Oracle...');
+    fetch(`${API_URL}/health`).catch(() => { });
+  }, []);
+  return null;
+};
+
 const NativeListener = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -38,6 +49,7 @@ const App = () => {
     <HelmetProvider>
       <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <NativeListener />
+        <PrimalPulse />
         <div className="min-h-screen bg-[#0c0c0c] text-white">
           <Navbar />
           <main>
