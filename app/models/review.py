@@ -54,10 +54,10 @@ class ReviewBase(BaseModel):
     movie_poster_url: Optional[str] = None
     status: str = "draft" # draft, published
     slug: str
-    overall_rating: float = Field(..., ge=0, le=10)
-    verdict: Verdict
-    summary: str
-    content: str # Markdown
+    overall_rating: float = Field(0.0, ge=0, le=10)
+    verdict: Optional[Verdict] = None
+    summary: Optional[str] = None
+    content: Optional[str] = None # Markdown
     spoiler_section: Optional[str] = None
     cast_performances: Optional[str] = None
     director_trademarks: Optional[str] = None

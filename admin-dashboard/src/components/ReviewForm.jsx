@@ -208,7 +208,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
 
         const payload = {
             ...formData,
-            verdict: normalizeVerdict(formData.verdict),
+            verdict: formData.verdict ? normalizeVerdict(formData.verdict) : null,
             aspects: cleanedAspects,
             slug,
             status,
