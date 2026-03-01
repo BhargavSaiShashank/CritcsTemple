@@ -25,4 +25,4 @@ jobs:
         run: npm run build
         
       - name: Deploy to Capgo
-        run: npx @capgo/cli@latest bundle upload --token ${{ secrets.CAPGO_TOKEN }} --app-id com.sanctuary.app --channel production --path dist
+        run: npx @capgo/cli@latest bundle upload com.sanctuary.app --apikey ${{ secrets.CAPGO_TOKEN }} --channel production --path dist
