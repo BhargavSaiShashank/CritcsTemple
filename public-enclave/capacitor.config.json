@@ -15,6 +15,10 @@
     },
     "CapacitorHttp": {
       "enabled": true
+    },
+    "CapacitorUpdater": {
+      "autoUpdate": true,
+      "statsUrl": "https://api.capgo.app/stats"
     }
   },
   "server": {
