@@ -4,34 +4,69 @@ import { Sparkles, X, Send, MessageSquare, Loader2 } from 'lucide-react';
 import { API_URL } from '../services/api';
 import axios from 'axios';
 
+const TypeWriter = ({ text, speed = 20, onComplete }) => {
+    const [displayedText, setDisplayedText] = useState('');
+    const [index, setIndex] = useState(0);
+
+    useEffect(() => {
+        if (index < text.length) {
+            const timeout = setTimeout(() => {
+                setDisplayedText(prev => prev + text.charAt(index));
+                setIndex(prev => prev + 1);
+            }, speed);
+            return () => clearTimeout(timeout);
+        } else {
+            onComplete?.();
+        }
+    }, [index, text, speed, onComplete]);
+
+    return <span>{displayedText}</span>;
+};
+
 const CeremonyOracle = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [query, setQuery] = useState('');
     const [messages, setMessages] = useState([
-        { role: 'oracle', content: 'Approach, Seeker. The cinematic winds have brought you to The Sanctuary. What lost vision or etched imprint do you wish to unearth from our archives today?' }
+        { role: 'oracle', content: 'Welcome, Seeker. What cinematic wisdom do you wish to unearth today?', isNew: false }
     ]);
     const [loading, setLoading] = useState(false);
     const scrollRef = useRef(null);
 
-    useEffect(() => {
+    const scrollToBottom = () => {
         if (scrollRef.current) {
-            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+            scrollRef.current.scrollTo({
+                top: scrollRef.current.scrollHeight,
+                behavior: 'smooth'
+            });
         }
-    }, [messages]);
+    };
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages, loading]);
 
     const handleSend = async () => {
         if (!query.trim() || loading) return;
 
-        const userMsg = { role: 'user', content: query };
+        const userMsg = { role: 'user', content: query, isNew: false };
         setMessages(prev => [...prev, userMsg]);
         setQuery('');
         setLoading(true);
 
         try {
-            const { data } = await axios.post(`${API_URL}/oracle/query`, { query });
-            setMessages(prev => [...prev, { role: 'oracle', content: data.response }]);
+            // Include message history in the query (last 10 messages for context)
+            const history = messages.slice(-10).map(m => ({
+                role: m.role,
+                content: m.content
+            }));
+
+            const { data } = await axios.post(`${API_URL}/oracle/query`, {
+                query,
+                history
+            });
+            setMessages(prev => [...prev, { role: 'oracle', content: data.response, isNew: true }]);
         } catch (err) {
-            setMessages(prev => [...prev, { role: 'oracle', content: 'The winds of fate are turbulent. I cannot see clearly right now.' }]);
+            setMessages(prev => [...prev, { role: 'oracle', content: 'The winds of fate are turbulent. I cannot see clearly right now.', isNew: true }]);
         } finally {
             setLoading(false);
         }
@@ -160,7 +195,16 @@ const CeremonyOracle = () => {
                                             color: m.role === 'user' ? '#fff' : 'rgba(255,255,255,0.8)',
                                             fontStyle: m.role === 'oracle' ? 'italic' : 'normal',
                                         }}>
-                                            {m.content}
+                                            {m.role === 'oracle' && m.isNew ? (
+                                                <TypeWriter
+                                                    text={m.content}
+                                                    onComplete={() => {
+                                                        const newMsgs = [...messages];
+                                                        newMsgs[i].isNew = false;
+                                                        setMessages(newMsgs);
+                                                    }}
+                                                />
+                                            ) : m.content}
                                         </div>
                                     </motion.div>
                                 ))}

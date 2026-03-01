@@ -212,6 +212,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             aspects: cleanedAspects,
             slug,
             status,
+            content_type: movie.content_type || 'movie',
             movie_id: parseInt(movie.id) || 0,
             movie_title: movie.title,
             movie_poster_url: formData.movie_poster_url || movie.poster_url,

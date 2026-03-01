@@ -100,8 +100,8 @@ const ReviewCard = React.memo(({ review, index }) => {
 
                     {/* Info */}
                     <div style={{ padding: '16px 18px 18px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                        {/* Verdict */}
-                        <div style={{ height: '24px', marginBottom: '10px' }}>
+                        {/* Verdict & Type */}
+                        <div style={{ height: '24px', marginBottom: '10px', display: 'flex', gap: '8px' }}>
                             {review.verdict && (
                                 <span style={{
                                     display: 'inline-block',
@@ -110,6 +110,16 @@ const ReviewCard = React.memo(({ review, index }) => {
                                     background: vc.bg, color: vc.color, border: `1px solid ${vc.border}`,
                                 }}>
                                     {review.verdict}
+                                </span>
+                            )}
+                            {review.content_type === 'tv' && (
+                                <span style={{
+                                    display: 'inline-block',
+                                    padding: '2px 10px', borderRadius: '99px',
+                                    fontSize: '9px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
+                                    background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.1)',
+                                }}>
+                                    TV Show
                                 </span>
                             )}
                         </div>

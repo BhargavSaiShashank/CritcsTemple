@@ -15,12 +15,13 @@ async def get_latest_reviews(
     tag: Optional[str] = None,
     verdict: Optional[str] = None,
     search: Optional[str] = None,
+    content_type: Optional[str] = None, # "movie" or "tv"
     sort_by: Optional[str] = "date",
     order: Optional[str] = "desc",
     db = Depends(get_database)
 ):
     return await review_service.get_latest_reviews(
-        db, limit, offset, tag, verdict, search, sort_by, order
+        db, limit, offset, tag, verdict, search, content_type, sort_by, order
     )
 
 @router.get("/reviews/{slug}")
@@ -68,6 +69,13 @@ async def get_movie_details(imdb_id: str, db = Depends(get_database)):
     if not movie:
         raise HTTPException(status_code=404, detail="Movie not found in our database")
     return review_service.serialize_doc(movie)
+
+@router.get("/tv/{tmdb_id}")
+async def get_show_details(tmdb_id: str, db = Depends(get_database)):
+    show = await db.shows.find_one({"tmdb_id": int(tmdb_id)})
+    if not show:
+        raise HTTPException(status_code=404, detail="TV Show not found in our database")
+    return review_service.serialize_doc(show)
 
 @router.get("/proxy-image")
 async def proxy_image(url: str):

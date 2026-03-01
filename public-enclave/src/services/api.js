@@ -1,18 +1,21 @@
 import axios from 'axios';
 import { Capacitor } from '@capacitor/core';
 
-const BASE_URL = 'https://temple-backend-zgu3.onrender.com/api/v1';
+const BASE_URL = Capacitor.isNativePlatform()
+    ? 'https://temple-backend-zgu3.onrender.com/api/v1'
+    : window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:8000/api/v1'
+        : 'https://temple-backend-zgu3.onrender.com/api/v1';
 
 /**
  * CONNECTIVITY:
- * The app is now pointing to a LIVE GLOBAL backend on Render.
- * This APK will work anywhere with an internet connection.
+ * Dynamically switches between Localhost (for development) and Render (for production).
  */
 
 export const API_URL = BASE_URL;
 
 if (Capacitor.isNativePlatform()) {
-    console.log('[Native Connectivity] Global Backend Active:', API_URL);
+    console.log('[Native Connectivity] Backend Active:', API_URL);
 }
 
 const api = axios.create({
@@ -51,7 +54,7 @@ api.interceptors.response.use(
     }
 );
 
-export const getLatestReviews = (limit = 12, offset = 0, search = '', verdict = '', sortBy = 'date', order = 'desc') => {
+export const getLatestReviews = (limit = 12, offset = 0, search = '', verdict = '', content_type = '', sortBy = 'date', order = 'desc') => {
     const params = {
         limit,
         offset,
@@ -60,6 +63,7 @@ export const getLatestReviews = (limit = 12, offset = 0, search = '', verdict = 
     };
     if (search) params.search = search;
     if (verdict && verdict !== 'All') params.verdict = verdict;
+    if (content_type && content_type !== 'All') params.content_type = content_type;
 
     return api.get('/reviews', { params });
 };
@@ -75,5 +79,6 @@ export const getMasterpieces = () => api.get('/masterpieces');
 export const getHallOfFameReviews = () => api.get('/masterpieces');
 export const getCategories = () => api.get('/categories');
 export const getMovieDetails = (imdbId) => api.get(`/movie/${imdbId}`);
+export const getTVDetails = (tmdbId) => api.get(`/tv/${tmdbId}`);
 
 export default api;

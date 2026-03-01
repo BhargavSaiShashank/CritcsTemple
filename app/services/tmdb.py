@@ -5,6 +5,7 @@ from typing import List, Any, Optional, Dict
 from aiocache import cached
 from app.core.config import get_settings
 from app.models.movie import MovieCreate, CastMember, CrewMember
+from app.models.show import ShowCreate
 from fastapi import HTTPException
 
 settings = get_settings()
@@ -17,7 +18,7 @@ class TMDBService:
     def __init__(self):
         self.api_key = settings.TMDB_API_KEY
 
-    def _map_results(self, data: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def _map_movie_results(self, data: Dict[str, Any]) -> List[Dict[str, Any]]:
         results = data.get("results", [])
         clean_results = []
         for res in results:
@@ -33,7 +34,29 @@ class TMDBService:
                 "Title": res.get("title", "Unknown"),
                 "Year": year,
                 "imdbID": str(res.get("id")),
-                "Poster": poster_url
+                "Poster": poster_url,
+                "Type": "movie"
+            })
+        return clean_results
+
+    def _map_show_results(self, data: Dict[str, Any]) -> List[Dict[str, Any]]:
+        results = data.get("results", [])
+        clean_results = []
+        for res in results:
+            poster_path = res.get("poster_path")
+            if not poster_path:
+                continue
+            
+            poster_url = f"{self.IMAGE_BASE_URL}{poster_path}"
+            first_air_date = res.get("first_air_date", "")
+            year = first_air_date.split("-")[0] if first_air_date else "N/A"
+            
+            clean_results.append({
+                "Title": res.get("name", "Unknown"),
+                "Year": year,
+                "imdbID": str(res.get("id")),
+                "Poster": poster_url,
+                "Type": "tv"
             })
         return clean_results
 
@@ -48,7 +71,7 @@ class TMDBService:
                 if resp.status_code != 200:
                     print(f"DEBUG: TMDb secure search status {resp.status_code}. Body: {resp.text[:500]}")
                 resp.raise_for_status()
-                return self._map_results(resp.json())
+                return self._map_movie_results(resp.json())
         except Exception as e:
             print(f"Standard TMDb search failed: {e}. Retrying insecurely...")
             try:
@@ -57,9 +80,30 @@ class TMDBService:
                     if resp.status_code != 200:
                         print(f"DEBUG: TMDb insecure search status {resp.status_code}. Body: {resp.text[:500]}")
                     resp.raise_for_status()
-                    return self._map_results(resp.json())
+                    return self._map_movie_results(resp.json())
             except Exception as e2:
                 print(f"TMDb search CRITICAL failure: {e2}")
+                return []
+
+    @cached(ttl=3600)
+    async def search_shows(self, title: str) -> List[Dict[str, Any]]:
+        print(f"Searching TMDb TV for: {title}")
+        url = f"{self.BASE_URL}/search/tv?api_key={self.api_key}&query={title}&include_adult=false&language=en-US&page=1"
+        
+        try:
+            async with httpx.AsyncClient(timeout=15.0) as client:
+                resp = await client.get(url)
+                resp.raise_for_status()
+                return self._map_show_results(resp.json())
+        except Exception as e:
+            print(f"Standard TMDb TV search failed: {e}. Retrying insecurely...")
+            try:
+                async with httpx.AsyncClient(timeout=15.0, verify=False) as client:
+                    resp = await client.get(url)
+                    resp.raise_for_status()
+                    return self._map_show_results(resp.json())
+            except Exception as e2:
+                print(f"TMDb TV search CRITICAL failure: {e2}")
                 return []
 
     @cached(ttl=3600)
@@ -74,14 +118,14 @@ class TMDBService:
             async with httpx.AsyncClient(timeout=15.0) as client:
                 resp = await client.get(url)
                 resp.raise_for_status()
-                return self._map_results(resp.json())
+                return self._map_movie_results(resp.json())
         except Exception as e:
             print(f"Standard TMDb discovery failed: {e}. Retrying insecurely...")
             try:
                 async with httpx.AsyncClient(timeout=15.0, verify=False) as client:
                     resp = await client.get(url)
                     resp.raise_for_status()
-                    return self._map_results(resp.json())
+                    return self._map_movie_results(resp.json())
             except Exception as e2:
                 print(f"TMDb discovery CRITICAL failure: {e2}")
                 return []
@@ -153,6 +197,78 @@ class TMDBService:
             language=language,
             country=country,
             runtime=data.get("runtime") or 0,
+            genres=[g.get("name") for g in data.get("genres", [])],
+            synopsis=data.get("overview") or "No synopsis available.",
+            poster_url=poster_url,
+            backdrop_url=backdrop_url,
+            ratings=[{"Source": "TMDb", "Value": str(data.get("vote_average", "N/A"))}],
+            cast=actors,
+            crew=crew
+        )
+
+    @cached(ttl=3600)
+    async def fetch_show_details(self, tmdb_id: str) -> ShowCreate:
+        print(f"Fetching TMDb TV details for: {tmdb_id}")
+        
+        async def _do_fetch(client_instance: httpx.AsyncClient, tid: str):
+            url = f"{self.BASE_URL}/tv/{tid}?api_key={self.api_key}&append_to_response=credits"
+            resp = await client_instance.get(url)
+            resp.raise_for_status()
+            return self._parse_show_details(resp.json(), tid)
+
+        try:
+            async with httpx.AsyncClient(timeout=20.0) as client:
+                return await _do_fetch(client, tmdb_id)
+        except Exception as e:
+            print(f"Standard TMDb TV fetch failed: {e}. Retrying insecurely...")
+            try:
+                async with httpx.AsyncClient(timeout=20.0, verify=False) as client:
+                    return await _do_fetch(client, tmdb_id)
+            except Exception as e2:
+                print(f"TMDb TV fetch CRITICAL failure: {e2}")
+                raise HTTPException(status_code=500, detail="TMDb Connection Error")
+
+    def _parse_show_details(self, data: Dict[str, Any], tmdb_id: str) -> ShowCreate:
+        credits = data.get("credits", {})
+        cast_raw = credits.get("cast", [])
+        actors = []
+        for c in cast_raw[:15]:
+            profile = f"{self.IMAGE_BASE_URL}{c['profile_path']}" if c.get("profile_path") else None
+            actors.append(CastMember(name=c.get("name", "Unknown"), character=c.get("character", "N/A"), profile_path=profile))
+        
+        crew_raw = credits.get("crew", [])
+        crew = []
+        for c in crew_raw:
+            if c.get("job") in ["Director", "Writer", "Executive Producer", "Producer"]:
+                profile = f"{self.IMAGE_BASE_URL}{c['profile_path']}" if c.get("profile_path") else None
+                crew.append(CrewMember(name=c.get("name", "Unknown"), job=c.get("job", "N/A"), profile_path=profile))
+
+        first_air_date = data.get("first_air_date", "")
+        first_air_year = int(first_air_date.split("-")[0]) if first_air_date else 0
+        
+        last_air_date = data.get("last_air_date", "")
+        last_air_year = int(last_air_date.split("-")[0]) if last_air_date else None
+        
+        poster_url = f"{self.ORIGINAL_IMAGE_BASE_URL}{data['poster_path']}" if data.get("poster_path") else ""
+        backdrop_url = f"{self.ORIGINAL_IMAGE_BASE_URL}{data['backdrop_path']}" if data.get("backdrop_path") else None
+
+        countries = data.get("production_countries", [])
+        country = countries[0].get("name") if countries else "Unknown"
+
+        languages = data.get("spoken_languages", [])
+        language = languages[0].get("english_name") if languages else "English"
+
+        return ShowCreate(
+            tmdb_id=int(tmdb_id),
+            title=data.get("name", "Untitled"),
+            first_air_year=first_air_year,
+            last_air_year=last_air_year,
+            language=language,
+            country=country,
+            episode_run_time=data.get("episode_run_time", [0])[0] if data.get("episode_run_time") else 0,
+            seasons_count=data.get("number_of_seasons", 0),
+            episodes_count=data.get("number_of_episodes", 0),
+            status=data.get("status"),
             genres=[g.get("name") for g in data.get("genres", [])],
             synopsis=data.get("overview") or "No synopsis available.",
             poster_url=poster_url,

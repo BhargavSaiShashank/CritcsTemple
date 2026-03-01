@@ -30,6 +30,7 @@ export default function Home() {
 
     // Filters
     const [verdictFilter, setVerdictFilter] = useState('All');
+    const [contentTypeFilter, setContentTypeFilter] = useState('All');
     const [sortOption, setSortOption] = useState('date-desc');
 
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -79,12 +80,12 @@ export default function Home() {
     const [loadingMore, setLoadingMore] = useState(false);
     const observer = useRef();
 
-    const fetchReviews = async (currentPage, isReset = false, currentSearch = search, currentVerdict = verdictFilter, currentSort = sortOption) => {
+    const fetchReviews = async (currentPage, isReset = false, currentSearch = search, currentVerdict = verdictFilter, currentContentType = contentTypeFilter, currentSort = sortOption) => {
         try {
             const limit = 15;
             const offset = currentPage * limit;
             const [sortBy, order] = currentSort.split('-');
-            const { data } = await getLatestReviews(limit, offset, currentSearch, currentVerdict, sortBy, order);
+            const { data } = await getLatestReviews(limit, offset, currentSearch, currentVerdict, currentContentType, sortBy, order);
 
             if (data && data.length > 0) {
                 setReviews(prev => isReset || currentPage === 0 ? data : [...prev, ...data]);
@@ -102,7 +103,8 @@ export default function Home() {
 
     // Fetch Featured Review once on mount
     useEffect(() => {
-        getLatestReviews(1, 0, '', 'All', 'date', 'desc')
+        // Correct order: limit, offset, search, verdict, content_type, sortBy, order
+        getLatestReviews(1, 0, '', 'All', 'All', 'date', 'desc')
             .then(({ data }) => {
                 if (data && data.length > 0) setFeaturedReview(data[0]);
             })
@@ -114,10 +116,10 @@ export default function Home() {
         setPage(0);
         setHasMore(true);
         const timeout = setTimeout(() => {
-            fetchReviews(0, true, search, verdictFilter, sortOption).finally(() => setLoading(false));
+            fetchReviews(0, true, search, verdictFilter, contentTypeFilter, sortOption).finally(() => setLoading(false));
         }, 400);
         return () => clearTimeout(timeout);
-    }, [search, verdictFilter, sortOption]);
+    }, [search, verdictFilter, contentTypeFilter, sortOption]);
 
     const lastElementRef = useCallback(node => {
         if (loading || loadingMore) return;
@@ -127,13 +129,13 @@ export default function Home() {
                 setLoadingMore(true);
                 setPage(prev => {
                     const nextPage = prev + 1;
-                    fetchReviews(nextPage, false, search, verdictFilter, sortOption).finally(() => setLoadingMore(false));
+                    fetchReviews(nextPage, false, search, verdictFilter, contentTypeFilter, sortOption).finally(() => setLoadingMore(false));
                     return nextPage;
                 });
             }
         });
         if (node) observer.current.observe(node);
-    }, [loading, loadingMore, hasMore, search, verdictFilter, sortOption]);
+    }, [loading, loadingMore, hasMore, search, verdictFilter, contentTypeFilter, sortOption]);
 
     const hero = featuredReview;
     const heroColor = VERDICT_COLOR[hero?.verdict] || '#f5a623';
@@ -186,7 +188,7 @@ export default function Home() {
                 </motion.div>
             </motion.div>
 
-            {/* <BackgroundAtmosphere activeColor={heroColor} /> */}
+            <BackgroundAtmosphere activeColor={heroColor} />
 
             {/* ── HERO ── */}
             <section style={{
@@ -371,6 +373,16 @@ export default function Home() {
                             <option value="Average" style={{ background: '#111', color: '#fff' }}>Average</option>
                             <option value="Mediocre" style={{ background: '#111', color: '#fff' }}>Mediocre</option>
                             <option value="Poor" style={{ background: '#111', color: '#fff' }}>Poor</option>
+                        </select>
+
+                        <select
+                            value={contentTypeFilter}
+                            onChange={e => setContentTypeFilter(e.target.value)}
+                            style={{ padding: '9px 14px', borderRadius: '10px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', fontSize: '12px', color: '#fff', outline: 'none', fontFamily: 'Outfit, sans-serif', cursor: 'pointer' }}
+                        >
+                            <option value="All" style={{ background: '#111', color: '#fff' }}>All Content</option>
+                            <option value="movie" style={{ background: '#111', color: '#fff' }}>Movies</option>
+                            <option value="tv" style={{ background: '#111', color: '#fff' }}>TV Shows</option>
                         </select>
 
                         <select

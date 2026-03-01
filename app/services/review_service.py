@@ -33,6 +33,7 @@ class ReviewService:
         tag: Optional[str] = None,
         verdict: Optional[str] = None,
         search: Optional[str] = None,
+        content_type: Optional[str] = None,
         sort_by: Optional[str] = "date",
         order: Optional[str] = "desc"
     ) -> List[Dict[str, Any]]:
@@ -44,6 +45,9 @@ class ReviewService:
         
         if verdict and verdict.strip():
             filters.append({"verdict": verdict.strip()})
+            
+        if content_type:
+            filters.append({"content_type": content_type})
             
         if search and search.strip():
             filters.append({

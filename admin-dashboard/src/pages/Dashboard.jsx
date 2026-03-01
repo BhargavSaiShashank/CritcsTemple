@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { auth } from '../services/firebase'
-import { fetchMovieFromOMDb, searchMovies, createReview, exportDataVault } from '../services/api'
+import { fetchMovieFromOMDb, searchMovies, fetchShowFromTMDB, searchShows, createReview, exportDataVault } from '../services/api'
 import { useNavigate, Link } from 'react-router-dom';
 import ReviewForm from '../components/ReviewForm'
 import {
@@ -91,8 +91,15 @@ const Dashboard = () => {
             }
             setSearchLoading(true)
             try {
-                const { data } = await searchMovies(term)
-                setSearchResults(data || [])
+                const [moviesRes, showsRes] = await Promise.all([
+                    searchMovies(term),
+                    searchShows(term)
+                ])
+                const combined = [
+                    ...(moviesRes.data || []),
+                    ...(showsRes.data || [])
+                ].sort((a, b) => b.Year.localeCompare(a.Year))
+                setSearchResults(combined)
             } catch (err) {
                 console.error("Search failed:", err)
             } finally {
@@ -121,11 +128,24 @@ const Dashboard = () => {
         e.target.src = "https://images.unsplash.com/photo-1485846234645-a62644f84728?q=30&w=1000";
     };
 
-    const handleSelectMovie = async (imdbID) => {
+    const handleSelectMovie = async (item) => {
         setLoading(true)
         try {
-            const { data } = await fetchMovieFromOMDb(imdbID)
-            setMovie(data)
+            const isTV = item.Type === 'tv'
+            const { data } = isTV
+                ? await fetchShowFromTMDB(item.imdbID)
+                : await fetchMovieFromOMDb(item.imdbID)
+
+            // Normalize for the form/preview
+            const normalized = {
+                ...data,
+                id: data.tmdb_id,
+                content_type: isTV ? 'tv' : 'movie',
+                // Map show fields to movie fields if needed for common UI
+                release_year: isTV ? data.first_air_year : data.release_year,
+                director: isTV ? (data.crew?.find(c => c.job === 'Executive Producer')?.name || 'Showrunner') : (data.crew?.find(c => c.job === 'Director')?.name || 'Visionary')
+            }
+            setMovie(normalized)
             setSearchResults([])
             setSearchTerm('')
         } catch (err) {
@@ -340,7 +360,7 @@ const Dashboard = () => {
                                                 animate={{ opacity: 1, y: 0 }}
                                                 transition={{ delay: idx * 0.04 }}
                                                 whileHover={{ y: -15, scale: 1.02 }}
-                                                onClick={() => handleSelectMovie(res.imdbID)}
+                                                onClick={() => handleSelectMovie(res)}
                                                 className="group relative aspect-[2/3] rounded-[32px] overflow-hidden cursor-pointer shadow-2xl bg-white/5 border border-white/5 hover:border-amber-500/30 transition-all duration-700"
                                             >
                                                 <img
@@ -353,7 +373,10 @@ const Dashboard = () => {
                                                 />
                                                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80 group-hover:opacity-20 transition-all duration-700" />
                                                 <div className="absolute bottom-0 left-0 right-0 p-8 space-y-2 translate-y-4 group-hover:translate-y-0 transition-all duration-700">
-                                                    <span className="text-amber-500 text-[10px] font-black uppercase tracking-[0.3em]">{res.Year}</span>
+                                                    <div className="flex justify-between items-center">
+                                                        <span className="text-amber-500 text-[10px] font-black uppercase tracking-[0.3em]">{res.Year}</span>
+                                                        <span className="px-2 py-0.5 bg-white/10 rounded-md text-[8px] font-black uppercase tracking-widest text-white/40">{res.Type === 'tv' ? 'TV SHOW' : 'MOVIE'}</span>
+                                                    </div>
                                                     <h3 className="text-lg font-bold leading-tight group-hover:text-amber-400 transition-colors line-clamp-2">{res.Title}</h3>
                                                 </div>
                                             </motion.div >

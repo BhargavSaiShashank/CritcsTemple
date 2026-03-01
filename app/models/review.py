@@ -50,6 +50,7 @@ class Reactions(BaseModel):
 
 class ReviewBase(BaseModel):
     movie_id: int # TMDB ID for easy mapping
+    content_type: str = "movie" # movie, tv
     movie_title: Optional[str] = None
     movie_poster_url: Optional[str] = None
     status: str = "draft" # draft, published
@@ -79,6 +80,7 @@ class ReviewCreate(ReviewBase):
 
 class ReviewUpdate(BaseModel):
     status: Optional[str] = None
+    content_type: Optional[str] = None
     overall_rating: Optional[float] = None
     verdict: Optional[Verdict] = None
     summary: Optional[str] = None
