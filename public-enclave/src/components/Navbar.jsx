@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Film, Award, Archive, Search } from 'lucide-react';
 
-export default function Navbar() {
+export default function Navbar({ onSearchOpen }) {
     const [scrolled, setScrolled] = useState(false);
     const location = useLocation();
 
@@ -85,12 +85,16 @@ export default function Navbar() {
                     }} />
 
                     {/* Search trigger or just indicator */}
-                    <div style={{
-                        color: 'rgba(255, 255, 255, 0.4)',
-                        cursor: 'pointer',
-                        transition: 'color 0.2s'
-                    }} onMouseEnter={e => e.currentTarget.style.color = '#f5a623'}
-                        onMouseLeave={e => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.4)'}>
+                    <div
+                        onClick={onSearchOpen}
+                        style={{
+                            color: 'rgba(255, 255, 255, 0.4)',
+                            cursor: 'pointer',
+                            transition: 'color 0.2s'
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.color = '#f5a623'}
+                        onMouseLeave={e => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.4)'}
+                    >
                         <Search size={18} />
                     </div>
                 </div>
