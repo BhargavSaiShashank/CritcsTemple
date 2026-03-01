@@ -31,7 +31,8 @@ const SearchOverlay = ({ isOpen, onClose }) => {
             setIsLoading(true);
             try {
                 const response = await getLatestReviews(6, 0, query);
-                setResults(response.data.reviews || []);
+                // The API returns an array directly, not an object with a 'reviews' key
+                setResults(Array.isArray(response.data) ? response.data : (response.data.reviews || []));
             } catch (error) {
                 console.error('Search failed:', error);
             } finally {
