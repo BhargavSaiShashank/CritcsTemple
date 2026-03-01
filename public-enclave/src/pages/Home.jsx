@@ -192,7 +192,7 @@ export default function Home() {
             <section style={{
                 position: 'relative',
                 minHeight: '90vh',
-                paddingTop: 'clamp(140px, 15vh, 200px)',
+                paddingTop: 'calc(clamp(160px, 15vh, 220px) + env(safe-area-inset-top, 0px))',
                 paddingBottom: '80px',
                 overflow: 'hidden',
                 display: 'flex',
