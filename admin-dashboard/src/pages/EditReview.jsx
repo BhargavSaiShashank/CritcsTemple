@@ -44,6 +44,7 @@ const EditReview = () => {
         id: review.movie_id,
         title: review.movie_title,
         poster_url: review.movie_poster_url,
+        content_type: review.content_type || 'movie'
     };
 
     return (

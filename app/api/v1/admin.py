@@ -7,9 +7,11 @@ from typing import List, Any, Optional, Dict
 from app.db.mongodb import get_database
 from app.models.review import ReviewCreate, ReviewUpdate, ReviewInDB
 from app.models.movie import MovieCreate, MovieInDB
+from app.models.show import ShowCreate
 from app.models.category import CategoryCreate, CategoryUpdate, CategoryInDB
 from app.services.tmdb import tmdb_service
 from app.services.movie_service import movie_service
+from app.services.show_service import show_service
 from app.services.analytics_service import analytics_service
 from app.services.review_service import review_service
 from app.services.images import image_service
@@ -58,6 +60,21 @@ async def fetch_and_save_movie(
     admin = Depends(get_current_admin)
 ):
     return await movie_service.fetch_and_save_movie(db, search_term)
+
+@router.get("/shows/search")
+async def search_shows(
+    title: str = Query(...), 
+    admin = Depends(get_current_admin)
+):
+    return await tmdb_service.search_shows(title)
+
+@router.post("/shows/fetch", response_model=ShowCreate)
+async def fetch_and_save_show(
+    tmdb_id: str = Body(..., embed=True), 
+    db = Depends(get_database),
+    admin = Depends(get_current_admin)
+):
+    return await show_service.fetch_and_save_show(db, tmdb_id)
 
 @router.post("/reviews", response_model=ReviewInDB)
 async def create_review(

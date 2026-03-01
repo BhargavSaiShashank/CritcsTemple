@@ -302,7 +302,18 @@ export default function ReviewDetail() {
                     <h1 className="display" style={{ fontSize: 'clamp(2rem, 8vw, 4.2rem)', fontWeight: 800, color: '#f2f2f2', lineHeight: 1.05, letterSpacing: '-0.025em', marginBottom: '8px' }}>
                         {review.movie_title}
                     </h1>
-                    {review.movie_year && <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)', fontWeight: 400 }}>{review.movie_year}</div>}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'rgba(255,255,255,0.3)', fontWeight: 400 }}>
+                        {review.content_type === 'tv' && (
+                            <span style={{ color: 'rgba(245,166,35,0.6)', fontWeight: 700, textTransform: 'uppercase', fontSize: '11px', letterSpacing: '0.05em' }}>TV Show &bull;</span>
+                        )}
+                        {review.movie_year && <span>{review.movie_year}</span>}
+                        {review.seasons_count && (
+                            <>
+                                <span style={{ color: 'rgba(255,255,255,0.1)' }}>&bull;</span>
+                                <span>{review.seasons_count} Seasons</span>
+                            </>
+                        )}
+                    </div>
                 </div>
             </div>
 

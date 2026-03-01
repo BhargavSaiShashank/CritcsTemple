@@ -22,6 +22,8 @@ api.interceptors.request.use(async (config) => {
 
 export const fetchMovieFromOMDb = (searchTerm) => api.post('/admin/movies/fetch', { search_term: searchTerm });
 export const searchMovies = (title) => api.get(`/admin/movies/search?title=${title}`);
+export const fetchShowFromTMDB = (tmdbId) => api.post('/admin/shows/fetch', { tmdb_id: tmdbId });
+export const searchShows = (title) => api.get(`/admin/shows/search?title=${title}`);
 export const getLatestMovies = (category = 'english') => api.get(`/admin/movies/latest?category=${category}`);
 export const getReviews = (params = {}) => api.get('/admin/reviews', { params });
 export const getReview = (id) => api.get(`/admin/reviews/${id}`);
