@@ -155,16 +155,16 @@ const SearchOverlay = ({ isOpen, onClose }) => {
                                             background: '#1a1a1a'
                                         }}>
                                             <img
-                                                src={movie.poster_url}
-                                                alt={movie.title}
+                                                src={movie.movie_poster_url}
+                                                alt={movie.movie_title}
                                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                             />
                                         </div>
                                         <div style={{ flex: 1 }}>
-                                            <h4 style={{ margin: '0 0 4px', fontSize: '16px', fontWeight: 600 }}>{movie.title}</h4>
+                                            <h4 style={{ margin: '0 0 4px', fontSize: '16px', fontWeight: 600 }}>{movie.movie_title}</h4>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                                 <span style={{ fontSize: '12px', color: '#f5a623', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700 }}>
-                                                    <Star size={12} fill="#f5a623" /> {movie.rating}
+                                                    <Star size={12} fill="#f5a623" /> {movie.overall_rating}
                                                 </span>
                                                 <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>
                                                     {movie.verdict}
