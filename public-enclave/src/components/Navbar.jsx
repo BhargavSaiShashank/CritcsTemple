@@ -21,8 +21,8 @@ export default function Navbar() {
             left: 0,
             right: 0,
             zIndex: 1000,
-            paddingTop: scrolled ? 'calc(12px + env(safe-area-inset-top, 0px))' : 'calc(24px + env(safe-area-inset-top, 0px))',
-            paddingBottom: scrolled ? '12px' : '24px',
+            paddingTop: scrolled ? 'calc(8px + env(safe-area-inset-top, 0px))' : 'calc(16px + env(safe-area-inset-top, 0px))',
+            paddingBottom: scrolled ? '8px' : '16px',
             transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
             background: scrolled ? 'rgba(8, 8, 8, 0.85)' : 'transparent',
             backdropFilter: scrolled ? 'blur(20px)' : 'none',
@@ -71,8 +71,8 @@ export default function Navbar() {
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '24px',
-                    flexWrap: 'wrap',
+                    gap: 'clamp(12px, 3vw, 24px)',
+                    flexWrap: 'nowrap',
                     justifyContent: 'center'
                 }}>
                     <NavLink to="/" active={isActive('/')} icon={<Archive size={14} />}>Archive</NavLink>
