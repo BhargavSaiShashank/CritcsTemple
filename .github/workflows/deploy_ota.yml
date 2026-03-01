@@ -24,5 +24,8 @@ jobs:
       - name: Build
         run: npm run build
         
+      - name: Register App with Capgo (if not exists)
+        run: npx @capgo/cli@latest app add com.sanctuary.app --apikey ${{ secrets.CAPGO_TOKEN }} || true
+
       - name: Deploy to Capgo
         run: npx @capgo/cli@latest bundle upload com.sanctuary.app --apikey ${{ secrets.CAPGO_TOKEN }} --channel production --path dist
