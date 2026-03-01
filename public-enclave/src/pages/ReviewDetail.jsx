@@ -4,6 +4,9 @@ import { ChevronLeft, Star, Calendar, Share2, Film, Check, Quote as QuoteIcon, Z
 import { motion, AnimatePresence } from 'framer-motion';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, PolarRadiusAxis } from 'recharts';
 import * as htmlToImage from 'html-to-image';
+import { Capacitor } from '@capacitor/core';
+import { Share } from '@capacitor/share';
+import { Filesystem, Directory } from '@capacitor/filesystem';
 import { getReviewBySlug, clapReview, unclapReview, reactReview, getRelatedReviews } from '../services/api';
 import ReviewExportCard from '../components/ReviewExportCard';
 import SanctuaryTicket from '../components/SanctuaryTicket';
@@ -126,10 +129,29 @@ export default function ReviewDetail() {
                 pixelRatio: 2,
                 backgroundColor: '#080808'
             });
-            const link = document.createElement('a');
-            link.download = `sanctuary-${review.slug}-square.png`;
-            link.href = dataUrl;
-            link.click();
+
+            if (Capacitor.isNativePlatform()) {
+                const fileName = `sanctuary-${review.slug}-square.png`;
+                const base64Data = dataUrl.split(',')[1];
+
+                const savedFile = await Filesystem.writeFile({
+                    path: fileName,
+                    data: base64Data,
+                    directory: Directory.Cache
+                });
+
+                await Share.share({
+                    title: 'Sanctuary Square Card',
+                    text: `Check out my cinematic verdict for ${review.movie_title}!`,
+                    url: savedFile.uri,
+                    dialogTitle: 'Share Cinematic Card'
+                });
+            } else {
+                const link = document.createElement('a');
+                link.download = `sanctuary-${review.slug}-square.png`;
+                link.href = dataUrl;
+                link.click();
+            }
         } catch (error) {
             console.error('Failed to generate square card:', error);
         } finally {
@@ -146,10 +168,29 @@ export default function ReviewDetail() {
                 pixelRatio: 2,
                 backgroundColor: '#0a0a0a'
             });
-            const link = document.createElement('a');
-            link.download = `sanctuary-${review.slug}-ticket.png`;
-            link.href = dataUrl;
-            link.click();
+
+            if (Capacitor.isNativePlatform()) {
+                const fileName = `sanctuary-${review.slug}-ticket.png`;
+                const base64Data = dataUrl.split(',')[1];
+
+                const savedFile = await Filesystem.writeFile({
+                    path: fileName,
+                    data: base64Data,
+                    directory: Directory.Cache
+                });
+
+                await Share.share({
+                    title: 'Sanctuary Ticket',
+                    text: `My exclusive Sanctuary Ticket for ${review.movie_title}!`,
+                    url: savedFile.uri,
+                    dialogTitle: 'Share Sanctuary Ticket'
+                });
+            } else {
+                const link = document.createElement('a');
+                link.download = `sanctuary-${review.slug}-ticket.png`;
+                link.href = dataUrl;
+                link.click();
+            }
         } catch (error) {
             console.error('Failed to generate ticket:', error);
             alert("Failed to generate your ticket.");
