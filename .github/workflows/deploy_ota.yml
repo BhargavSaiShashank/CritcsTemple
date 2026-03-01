@@ -1,0 +1,33 @@
+name: OTA Update (Capgo)
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy-ota:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./public-enclave
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+        
+      - name: Build
+        run: npm run build
+        
+      - name: Deploy to Capgo
+        uses: capgo/action-deploy@v1
+        with:
+          token: ${{ secrets.CAPGO_TOKEN }}
+          app-id: com.sanctuary.app
+          channel: production
+          bundle-path: dist
