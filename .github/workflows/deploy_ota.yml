@@ -28,4 +28,4 @@ jobs:
         run: npx @capgo/cli@latest app add com.sanctuary.app --apikey ${{ secrets.CAPGO_TOKEN }} || true
 
       - name: Deploy to Capgo
-        run: npx @capgo/cli@latest bundle upload com.sanctuary.app --apikey ${{ secrets.CAPGO_TOKEN }} --channel production --path dist
+        run: npx @capgo/cli@latest bundle upload com.sanctuary.app --apikey ${{ secrets.CAPGO_TOKEN }} --channel production --path dist --bundle 1.0.${{ github.run_number }}
