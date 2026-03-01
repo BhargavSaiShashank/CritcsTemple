@@ -1,6 +1,6 @@
 {
   "appId": "com.sanctuary.app",
-  "appName": "The Sanctuary",
+  "appName": "Critic's Temple",
   "webDir": "dist",
   "plugins": {
     "SplashScreen": {
