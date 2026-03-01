@@ -111,11 +111,12 @@ const SanctuaryTicket = React.forwardRef(({ review }, ref) => {
                                 <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)' }} />
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                                {['story', 'direction', 'acting', 'visuals'].map(k => {
+                                {['story', 'direction', 'acting', 'cinematography'].map(k => {
                                     const val = review.aspects?.[k]?.score || '–';
+                                    const label = k === 'cinematography' ? 'Visuals' : k;
                                     return (
                                         <div key={k} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', textTransform: 'capitalize' }}>{k}</span>
+                                            <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', textTransform: 'capitalize' }}>{label}</span>
                                             <span style={{ fontSize: '13px', fontWeight: 800, color: '#f2f2f2' }}>{val}</span>
                                         </div>
                                     );
