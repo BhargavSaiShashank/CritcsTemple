@@ -65,7 +65,7 @@ class ReviewBase(BaseModel):
     trivia_and_details: Optional[str] = None
     favourite_dialogues: List[str] = []
     cinematic_moments: List[str] = []
-    aspects: AspectRatings
+    aspects: AspectRatings = Field(default_factory=AspectRatings)
     tags: List[str] = []
     is_featured: bool = False
     author: Optional[str] = None
