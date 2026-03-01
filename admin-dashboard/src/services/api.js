@@ -1,8 +1,11 @@
 import axios from 'axios';
 import { auth } from './firebase';
 
+const baseURL = import.meta.env.VITE_API_URL || '/api/v1';
+console.log(`[API_CONFIG] Base URL: ${baseURL}`);
+
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || '/api/v1',
+    baseURL: baseURL,
 });
 
 // Inject Firebase ID Token into every request

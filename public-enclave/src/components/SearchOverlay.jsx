@@ -13,6 +13,7 @@ const SearchOverlay = ({ isOpen, onClose }) => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        console.log(`[QUERY_CHANGE] Current query: "${query}"`);
         if (isOpen) {
             setTimeout(() => inputRef.current?.focus(), 100);
             document.body.style.overflow = 'hidden';
@@ -22,32 +23,34 @@ const SearchOverlay = ({ isOpen, onClose }) => {
             setResults([]);
             setError(null);
         }
-    }, [isOpen]);
+    }, [isOpen, query]);
 
     useEffect(() => {
         const fetchResults = async () => {
-            if (!query.trim()) {
+            const trimmedQuery = query.trim();
+            console.log(`[SEARCH] Triggering fetch for query: "${trimmedQuery}"`);
+
+            if (!trimmedQuery) {
                 setResults([]);
                 setError(null);
                 return;
             }
+
             setIsLoading(true);
             setError(null);
             try {
-                const response = await getLatestReviews(6, 0, query);
-                // The API returns an array directly, not an object with a 'reviews' key
+                const response = await getLatestReviews(6, 0, trimmedQuery);
                 const data = Array.isArray(response.data) ? response.data : (response.data.reviews || []);
                 setResults(data);
             } catch (error) {
-                console.error('Search failed:', error);
+                console.error('[SEARCH] Failed:', error);
                 setError('The Oracle is silent. Check your connection.');
             } finally {
                 setIsLoading(false);
             }
         };
 
-        const timer = setTimeout(fetchResults, 300);
-        return () => clearTimeout(timer);
+        fetchResults();
     }, [query]);
 
     const handleResultClick = (slug) => {
@@ -190,10 +193,11 @@ const SearchOverlay = ({ isOpen, onClose }) => {
                                     </motion.div>
                                 ))}
                             </div>
-                        ) : query ? (
+                        ) : (query.trim().length > 1) ? (
                             <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.4)', marginTop: '40px' }}>
                                 <Film size={48} style={{ opacity: 0.2, marginBottom: '16px' }} />
                                 <p>No imprints found for "{query}"</p>
+                                <span style={{ fontSize: '10px', opacity: 0.3 }}>v2.3-array-fix</span>
                             </div>
                         ) : (
                             <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.2)', marginTop: '40px' }}>
