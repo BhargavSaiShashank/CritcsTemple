@@ -22,13 +22,22 @@ app.add_middleware(
         "capacitor://localhost",
         "https://critiquetemple.vercel.app",
         "https://temple-admin-dashboard.vercel.app",
-        "https://critiquetemplesanctuary.vercel.app"
+        "https://critiquetemplesanctuary.vercel.app",
+        "https://the-critics-temple.vercel.app",
     ],
-    allow_origin_regex=r"^https:\/\/.*\.vercel\.app$",
+    allow_origin_regex=r"https:\/\/.*\.vercel\.app$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def log_origin_middleware(request: Request, call_next):
+    origin = request.headers.get("origin")
+    if origin:
+        print(f"REQUEST ORIGIN: {origin}")
+    response = await call_next(request)
+    return response
 
 @app.on_event("startup")
 async def startup_db_client():
