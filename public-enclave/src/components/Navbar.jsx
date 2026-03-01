@@ -33,7 +33,7 @@ export default function Navbar() {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 flexWrap: 'wrap',
-                gap: '16px'
+                gap: 'clamp(8px, 2vw, 16px)'
             }}>
                 {/* Logo */}
                 <Link to="/" style={{
