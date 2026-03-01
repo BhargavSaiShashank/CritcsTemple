@@ -36,19 +36,25 @@ class ReviewService:
         sort_by: Optional[str] = "date",
         order: Optional[str] = "desc"
     ) -> List[Dict[str, Any]]:
-        query = self._get_publication_query()
+        publication_query = self._get_publication_query()
+        filters = [publication_query]
+        
         if tag:
-            query["tags"] = tag
+            filters.append({"tags": tag})
         
         if verdict and verdict.strip():
-            query["verdict"] = verdict.strip()
+            filters.append({"verdict": verdict.strip()})
             
         if search and search.strip():
-            query["$or"] = [
-                {"movie_title": {"$regex": search.strip(), "$options": "i"}},
-                {"verdict": {"$regex": search.strip(), "$options": "i"}},
-                {"tags": {"$regex": search.strip(), "$options": "i"}}
-            ]
+            filters.append({
+                "$or": [
+                    {"movie_title": {"$regex": search.strip(), "$options": "i"}},
+                    {"verdict": {"$regex": search.strip(), "$options": "i"}},
+                    {"tags": {"$regex": search.strip(), "$options": "i"}}
+                ]
+            })
+            
+        query = {"$and": filters} if len(filters) > 1 else filters[0]
             
         sort_field = "overall_rating" if sort_by == "score" else "published_at"
         sort_direction = ASCENDING if (order or "desc").lower() == "asc" else DESCENDING
