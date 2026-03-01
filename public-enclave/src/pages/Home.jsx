@@ -154,8 +154,8 @@ export default function Home() {
             style={{ background: '#080808', minHeight: '100vh', position: 'relative', touchAction: pullDistance > 0 ? 'none' : 'auto' }}
         >
             <Helmet>
-                <title>The Sanctuary: Cinema Archive</title>
-                <meta property="og:title" content="The Sanctuary: Cinema Archive" />
+                <title>Critic's Temple: Cinema Archive</title>
+                <meta property="og:title" content="Critic's Temple: Cinema Archive" />
                 <meta property="og:description" content="An elite, highly aesthetics-focused movie review platform." />
                 <meta property="og:type" content="website" />
                 <meta name="twitter:card" content="summary_large_image" />
@@ -269,7 +269,7 @@ export default function Home() {
                             marginBottom: '18px',
                             textShadow: '0 20px 40px rgba(0,0,0,0.5)'
                         }}>
-                            {hero?.movie_title || 'The Sanctuary'}
+                            {hero?.movie_title || "Critic's Temple"}
                         </h1>
 
                         {hero?.summary && hero.summary.length > 6 && (

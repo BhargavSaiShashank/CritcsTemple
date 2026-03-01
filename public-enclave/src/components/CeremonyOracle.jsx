@@ -27,7 +27,7 @@ const CeremonyOracle = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [query, setQuery] = useState('');
     const [messages, setMessages] = useState([
-        { role: 'oracle', content: 'Welcome, Seeker. What cinematic wisdom do you wish to unearth today?', isNew: false }
+        { role: 'oracle', content: "Welcome, Seeker. What cinematic enlightenment do you seek within the Temple today?", isNew: false }
     ]);
     const [loading, setLoading] = useState(false);
     const scrollRef = useRef(null);
@@ -158,7 +158,7 @@ const CeremonyOracle = () => {
                                         <Sparkles size={18} color="#f5a623" />
                                     </div>
                                     <div>
-                                        <div style={{ fontSize: '14px', fontWeight: 800, color: '#f2f2f2', letterSpacing: '0.02em' }}>The Cinematic Oracle</div>
+                                        <div style={{ fontSize: '14px', fontWeight: 800, color: '#f2f2f2', letterSpacing: '0.02em' }}>The Temple Oracle</div>
                                         <div style={{ fontSize: '10px', fontWeight: 600, color: 'rgba(245,166,35,0.6)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Guardian of Lore</div>
                                     </div>
                                 </div>

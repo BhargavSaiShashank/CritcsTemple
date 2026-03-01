@@ -63,7 +63,7 @@ export default function Navbar({ onSearchOpen }) {
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent'
                     }}>
-                        SANCTUARY
+                        CRITIC'S TEMPLE
                     </span>
                 </Link>
 

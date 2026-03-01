@@ -77,7 +77,7 @@ const ReviewExportCard = React.forwardRef(({ review }, ref) => {
                                 <rect x="2" y="2" width="20" height="20" rx="2.5" ry="2.5"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line>
                             </svg>
                         </div>
-                        <span style={{ fontSize: '32px', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', textTransform: 'uppercase' }}>Sanctuary</span>
+                        <span style={{ fontSize: '32px', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', textTransform: 'uppercase' }}>Critic's Temple</span>
                     </div>
                     {/* Verdict simple pill at top right */}
                     <div style={{
@@ -163,7 +163,7 @@ const ReviewExportCard = React.forwardRef(({ review }, ref) => {
                 {/* 4. Bottom Footer */}
                 <div style={{ position: 'absolute', bottom: '60px', left: '80px', right: '80px', display: 'flex', justifyContent: 'center', zIndex: 10 }}>
                     <div style={{ fontSize: '18px', color: 'rgba(255,255,255,0.25)', fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase' }}>
-                        The Sanctuary • Film Archive
+                        Critic's Temple • Film Archive
                     </div>
                 </div>
 

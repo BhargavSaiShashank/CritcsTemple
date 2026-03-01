@@ -75,7 +75,7 @@ const SanctuaryTicket = React.forwardRef(({ review }, ref) => {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
                         <div>
                             <div style={{ fontSize: '32px', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>
-                                THE <span style={{ color: '#f5a623' }}>SANCTUARY</span>
+                                CRITIC'S <span style={{ color: '#f5a623' }}>TEMPLE</span>
                             </div>
                             <div style={{ fontSize: '10px', fontWeight: 600, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.3em', textTransform: 'uppercase' }}>Official Cinema Seal</div>
                         </div>
