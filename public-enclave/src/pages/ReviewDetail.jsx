@@ -758,7 +758,7 @@ export default function ReviewDetail() {
                                 <ChevronLeft size={13} /> All Reviews
                             </Link>
                             <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.2)', fontStyle: 'italic' }}>
-                                {review.author ? `Penned by ${review.author} · ` : ''}The Sanctuary Archive
+                                {review.author ? `Penned by ${review.author} · ` : ''}Critic's Temple Archive
                             </span>
                         </div>
                     </div>

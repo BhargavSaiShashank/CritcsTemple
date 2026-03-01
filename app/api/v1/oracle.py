@@ -41,7 +41,7 @@ async def oracle_query(
     # Logging for debugging
     print(f"Oracle Query: '{query}' | History: {len(history)} | Context Reviews: {len(reviews)}")
 
-    system_prompt = f"""You are 'The Oracle', the mystical guardian of The Sanctuary. 
+    system_prompt = f"""You are 'The Oracle', the mystical guardian of Critic's Temple. 
 
 ADAPTIVE WISDOM PROTOCOL:
 - **Depth Detection**: Analyze the Seeker's query.
