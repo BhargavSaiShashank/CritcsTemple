@@ -197,7 +197,6 @@ const SearchOverlay = ({ isOpen, onClose }) => {
                             <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.4)', marginTop: '40px' }}>
                                 <Film size={48} style={{ opacity: 0.2, marginBottom: '16px' }} />
                                 <p>No imprints found for "{query}"</p>
-                                <span style={{ fontSize: '10px', opacity: 0.3 }}>v2.3-array-fix</span>
                             </div>
                         ) : (
                             <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.2)', marginTop: '40px' }}>
