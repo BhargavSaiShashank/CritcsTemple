@@ -8,7 +8,7 @@ import Home from './pages/Home'
 import ReviewDetail from './pages/ReviewDetail'
 import HallOfFame from './pages/HallOfFame'
 import CeremonyOracle from './components/CeremonyOracle'
-
+import { CapacitorUpdater } from '@capgo/capacitor-updater'
 import { API_URL } from './services/api'
 
 const PrimalPulse = () => {
@@ -16,6 +16,11 @@ const PrimalPulse = () => {
     // Ping the backend immediately to wake it up from Render sleep phase
     console.log('[Primal Pulse] Waking up the Oracle...');
     fetch(`${API_URL}/health`).catch(() => { });
+
+    // Capgo OTA Update Check
+    if (Capacitor.isNativePlatform()) {
+      CapacitorUpdater.notifyAppReady();
+    }
   }, []);
   return null;
 };
