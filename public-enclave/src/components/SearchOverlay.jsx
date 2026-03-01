@@ -8,6 +8,7 @@ const SearchOverlay = ({ isOpen, onClose }) => {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
     const inputRef = useRef(null);
     const navigate = useNavigate();
 
@@ -19,6 +20,7 @@ const SearchOverlay = ({ isOpen, onClose }) => {
             document.body.style.overflow = 'unset';
             setQuery('');
             setResults([]);
+            setError(null);
         }
     }, [isOpen]);
 
@@ -26,15 +28,19 @@ const SearchOverlay = ({ isOpen, onClose }) => {
         const fetchResults = async () => {
             if (!query.trim()) {
                 setResults([]);
+                setError(null);
                 return;
             }
             setIsLoading(true);
+            setError(null);
             try {
                 const response = await getLatestReviews(6, 0, query);
                 // The API returns an array directly, not an object with a 'reviews' key
-                setResults(Array.isArray(response.data) ? response.data : (response.data.reviews || []));
+                const data = Array.isArray(response.data) ? response.data : (response.data.reviews || []);
+                setResults(data);
             } catch (error) {
                 console.error('Search failed:', error);
+                setError('The Oracle is silent. Check your connection.');
             } finally {
                 setIsLoading(false);
             }
@@ -109,8 +115,7 @@ const SearchOverlay = ({ isOpen, onClose }) => {
                                 fontSize: '24px',
                                 fontWeight: 500,
                                 color: 'white',
-                                outline: 'none',
-                                focus: { border: '1px solid #f5a623' }
+                                outline: 'none'
                             }}
                         />
                     </div>
@@ -124,11 +129,21 @@ const SearchOverlay = ({ isOpen, onClose }) => {
                         overflowY: 'auto',
                         paddingBottom: '40px'
                     }}>
-                        {results.length > 0 ? (
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
+                        {isLoading ? (
+                            <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.4)', marginTop: '40px' }}>
+                                <div className="skeleton" style={{ width: '40px', height: '40px', borderRadius: '50%', margin: '0 auto 16px' }} />
+                                <p>Searching the archive...</p>
+                            </div>
+                        ) : error ? (
+                            <div style={{ textAlign: 'center', color: 'rgba(239,68,68,0.6)', marginTop: '40px' }}>
+                                <X size={48} style={{ opacity: 0.2, marginBottom: '16px' }} />
+                                <p>{error}</p>
+                            </div>
+                        ) : results.length > 0 ? (
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
                                 {results.map((movie) => (
                                     <motion.div
-                                        key={movie.id}
+                                        key={movie._id || movie.id}
                                         layout
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
@@ -175,15 +190,10 @@ const SearchOverlay = ({ isOpen, onClose }) => {
                                     </motion.div>
                                 ))}
                             </div>
-                        ) : query && !isLoading ? (
+                        ) : query ? (
                             <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.4)', marginTop: '40px' }}>
                                 <Film size={48} style={{ opacity: 0.2, marginBottom: '16px' }} />
                                 <p>No imprints found for "{query}"</p>
-                            </div>
-                        ) : query ? (
-                            <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.4)', marginTop: '40px' }}>
-                                <div className="skeleton" style={{ width: '40px', height: '40px', borderRadius: '50%', margin: '0 auto 16px' }} />
-                                <p>Searching the archive...</p>
                             </div>
                         ) : (
                             <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.2)', marginTop: '40px' }}>

@@ -52,10 +52,16 @@ api.interceptors.response.use(
 );
 
 export const getLatestReviews = (limit = 12, offset = 0, search = '', verdict = '', sortBy = 'date', order = 'desc') => {
-    const params = new URLSearchParams({ limit, offset, sort_by: sortBy, order });
-    if (search) params.append('search', search);
-    if (verdict && verdict !== 'All') params.append('verdict', verdict);
-    return api.get(`/reviews?${params.toString()}`);
+    const params = {
+        limit,
+        offset,
+        sort_by: sortBy,
+        order
+    };
+    if (search) params.search = search;
+    if (verdict && verdict !== 'All') params.verdict = verdict;
+
+    return api.get('/reviews', { params });
 };
 export const getReviewBySlug = (slug) => api.get(`/reviews/${slug}`);
 export const clapReview = (slug) => api.post(`/reviews/${slug}/clap`);
