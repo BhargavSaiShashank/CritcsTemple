@@ -74,11 +74,11 @@ app.include_router(public.router, prefix="/api/v1", tags=["Public"])
 app.include_router(admin.router, prefix="/api/v1/admin", tags=["Admin"])
 app.include_router(oracle.router, prefix="/api/v1/oracle", tags=["Oracle"])
 
-@app.get("/health")
-@app.get("/api/v1/health")
+@app.api_route("/health", methods=["GET", "HEAD"])
+@app.api_route("/api/v1/health", methods=["GET", "HEAD"])
 async def health_check():
     return {"status": "alive", "timestamp": datetime.now()}
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 async def root():
     return {"message": "Welcome to The Critic's Temple API"}
