@@ -1,39 +1,39 @@
 import React, { memo } from 'react';
 
 // Use React.memo to prevent unnecessary re-renders when parent states (like mouse position) change
-const BackgroundAtmosphere = memo(({ activeColor = '#f5a623' }) => {
+const BackgroundAtmosphere = memo(({ activeColor = '#f5a623', secondaryColor = null }) => {
     return (
         <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0, overflow: 'hidden' }}>
             {/* 
-                Top-left ambient glow. 
-                Using standard CSS transition for opacity/color is more performant than Framer Motion 
-                for high-frequency background updates. 
+                Left/Top-left ambient glow (Contender 1)
             */}
             <div
                 style={{
                     position: 'absolute',
                     top: '-15%',
                     left: '-10%',
-                    width: '80%',
+                    width: secondaryColor ? '60%' : '80%',
                     height: '80%',
                     borderRadius: '50%',
                     background: `radial-gradient(circle, var(--accent-glow, ${activeColor}08) 0%, transparent 70%)`,
-                    transition: 'background 1.5s ease-in-out, opacity 1s',
+                    transition: 'all 1.5s ease-in-out',
                     filter: 'blur(60px)',
                 }}
             />
 
-            {/* Bottom-right ambient glow */}
+            {/* 
+                Right/Bottom-right ambient glow (Contender 2)
+            */}
             <div
                 style={{
                     position: 'absolute',
-                    bottom: '-20%',
+                    bottom: secondaryColor ? '-10%' : '-20%',
                     right: '-10%',
-                    width: '70%',
+                    width: secondaryColor ? '60%' : '70%',
                     height: '70%',
                     borderRadius: '50%',
-                    background: `radial-gradient(circle, var(--accent-glow, ${activeColor}05) 0%, transparent 70%)`,
-                    transition: 'background 2s ease-in-out, opacity 1s',
+                    background: `radial-gradient(circle, var(--accent-glow, ${secondaryColor || activeColor}05) 0%, transparent 70%)`,
+                    transition: 'all 2s ease-in-out',
                     filter: 'blur(80px)',
                     transitionDelay: '0.2s'
                 }}

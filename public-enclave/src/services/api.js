@@ -80,6 +80,6 @@ export const getHallOfFameReviews = () => api.get('/masterpieces');
 export const getCategories = () => api.get('/categories');
 export const getMovieDetails = (imdbId) => api.get(`/movie/${imdbId}`);
 export const getTVDetails = (tmdbId) => api.get(`/tv/${tmdbId}`);
-export const proxyImage = (url) => `${API_URL}/public/proxy-image?url=${encodeURIComponent(url)}`;
+export const proxyImage = (url) => `${API_URL}/proxy-image?url=${encodeURIComponent(url)}`;
 
 export default api;

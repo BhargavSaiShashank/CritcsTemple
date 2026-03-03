@@ -121,7 +121,7 @@ const Intelligence = () => {
                         </div>
                     </div>
 
-                    <div className="h-[450px] w-full mt-4 transform group-hover:scale-105 transition-transform duration-1000">
+                    <div className="h-[450px] min-h-[450px] w-full mt-4 transform group-hover:scale-105 transition-transform duration-1000">
                         {loading ? (
                             <div className="h-full flex items-center justify-center">
                                 <Loader2 className="animate-spin text-amber-500" size={40} />
