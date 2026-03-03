@@ -76,6 +76,8 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                 viewing_context: initialData.viewing_context || '',
                 trivia_and_details: initialData.trivia_and_details || '',
                 tags: initialData.tags || [],
+                trailer_url: initialData.trailer_url || '',
+                movie_year: initialData.movie_year || '',
                 scheduled_date: initialData.scheduled_date ? initialData.scheduled_date.slice(0, 16) : '',
                 aspects: { ...defaultAspects, ...(initialData.aspects || {}) }
             };
@@ -95,6 +97,8 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             viewing_context: '',
             trivia_and_details: '',
             tags: [],
+            trailer_url: movie?.trailer_url || '',
+            movie_year: movie?.release_year || '',
             scheduled_date: '',
             aspects: defaultAspects
         };
@@ -187,6 +191,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
     }
 
     const handleImprinting = async (status) => {
+        console.log("[DEBUG] Form Data before submission:", formData);
         setSubmitting(true);
 
         // Generate slug from movie title
@@ -217,6 +222,8 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             movie_title: movie.title,
             movie_poster_url: formData.movie_poster_url || movie.poster_url,
             watch_links: formData.watch_links,
+            trailer_url: formData.trailer_url,
+            movie_year: parseInt(formData.movie_year) || null,
             scheduled_date: formData.status === 'scheduled' ? formData.scheduled_date : null,
             overall_rating: parseFloat(averageScore) || 0.0
         };
@@ -373,6 +380,27 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                             onChange={e => setFormData({ ...formData, watch_links: e.target.value })}
                             placeholder="e.g. Netflix, Prime Video (comma separated or URL)"
                             className="w-full bg-transparent border-b border-white/5 py-4 text-base md:text-xl font-bold text-blue-400 outline-none focus:border-blue-500/30 transition-all placeholder:text-white/5 tracking-tight"
+                        />
+                    </div>
+
+                    <div className="space-y-6">
+                        <label className="text-[10px] font-black uppercase tracking-[0.6em] text-white/10">Cinematic Trailer (YouTube URL)</label>
+                        <input
+                            value={formData.trailer_url}
+                            onChange={e => setFormData({ ...formData, trailer_url: e.target.value })}
+                            placeholder="e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                            className="w-full bg-transparent border-b border-white/5 py-4 text-base md:text-xl font-bold text-red-500/80 outline-none focus:border-red-500/30 transition-all placeholder:text-white/5 tracking-tight font-premium"
+                        />
+                    </div>
+
+                    <div className="space-y-6">
+                        <label className="text-[10px] font-black uppercase tracking-[0.6em] text-white/10">Release Year</label>
+                        <input
+                            type="number"
+                            value={formData.movie_year}
+                            onChange={e => setFormData({ ...formData, movie_year: e.target.value })}
+                            placeholder="e.g. 2024"
+                            className="w-full bg-transparent border-b border-white/5 py-4 text-base md:text-xl font-bold text-amber-500/80 outline-none focus:border-amber-500/30 transition-all placeholder:text-white/5 tracking-tight"
                         />
                     </div>
 

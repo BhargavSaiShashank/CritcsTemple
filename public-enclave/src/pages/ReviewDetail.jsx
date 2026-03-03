@@ -2,15 +2,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ChevronLeft, Star, Calendar, Share2, Film, Check, Quote as QuoteIcon, Zap, Camera, Music, Heart, Info, Target, Sparkles, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, PolarRadiusAxis } from 'recharts';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, PolarRadiusAxis, Tooltip } from 'recharts';
 import * as htmlToImage from 'html-to-image';
 import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
-import { getReviewBySlug, clapReview, unclapReview, reactReview, getRelatedReviews } from '../services/api';
+import { getReviewBySlug, clapReview, unclapReview, reactReview, getRelatedReviews, proxyImage } from '../services/api';
 import ReviewExportCard from '../components/ReviewExportCard';
 import SanctuaryTicket from '../components/SanctuaryTicket';
 import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
+import { useColorHarmonizer } from '../hooks/useColorHarmonizer';
 
 const FALLBACK = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=1200';
 
@@ -119,6 +120,23 @@ export default function ReviewDetail() {
     const [related, setRelated] = useState([]);
     const ticketRef = useRef(null);
     const [exportingTicket, setExportingTicket] = useState(false);
+    const [isTrailerOpen, setIsTrailerOpen] = useState(false);
+
+    // Dynamic Color Harmonization
+    useColorHarmonizer(review?.movie_poster_url ? proxyImage(review.movie_poster_url) : null);
+
+    // Robust YouTube ID extraction
+    const getEmbedUrl = (url) => {
+        if (!url) return '';
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regExp);
+        const videoId = (match && match[2].length === 11) ? match[2] : null;
+
+        if (videoId) {
+            return `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+        }
+        return '';
+    };
 
     const handleDownloadCard = async () => {
         if (!exportRef.current) return;
@@ -202,6 +220,7 @@ export default function ReviewDetail() {
     useEffect(() => {
         getReviewBySlug(slug)
             .then(({ data }) => {
+                console.log("[DEBUG] Review data in Detail:", data);
                 setReview(data);
                 setSrc(data?.movie_poster_url || FALLBACK);
                 setClaps(data.claps || 0);
@@ -350,9 +369,21 @@ export default function ReviewDetail() {
                     </h1>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'rgba(255,255,255,0.3)', fontWeight: 400 }}>
                         {review.content_type === 'tv' && (
-                            <span style={{ color: 'rgba(245,166,35,0.6)', fontWeight: 700, textTransform: 'uppercase', fontSize: '11px', letterSpacing: '0.05em' }}>TV Show &bull;</span>
+                            <span style={{ color: 'var(--accent-primary, rgba(245,166,35,0.6))', fontWeight: 700, textTransform: 'uppercase', fontSize: '11px', letterSpacing: '0.05em' }}>TV Show &bull;</span>
                         )}
                         {review.movie_year && <span>{review.movie_year}</span>}
+                        {review.trailer_url && (
+                            <>
+                                <span style={{ color: 'rgba(255,255,255,0.1)' }}>&bull;</span>
+                                <button
+                                    onClick={() => setIsTrailerOpen(true)}
+                                    style={{ background: 'none', border: 'none', padding: 0, color: 'var(--accent-primary, #f5a623)', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                                    className="hover:brightness-125 transition-all"
+                                >
+                                    <Film size={12} /> Watch Glimpse
+                                </button>
+                            </>
+                        )}
                         {review.seasons_count && (
                             <>
                                 <span style={{ color: 'rgba(255,255,255,0.1)' }}>&bull;</span>
@@ -609,12 +640,38 @@ export default function ReviewDetail() {
                                             <PolarGrid stroke="rgba(255,255,255,0.1)" />
                                             <PolarAngleAxis dataKey="subject" tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 10, fontWeight: 600 }} />
                                             <PolarRadiusAxis angle={30} domain={[0, 10]} axisLine={false} tick={false} />
+                                            <Tooltip
+                                                content={({ active, payload }) => {
+                                                    if (active && payload && payload.length) {
+                                                        const data = payload[0].payload;
+                                                        return (
+                                                            <div style={{
+                                                                background: 'rgba(15, 15, 15, 0.85)',
+                                                                backdropFilter: 'blur(12px)',
+                                                                border: `1px solid ${vc.color}40`,
+                                                                padding: '12px 16px',
+                                                                borderRadius: '12px',
+                                                                boxShadow: `0 10px 30px rgba(0,0,0,0.5), 0 0 20px ${vc.color}10`,
+                                                                display: 'flex',
+                                                                flexDirection: 'column',
+                                                                gap: '4px'
+                                                            }}>
+                                                                <div style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{data.subject}</div>
+                                                                <div style={{ fontSize: '20px', fontWeight: 900, color: vc.color, fontFamily: 'serif', fontStyle: 'italic' }}>{data.A.toFixed(1)}<span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.2)', fontStyle: 'normal', marginLeft: '4px' }}>/ 10</span></div>
+                                                            </div>
+                                                        );
+                                                    }
+                                                    return null;
+                                                }}
+                                            />
                                             <Radar
                                                 name="Score"
                                                 dataKey="A"
                                                 stroke={vc.color}
                                                 fill={vc.color}
                                                 fillOpacity={0.35}
+                                                dot={{ r: 4, fill: vc.color, fillOpacity: 0.8, stroke: '#fff', strokeWidth: 1 }}
+                                                activeDot={{ r: 6, fill: '#fff', stroke: vc.color, strokeWidth: 2 }}
                                             />
                                         </RadarChart>
                                     </ResponsiveContainer>
@@ -773,6 +830,62 @@ export default function ReviewDetail() {
             {/* Hidden Export Components */}
             <ReviewExportCard ref={exportRef} review={review} />
             <SanctuaryTicket ref={ticketRef} review={review} />
+
+            {/* Cinematic Trailer Modal */}
+            <AnimatePresence>
+                {isTrailerOpen && review.trailer_url && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setIsTrailerOpen(false)}
+                        style={{
+                            position: 'fixed',
+                            inset: 0,
+                            zIndex: 1000,
+                            background: 'rgba(0,0,0,0.92)',
+                            backdropFilter: 'blur(10px)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: '20px'
+                        }}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.95, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.95, opacity: 0 }}
+                            onClick={e => e.stopPropagation()}
+                            style={{
+                                width: '100%',
+                                maxWidth: '1000px',
+                                aspectRatio: '16/9',
+                                background: '#000',
+                                borderRadius: '12px',
+                                overflow: 'hidden',
+                                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+                                border: '1px solid rgba(255,255,255,0.1)'
+                            }}
+                        >
+                            <iframe
+                                width="100%"
+                                height="100%"
+                                src={getEmbedUrl(review.trailer_url)}
+                                title="YouTube video player"
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowFullScreen
+                            ></iframe>
+                        </motion.div>
+                        <button
+                            onClick={() => setIsTrailerOpen(false)}
+                            style={{ position: 'absolute', top: '24px', right: '24px', background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', width: '40px', height: '40px', borderRadius: '50%', cursor: 'pointer', fontSize: '20px' }}
+                        >
+                            ×
+                        </button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

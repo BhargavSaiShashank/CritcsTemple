@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer
+    Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip
 } from 'recharts';
 import {
     TrendingUp, History, LayoutDashboard, Loader2, Star, ChevronRight, Filter, Search
@@ -140,12 +140,31 @@ const Intelligence = () => {
                                         axisLine={false}
                                         tick={false}
                                     />
+                                    <Tooltip
+                                        content={({ active, payload }) => {
+                                            if (active && payload && payload.length) {
+                                                const data = payload[0].payload;
+                                                return (
+                                                    <div className="bg-black/80 backdrop-blur-xl border border-amber-500/30 p-4 rounded-2xl shadow-2xl flex flex-col gap-1">
+                                                        <div className="text-[10px] font-black text-white/30 uppercase tracking-widest">{data.subject}</div>
+                                                        <div className="text-2xl font-black text-amber-500 italic">
+                                                            {data.A.toFixed(1)}
+                                                            <span className="text-xs text-white/10 not-italic ml-2 font-black">/ 10</span>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            }
+                                            return null;
+                                        }}
+                                    />
                                     <Radar
                                         name="Sanctuary"
                                         dataKey="A"
                                         stroke="#f59e0b"
                                         fill="#f59e0b"
                                         fillOpacity={0.4}
+                                        dot={{ r: 4, fill: '#f59e0b', fillOpacity: 0.8, stroke: '#fff', strokeWidth: 1 }}
+                                        activeDot={{ r: 6, fill: '#fff', stroke: '#f59e0b', strokeWidth: 2 }}
                                         animationBegin={500}
                                         animationDuration={2000}
                                     />

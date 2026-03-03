@@ -71,6 +71,8 @@ class ReviewBase(BaseModel):
     is_featured: bool = False
     author: Optional[str] = None
     watch_links: Optional[str] = None
+    trailer_url: Optional[str] = None
+    movie_year: Optional[int] = None
     claps: int = 0
     scheduled_date: Optional[datetime] = None
     reactions: Reactions = Field(default_factory=Reactions)
@@ -98,6 +100,8 @@ class ReviewUpdate(BaseModel):
     author: Optional[str] = None
     movie_poster_url: Optional[str] = None
     watch_links: Optional[str] = None
+    trailer_url: Optional[str] = None
+    movie_year: Optional[int] = None
     scheduled_date: Optional[datetime] = None
 
 class ReviewInDB(ReviewBase):

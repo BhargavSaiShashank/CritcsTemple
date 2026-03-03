@@ -145,7 +145,7 @@ class TMDBService:
                     if res:
                         tmdb_id = str(res[0]["id"])
             
-            url = f"{self.BASE_URL}/movie/{tmdb_id}?api_key={self.api_key}&append_to_response=credits"
+            url = f"{self.BASE_URL}/movie/{tmdb_id}?api_key={self.api_key}&append_to_response=credits,videos"
             resp = await client_instance.get(url)
             resp.raise_for_status()
             return self._parse_details(resp.json(), tmdb_id)
@@ -163,6 +163,18 @@ class TMDBService:
                 raise HTTPException(status_code=500, detail="TMDb Connection Error")
 
     def _parse_details(self, data: Dict[str, Any], tmdb_id: str) -> MovieCreate:
+        videos = data.get("videos", {}).get("results", [])
+        trailer_url = None
+        for v in videos:
+            if v.get("site") == "YouTube" and v.get("type") == "Trailer" and v.get("official") is True:
+                trailer_url = f"https://www.youtube.com/watch?v={v.get('key')}"
+                break
+        if not trailer_url and videos:
+            for v in videos:
+                if v.get("site") == "YouTube" and v.get("type") == "Trailer":
+                    trailer_url = f"https://www.youtube.com/watch?v={v.get('key')}"
+                    break
+
         credits = data.get("credits", {})
         cast_raw = credits.get("cast", [])
         actors = []
@@ -203,7 +215,8 @@ class TMDBService:
             backdrop_url=backdrop_url,
             ratings=[{"Source": "TMDb", "Value": str(data.get("vote_average", "N/A"))}],
             cast=actors,
-            crew=crew
+            crew=crew,
+            trailer_url=trailer_url
         )
 
     @cached(ttl=3600)
@@ -211,7 +224,7 @@ class TMDBService:
         print(f"Fetching TMDb TV details for: {tmdb_id}")
         
         async def _do_fetch(client_instance: httpx.AsyncClient, tid: str):
-            url = f"{self.BASE_URL}/tv/{tid}?api_key={self.api_key}&append_to_response=credits"
+            url = f"{self.BASE_URL}/tv/{tid}?api_key={self.api_key}&append_to_response=credits,videos"
             resp = await client_instance.get(url)
             resp.raise_for_status()
             return self._parse_show_details(resp.json(), tid)
@@ -229,6 +242,18 @@ class TMDBService:
                 raise HTTPException(status_code=500, detail="TMDb Connection Error")
 
     def _parse_show_details(self, data: Dict[str, Any], tmdb_id: str) -> ShowCreate:
+        videos = data.get("videos", {}).get("results", [])
+        trailer_url = None
+        for v in videos:
+            if v.get("site") == "YouTube" and v.get("type") == "Trailer" and v.get("official") is True:
+                trailer_url = f"https://www.youtube.com/watch?v={v.get('key')}"
+                break
+        if not trailer_url and videos:
+            for v in videos:
+                if v.get("site") == "YouTube" and v.get("type") == "Trailer":
+                    trailer_url = f"https://www.youtube.com/watch?v={v.get('key')}"
+                    break
+
         credits = data.get("credits", {})
         cast_raw = credits.get("cast", [])
         actors = []
@@ -275,7 +300,8 @@ class TMDBService:
             backdrop_url=backdrop_url,
             ratings=[{"Source": "TMDb", "Value": str(data.get("vote_average", "N/A"))}],
             cast=actors,
-            crew=crew
+            crew=crew,
+            trailer_url=trailer_url
         )
 
 tmdb_service = TMDBService()
