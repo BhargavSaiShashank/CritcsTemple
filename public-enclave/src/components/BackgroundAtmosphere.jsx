@@ -17,7 +17,7 @@ const BackgroundAtmosphere = memo(({ activeColor = '#f5a623' }) => {
                     width: '80%',
                     height: '80%',
                     borderRadius: '50%',
-                    background: `radial-gradient(circle, ${activeColor}08 0%, transparent 70%)`,
+                    background: `radial-gradient(circle, var(--accent-glow, ${activeColor}08) 0%, transparent 70%)`,
                     transition: 'background 1.5s ease-in-out, opacity 1s',
                     filter: 'blur(60px)',
                 }}
@@ -32,7 +32,7 @@ const BackgroundAtmosphere = memo(({ activeColor = '#f5a623' }) => {
                     width: '70%',
                     height: '70%',
                     borderRadius: '50%',
-                    background: `radial-gradient(circle, ${activeColor}05 0%, transparent 70%)`,
+                    background: `radial-gradient(circle, var(--accent-glow, ${activeColor}05) 0%, transparent 70%)`,
                     transition: 'background 2s ease-in-out, opacity 1s',
                     filter: 'blur(80px)',
                     transitionDelay: '0.2s'

@@ -18,6 +18,7 @@ class ShowBase(BaseModel):
     synopsis: Optional[str] = "No synopsis available."
     poster_url: Optional[str] = None
     backdrop_url: Optional[str] = None
+    trailer_url: Optional[str] = None
     ratings: List[Dict[str, str]] = []
     cast: List[CastMember] = []
     crew: List[CrewMember] = []
