@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+
+Sitemap: https://critiquetemplesanctuary.vercel.app/sitemap.xml
