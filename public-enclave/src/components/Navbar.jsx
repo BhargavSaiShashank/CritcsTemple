@@ -21,7 +21,7 @@ export default function Navbar({ onSearchOpen }) {
             left: 0,
             right: 0,
             zIndex: 1000,
-            paddingTop: scrolled ? 'calc(8px + env(safe-area-inset-top, 0px))' : 'calc(16px + env(safe-area-inset-top, 0px))',
+            paddingTop: scrolled ? 'calc(8px + var(--safe-top))' : 'calc(16px + var(--safe-top))',
             paddingBottom: scrolled ? '8px' : '16px',
             transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
             background: scrolled ? 'rgba(8, 8, 8, 0.85)' : 'transparent',

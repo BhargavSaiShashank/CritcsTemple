@@ -53,6 +53,12 @@ const NativeListener = () => {
 const App = () => {
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
 
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      document.body.classList.add('is-native');
+    }
+  }, []);
+
   return (
     <HelmetProvider>
       <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>

@@ -147,7 +147,7 @@ const CeremonyOracle = () => {
                             {/* Header */}
                             <div style={{
                                 padding: '24px',
-                                paddingTop: 'calc(24px + env(safe-area-inset-top, 0px))',
+                                paddingTop: 'calc(24px + var(--safe-top))',
                                 borderBottom: '1px solid rgba(255,255,255,0.05)',
                                 display: 'flex',
                                 alignItems: 'center',

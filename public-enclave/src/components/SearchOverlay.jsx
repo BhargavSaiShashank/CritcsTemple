@@ -74,7 +74,7 @@ const SearchOverlay = ({ isOpen, onClose }) => {
                         zIndex: 2000,
                         background: 'rgba(8, 8, 8, 0.95)',
                         backdropFilter: 'blur(30px)',
-                        padding: 'calc(24px + env(safe-area-inset-top, 0px)) 24px 24px',
+                        padding: 'calc(24px + var(--safe-top)) 24px 24px',
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center'
