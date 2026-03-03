@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ChevronLeft, Star, Calendar, Share2, Film, Check, Quote as QuoteIcon, Zap, Camera, Music, Heart, Info, Target, Sparkles, Download } from 'lucide-react';
+import { ChevronLeft, Star, Calendar, Share2, Film, Check, Quote as QuoteIcon, Zap, Camera, Music, Heart, Info, Target, Sparkles, Download, Sword } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, PolarRadiusAxis, Tooltip } from 'recharts';
 import * as htmlToImage from 'html-to-image';
@@ -627,6 +627,33 @@ export default function ReviewDetail() {
                                     <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.06)' }} />
                                     Structural DNA
                                     <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.06)' }} />
+                                </div>
+
+                                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+                                    <Link
+                                        to={`/duel/${review.slug}`}
+                                        style={{
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '8px',
+                                            padding: '8px 16px',
+                                            borderRadius: '10px',
+                                            background: 'rgba(245,166,35,0.1)',
+                                            border: '1px solid rgba(245,166,35,0.2)',
+                                            color: '#f5a623',
+                                            fontSize: '11px',
+                                            fontWeight: 800,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.1em',
+                                            textDecoration: 'none',
+                                            transition: 'all 0.3s ease'
+                                        }}
+                                        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(245,166,35,0.2)'; e.currentTarget.style.boxShadow = '0 0 15px rgba(245,166,35,0.2)'; }}
+                                        onMouseLeave={e => { e.currentTarget.style.background = 'rgba(245,166,35,0.1)'; e.currentTarget.style.boxShadow = 'none'; }}
+                                    >
+                                        <Sword size={12} />
+                                        Launch Duel
+                                    </Link>
                                 </div>
 
                                 {/* Radar Chart Integration */}
