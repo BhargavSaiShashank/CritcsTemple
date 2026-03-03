@@ -295,10 +295,7 @@ export default function ReviewDetail() {
     };
 
     const handleShare = async () => {
-        let textToCopy = window.location.href;
-        if (Capacitor.isNativePlatform()) {
-            textToCopy = `https://critiquetemplesanctuary.vercel.app/review/${review.slug}`;
-        }
+        const textToCopy = `https://critiquetemplesanctuary.vercel.app/review/${review.slug}`;
         try {
             await navigator.clipboard?.writeText(textToCopy);
             setCopied(true);
