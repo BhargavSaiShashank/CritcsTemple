@@ -124,7 +124,7 @@ const Intelligence = () => {
                         </div>
                     </div>
 
-                    <div className="h-[300px] md:h-[450px] w-full mt-4 transform group-hover:scale-105 transition-transform duration-1000 relative" style={{ minHeight: '300px' }}>
+                    <div className="h-[300px] md:h-[450px] w-full mt-4 transform group-hover:scale-105 transition-transform duration-1000 relative" style={{ minHeight: '400px' }}>
                         {loading ? (
                             <div className="h-full flex items-center justify-center">
                                 <Loader2 className="animate-spin text-amber-500" size={40} />

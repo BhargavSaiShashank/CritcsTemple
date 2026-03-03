@@ -657,7 +657,7 @@ export default function ReviewDetail() {
                                 </div>
 
                                 {/* Radar Chart Integration */}
-                                <div style={{ height: '320px', background: '#111', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '32px', padding: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <div style={{ height: '320px', minHeight: '320px', background: '#111', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '32px', padding: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <ResponsiveContainer width="100%" height="100%">
                                         <RadarChart cx="50%" cy="50%" outerRadius="80%" data={
                                             Object.keys(aspects)

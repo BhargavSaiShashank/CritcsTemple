@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Film, Award, Archive, Search, Sword } from 'lucide-react';
+import { Film, Award, Archive, Search } from 'lucide-react';
 
 export default function Navbar({ onSearchOpen }) {
     const [scrolled, setScrolled] = useState(false);
@@ -77,7 +77,6 @@ export default function Navbar({ onSearchOpen }) {
                 }}>
                     <NavLink to="/" active={isActive('/')} icon={<Archive size={14} />}>Archive</NavLink>
                     <NavLink to="/hall-of-fame" active={isActive('/hall-of-fame')} icon={<Award size={14} />}>Hall of Fame</NavLink>
-                    <NavLink to="/duel" active={isActive('/duel')} icon={<Sword size={14} />}>Showdown</NavLink>
 
                     <div style={{
                         width: '1px',
