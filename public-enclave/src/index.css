@@ -39,6 +39,14 @@ body,
   /* Responsive foundations */
   --page-padding: clamp(1.5rem, 5vw, 3rem);
   --max-width: 1400px;
+
+  /* Safe area defaults */
+  --safe-top: env(safe-area-inset-top, 0px);
+}
+
+body.is-native {
+  /* On native, if env() fails, we want at least 44px of top gap (to cover most notches) */
+  --safe-top: env(safe-area-inset-top, 44px);
 }
 
 .max-w-container {

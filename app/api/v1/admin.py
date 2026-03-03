@@ -98,7 +98,10 @@ async def create_review(
         review_dict["published_at"] = None
 
     result = await db.reviews.insert_one(review_dict)
-    review_dict["_id"] = str(result.inserted_id)
+    review_id = str(result.inserted_id)
+    review_dict["_id"] = review_id
+
+
     return review_dict
 
 from bson import ObjectId
@@ -159,6 +162,7 @@ async def update_review(
         {"$set": update_dict, "$push": {"history": history_entry}}
     )
     
+
     updated = await db.reviews.find_one({"_id": obj_id})
     if updated and "_id" in updated:
         updated["_id"] = str(updated["_id"])

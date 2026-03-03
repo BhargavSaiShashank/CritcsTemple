@@ -88,3 +88,4 @@ async def proxy_image(url: str):
                 async for chunk in response.aiter_bytes():
                     yield chunk
     return StreamingResponse(stream_image(), media_type="image/jpeg")
+

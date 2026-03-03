@@ -4,7 +4,6 @@ motor
 pydantic
 pydantic-settings
 python-dotenv
-firebase-admin
 httpx
 cloudinary
 python-multipart
