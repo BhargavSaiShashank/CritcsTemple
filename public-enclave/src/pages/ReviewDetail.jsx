@@ -294,10 +294,18 @@ export default function ReviewDetail() {
         }
     };
 
-    const handleShare = () => {
-        navigator.clipboard?.writeText(window.location.href);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+    const handleShare = async () => {
+        let textToCopy = window.location.href;
+        if (Capacitor.isNativePlatform()) {
+            textToCopy = `https://critiquetemplesanctuary.vercel.app/review/${review.slug}`;
+        }
+        try {
+            await navigator.clipboard?.writeText(textToCopy);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch (e) {
+            console.error("Failed to copy", e);
+        }
     };
 
     if (loading) return (
