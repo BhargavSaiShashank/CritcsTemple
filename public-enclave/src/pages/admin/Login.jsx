@@ -3,7 +3,6 @@ import { auth } from '../services/firebase'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
 import { LogIn, Sparkles, ShieldCheck, Loader2, Clapperboard } from 'lucide-react'
-import { motion } from 'framer-motion'
 
 const Login = () => {
     const [email, setEmail] = useState('')

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, Film, Star, ArrowRight } from 'lucide-react';
+import { Search, X, Loader, Film, ArrowRight, Star } from 'lucide-react';
 import { getLatestReviews } from '../services/api';
 
 const SearchOverlay = ({ isOpen, onClose }) => {
@@ -114,8 +114,8 @@ const SearchOverlay = ({ isOpen, onClose }) => {
                                 background: 'rgba(255, 255, 255, 0.05)',
                                 border: '1px solid rgba(255, 255, 255, 0.1)',
                                 borderRadius: '20px',
-                                padding: '24px 24px 24px 64px',
-                                fontSize: '24px',
+                                padding: 'clamp(16px, 4vw, 24px) clamp(16px, 4vw, 24px) clamp(16px, 4vw, 24px) clamp(48px, 12vw, 64px)',
+                                fontSize: 'clamp(16px, 5vw, 24px)',
                                 fontWeight: 500,
                                 color: 'white',
                                 outline: 'none'

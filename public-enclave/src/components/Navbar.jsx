@@ -56,12 +56,17 @@ export default function Navbar({ onSearchOpen }) {
                         <Film size={20} color="#000" strokeWidth={2.5} />
                     </div>
                     <span style={{
-                        fontSize: '18px',
+                        display: 'block',
+                        fontSize: 'clamp(14px, 4vw, 18px)',
                         fontWeight: 800,
                         letterSpacing: '-0.02em',
                         background: 'linear-gradient(to bottom, #fff, #aaa)',
                         WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent'
+                        WebkitTextFillColor: 'transparent',
+                        maxWidth: 'clamp(120px, 30vw, 200px)',
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap',
+                        textOverflow: 'ellipsis'
                     }}>
                         CRITIC'S TEMPLE
                     </span>
@@ -76,6 +81,7 @@ export default function Navbar({ onSearchOpen }) {
                     justifyContent: 'center'
                 }}>
                     <NavLink to="/" active={isActive('/')} icon={<Archive size={14} />}>Archive</NavLink>
+                    <NavLink to="/compare" active={isActive('/compare')} icon={<Film size={14} />}>Compare</NavLink>
                     <NavLink to="/hall-of-fame" active={isActive('/hall-of-fame')} icon={<Award size={14} />}>Hall of Fame</NavLink>
 
                     <div style={{

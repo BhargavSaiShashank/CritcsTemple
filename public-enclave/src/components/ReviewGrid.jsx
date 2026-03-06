@@ -124,13 +124,13 @@ const ReviewCard = React.memo(({ review, index }) => {
                             )}
                         </div>
 
-                        <h3 className="line-clamp-2" style={{ fontSize: '16px', fontWeight: 700, color: '#f2f2f2', marginBottom: '8px', lineHeight: 1.3, letterSpacing: '-0.015em', height: '2.6em', overflow: 'hidden' }}>
+                        <h3 className="line-clamp-2" style={{ fontSize: 'clamp(14px, 4vw, 16px)', fontWeight: 700, color: '#f2f2f2', marginBottom: '8px', lineHeight: 1.3, letterSpacing: '-0.015em', height: '2.6em', overflow: 'hidden' }}>
                             {review.movie_title}
                         </h3>
 
                         <div style={{ flex: 1 }}>
                             {review.summary && (
-                                <p className="line-clamp-2" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', lineHeight: 1.6, marginBottom: '14px' }}>
+                                <p className="line-clamp-2" style={{ fontSize: 'clamp(11px, 3vw, 13px)', color: 'rgba(255,255,255,0.4)', lineHeight: 1.6, marginBottom: '14px' }}>
                                     {review.summary}
                                 </p>
                             )}

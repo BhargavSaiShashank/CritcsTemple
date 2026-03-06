@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Trophy } from 'lucide-react';
-import { getCategories } from '../services/api';
 import { motion } from 'framer-motion';
+import { getCategories } from '../services/api';
 import ReviewGrid from '../components/ReviewGrid';
 
 export default function HallOfFame() {

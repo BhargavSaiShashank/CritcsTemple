@@ -45,8 +45,12 @@ export default function PublicHeader() {
                 </Link>
 
                 {/* Nav pills */}
-                <nav style={{ display: 'flex', gap: '3px' }}>
-                    {NAV.map(({ to, label, icon: Icon }) => {
+                <div style={{ display: 'none', gap: '32px', '@media (minWidth: 768px)': { display: 'flex' } }}>
+                    {[
+                        { to: '/', label: 'Archive' },
+                        { to: '/compare', label: 'Compare' },
+                        { to: '/hall-of-fame', label: 'Hall of Fame' }
+                    ].map(({ to, label }) => {
                         const active = to === '/' ? pathname === '/' : pathname.startsWith(to);
                         return (
                             <Link key={to} to={to} style={{
@@ -59,12 +63,11 @@ export default function PublicHeader() {
                                 border: active ? '1px solid rgba(245,166,35,0.15)' : '1px solid transparent',
                                 transition: 'all 0.18s ease',
                             }}>
-                                <Icon size={12} />
-                                {label}
+                                <span>{label}</span>
                             </Link>
                         );
                     })}
-                </nav>
+                </div>
             </div>
         </header>
     );

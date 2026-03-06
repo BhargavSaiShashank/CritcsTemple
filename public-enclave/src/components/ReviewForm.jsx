@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronRight, Star, Quote, AlignLeft, Layout, Zap, Heart, Music, Camera, Plus, Loader2, Sparkles, Download, Eye } from 'lucide-react'
 import { draftVerdict, createReview, updateReview } from '../services/api'
 import SanctuaryCard from './SanctuaryCard';
@@ -121,7 +120,7 @@ const ReviewForm = ({ movie, onSubmit, loading }) => {
             const safeTitle = (movie.title || 'Sanctuary-Verdict').replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
 
             link.setAttribute('href', dataUrl);
-            link.setAttribute('download', `SanctuaryCard-${safeTitle}.png`);
+            link.setAttribute('download', `SanctuaryCard - ${safeTitle}.png`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -195,9 +194,9 @@ const ReviewForm = ({ movie, onSubmit, loading }) => {
             console.error("Failed to save review:", err);
             const detail = err.response?.data?.detail;
             const msg = Array.isArray(detail)
-                ? detail.map(d => `${d.loc?.join('.')} — ${d.msg}`).join('\n')
+                ? detail.map(d => `${d.loc?.join('.')} — ${d.msg} `).join('\n')
                 : JSON.stringify(detail) || err.message;
-            window.alert(`Imprint Failed:\n\n${msg}`);
+            window.alert(`Imprint Failed: \n\n${msg} `);
         } finally {
             setSubmitting(false);
         }
@@ -237,10 +236,10 @@ const ReviewForm = ({ movie, onSubmit, loading }) => {
                         <button
                             key={group.name}
                             onClick={() => setActiveGroup(idx)}
-                            className={`w-full flex items-center justify-between p-6 rounded-3xl transition-all duration-500 group relative overflow-hidden ${activeGroup === idx
+                            className={`w - full flex items - center justify - between p - 6 rounded - 3xl transition - all duration - 500 group relative overflow - hidden ${activeGroup === idx
                                 ? 'bg-amber-500 text-black shadow-2xl shadow-amber-500/20'
                                 : 'hover:bg-white/5 text-white/30 hover:text-white'
-                                }`}
+                                } `}
                         >
                             <div className="flex items-center gap-5 relative z-10">
                                 {group.icon}
@@ -393,10 +392,10 @@ const ReviewForm = ({ movie, onSubmit, loading }) => {
                                         key={v}
                                         type="button"
                                         onClick={() => setFormData({ ...formData, verdict: v })}
-                                        className={`py-6 rounded-2xl border text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-500 ${formData.verdict === v
+                                        className={`py - 6 rounded - 2xl border text - [9px] font - black uppercase tracking - [0.2em] transition - all duration - 500 ${formData.verdict === v
                                             ? 'bg-amber-500 border-amber-500 text-black shadow-[0_0_40px_rgba(245,158,11,0.3)] scale-105 z-10'
                                             : 'bg-white/5 border-white/10 text-white/20 hover:border-white/30 hover:text-white'
-                                            }`}
+                                            } `}
                                     >
                                         {v}
                                     </button>
@@ -405,8 +404,8 @@ const ReviewForm = ({ movie, onSubmit, loading }) => {
                         </div>
 
                         <label className="flex items-center gap-8 cursor-pointer group w-fit">
-                            <div className={`w-10 h-10 rounded-2xl border flex items-center justify-center transition-all duration-700 ${formData.is_featured ? 'bg-amber-500 border-amber-500 rotate-12 scale-110 shadow-[0_0_30px_rgba(245,158,11,0.4)]' : 'bg-white/5 border-white/10 group-hover:border-amber-500/30'
-                                }`}>
+                            <div className={`w - 10 h - 10 rounded - 2xl border flex items - center justify - center transition - all duration - 700 ${formData.is_featured ? 'bg-amber-500 border-amber-500 rotate-12 scale-110 shadow-[0_0_30px_rgba(245,158,11,0.4)]' : 'bg-white/5 border-white/10 group-hover:border-amber-500/30'
+                                } `}>
                                 {formData.is_featured && <Star size={18} className="text-black fill-black" />}
                             </div>
                             <input

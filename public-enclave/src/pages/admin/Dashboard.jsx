@@ -4,7 +4,7 @@ import { fetchMovieFromOMDb, searchMovies, createReview } from '../services/api'
 import { useNavigate, Link } from 'react-router-dom';
 import ReviewForm from '../components/ReviewForm'
 import { Search, Film, Loader2, Info, Sparkles, LogOut, Clapperboard, ChevronRight, LayoutGrid, List, TrendingUp, Star, Clock, Calendar, Plus, CheckCircle2, X } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
 
 const Dashboard = () => {

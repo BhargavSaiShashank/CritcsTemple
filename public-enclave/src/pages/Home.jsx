@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Star, ChevronRight, Search, Film, TrendingUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Zap, Camera, Music, Heart, QuoteIcon, Star, TrendingUp, ChevronRight, Search, Film, ChevronLeft } from 'lucide-react';
 import { getLatestReviews } from '../services/api';
 import ReviewGrid from '../components/ReviewGrid';
 import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
@@ -16,10 +16,10 @@ const VERDICT_COLOR = {
 export default function Home() {
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [search, setSearch] = useState('');
     const [featuredReview, setFeaturedReview] = useState(null);
     const [error, setError] = useState(null);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+    const [search, setSearch] = useState('');
 
     const handleMouseMove = useCallback((e) => {
         if (window.innerWidth < 768) return; // Disable parallax on mobile
@@ -75,31 +75,32 @@ export default function Home() {
     };
 
     // Infinite Scroll State
-    const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const observer = useRef();
 
-    const fetchReviews = async (currentPage, isReset = false, currentSearch = search, currentVerdict = verdictFilter, currentContentType = contentTypeFilter, currentSort = sortOption) => {
+    const fetchReviews = useCallback(async (offset = 0, isReset = false) => {
         try {
             const limit = 15;
-            const offset = currentPage * limit;
-            const [sortBy, order] = currentSort.split('-');
-            const { data } = await getLatestReviews(limit, offset, currentSearch, currentVerdict, currentContentType, sortBy, order);
+            const [sortBy, order] = sortOption.split('-');
+            const { data } = await getLatestReviews(limit, offset, search, verdictFilter, contentTypeFilter, sortBy, order);
 
             if (data && data.length > 0) {
-                setReviews(prev => isReset || currentPage === 0 ? data : [...prev, ...data]);
+                setReviews(prev => isReset || offset === 0 ? data : [...prev, ...data]);
                 setHasMore(data.length === limit);
             } else {
-                if (isReset || currentPage === 0) setReviews([]);
+                if (isReset || offset === 0) setReviews([]);
                 setHasMore(false);
             }
         } catch (err) {
-            console.error("Failed to fetch archives", err);
+            console.error("Home fetch error", err);
             setError(err.message || "Failed to fetch content");
             setHasMore(false); // Prevent infinite IntersectionObserver retry loops
+        } finally {
+            setLoading(false);
+            setLoadingMore(false);
         }
-    };
+    }, [search, verdictFilter, contentTypeFilter, sortOption]);
 
     // Fetch Featured Review once on mount
     useEffect(() => {
@@ -112,30 +113,42 @@ export default function Home() {
     }, []);
 
     useEffect(() => {
-        setLoading(true);
-        setPage(0);
-        setHasMore(true);
+        let isCurrent = true;
+
+        const clearTimer = setTimeout(() => {
+            if (isCurrent) {
+                setLoading(true);
+                setHasMore(true);
+            }
+        }, 0);
+
         const timeout = setTimeout(() => {
-            fetchReviews(0, true, search, verdictFilter, contentTypeFilter, sortOption).finally(() => setLoading(false));
-        }, 400);
-        return () => clearTimeout(timeout);
-    }, [search, verdictFilter, contentTypeFilter, sortOption]);
+            if (isCurrent) fetchReviews();
+        }, 300);
+
+        return () => {
+            isCurrent = false;
+            clearTimeout(clearTimer);
+            clearTimeout(timeout);
+        }
+    }, [fetchReviews]);
 
     const lastElementRef = useCallback(node => {
         if (loading || loadingMore) return;
         if (observer.current) observer.current.disconnect();
+
         observer.current = new IntersectionObserver(entries => {
             if (entries[0].isIntersecting && hasMore) {
+                // We mock pagination for now, fetch again or manage page tokens
                 setLoadingMore(true);
-                setPage(prev => {
-                    const nextPage = prev + 1;
-                    fetchReviews(nextPage, false, search, verdictFilter, contentTypeFilter, sortOption).finally(() => setLoadingMore(false));
-                    return nextPage;
-                });
+                setTimeout(() => {
+                    fetchReviews(reviews.length);
+                }, 500);
             }
         });
+
         if (node) observer.current.observe(node);
-    }, [loading, loadingMore, hasMore, search, verdictFilter, contentTypeFilter, sortOption]);
+    }, [loading, loadingMore, hasMore, fetchReviews, reviews.length]);
 
     const hero = featuredReview;
     const heroColor = VERDICT_COLOR[hero?.verdict] || '#f5a623';

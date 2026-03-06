@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
     Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip
 } from 'recharts';
+import { getVerdictTheme } from '../utils/verdictTheme';
 
-const ReviewRadar = ({ aspects, rating }) => {
+const ReviewRadar = ({ aspects }) => {
     // Transform aspects to recharts format
     const dnaData = Object.entries(aspects || {}).map(([subject, A]) => ({
         subject: subject.toUpperCase().replace(/_/g, ' '),
@@ -12,8 +13,8 @@ const ReviewRadar = ({ aspects, rating }) => {
     }));
 
     return (
-        <div className="h-[400px] min-h-[400px] w-full group-hover:scale-105 transition-transform duration-1000">
-            <ResponsiveContainer width="100%" height="100%">
+        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                 <RadarChart cx="50%" cy="50%" outerRadius="70%" data={dnaData}>
                     <PolarGrid stroke="#ffffff10" />
                     <PolarAngleAxis
