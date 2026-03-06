@@ -127,156 +127,148 @@ const Intelligence = () => {
                                 <Loader2 className="animate-spin text-amber-500" size={40} />
                             </div>
                         ) : (
-                            <ResponsiveContainer width="100%" height="100%">
-                                <RadarChart cx="50%" cy="50%" outerRadius="75%" data={dnaData}>
-                                    <PolarGrid stroke="#ffffff10" />
-                                    <PolarAngleAxis
-                                        dataKey="subject"
-                                        tick={{ fill: "#ffffff40", fontSize: 10, fontWeight: 900 }}
-                                    />
-                                    <PolarRadiusAxis
-                                        angle={30}
+                            angle = { 30}
                                         domain={[0, 10]}
-                                        axisLine={false}
-                                        tick={false}
+                        axisLine={false}
+                        tick={false}
                                     />
-                                    <Tooltip
-                                        content={({ active, payload }) => {
-                                            if (active && payload && payload.length) {
-                                                const data = payload[0].payload;
-                                                return (
-                                                    <div className="bg-black/80 backdrop-blur-xl border border-amber-500/30 p-4 rounded-2xl shadow-2xl flex flex-col gap-1">
-                                                        <div className="text-[10px] font-black text-white/30 uppercase tracking-widest">{data.subject}</div>
-                                                        <div className="text-2xl font-black text-amber-500 italic">
-                                                            {data.A.toFixed(1)}
-                                                            <span className="text-xs text-white/10 not-italic ml-2 font-black">/ 10</span>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            }
-                                            return null;
-                                        }}
-                                    />
-                                    <Radar
-                                        name="Sanctuary"
-                                        dataKey="A"
-                                        stroke="#f59e0b"
-                                        fill="#f59e0b"
-                                        fillOpacity={0.4}
-                                        dot={{ r: 4, fill: '#f59e0b', fillOpacity: 0.8, stroke: '#fff', strokeWidth: 1 }}
-                                        activeDot={{ r: 6, fill: '#fff', stroke: '#f59e0b', strokeWidth: 2 }}
-                                        animationBegin={500}
-                                        animationDuration={2000}
-                                    />
-                                </RadarChart>
-                            </ResponsiveContainer>
-                        )}
-                    </div>
-                </motion.div>
-
-                {/* History Gallery Section */}
-                <motion.div
-                    initial={{ opacity: 0, y: 40 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="lg:col-span-12 xl:col-span-7 space-y-8"
-                >
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4">
-                        <div>
-                            <div className="flex items-center gap-3 text-white/40 mb-2">
-                                <History size={20} />
-                                <span className="text-[10px] font-black uppercase tracking-[0.4em]">Sanctuary Scroll</span>
-                            </div>
-                            <h2 className="text-3xl font-black italic">HISTORY <span className="text-amber-500">GALLERY</span></h2>
-                        </div>
-
-                        <div className="flex gap-4">
-                            <div className="relative">
-                                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" />
-                                <input
-                                    type="text"
-                                    placeholder="SEARCH VERDICTS..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="bg-white/5 border border-white/10 rounded-xl pl-12 pr-6 py-3 text-[10px] font-black uppercase tracking-widest focus:outline-none focus:border-amber-500/50 transition-all w-full md:w-64"
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-20">
-                        {loading ? (
-                            [1, 2, 3, 4].map(i => (
-                                <div key={i} className="h-48 bg-white/5 rounded-3xl animate-pulse" />
-                            ))
-                        ) : filteredReviews.map((review, idx) => (
-                            <motion.div
-                                key={review._id || review.id}
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.3 + (idx * 0.05) }}
-                                whileHover={{ scale: 1.02, y: -5 }}
-                                onClick={() => {
-                                    setSelectedReview(review);
-                                    setIsModalOpen(true);
-                                }}
-                                className="group bg-white/5 backdrop-blur-xl border border-white/5 p-6 rounded-[32px] flex gap-6 hover:border-amber-500/30 transition-all duration-500 cursor-pointer"
-                            >
-                                <div className="w-24 aspect-[2/3] rounded-2xl overflow-hidden bg-white/5 shadow-xl transition-transform duration-700 group-hover:scale-110">
-                                    <img
-                                        src={failedPosters.has(review.movie_poster_url) || !review.movie_poster_url
-                                            ? "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&q=80&w=800"
-                                            : review.movie_poster_url}
-                                        className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-700"
-                                        alt={review.movie_title}
-                                        onError={(e) => handlePosterError(e, review.movie_poster_url)}
-                                    />
-                                </div>
-                                <div className="flex-1 flex flex-col justify-between py-2">
-                                    <div className="space-y-2">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">{review.verdict}</span>
-                                            <div className="h-1 w-1 rounded-full bg-white/20" />
-                                            <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">
-                                                {new Date(review.created_at).toLocaleDateString()}
-                                            </span>
+                        <Tooltip
+                            content={({ active, payload }) => {
+                                if (active && payload && payload.length) {
+                                    const data = payload[0].payload;
+                                    return (
+                                        <div className="bg-black/80 backdrop-blur-xl border border-amber-500/30 p-4 rounded-2xl shadow-2xl flex flex-col gap-1">
+                                            <div className="text-[10px] font-black text-white/30 uppercase tracking-widest">{data.subject}</div>
+                                            <div className="text-2xl font-black text-amber-500 italic">
+                                                {data.A.toFixed(1)}
+                                                <span className="text-xs text-white/10 not-italic ml-2 font-black">/ 10</span>
+                                            </div>
                                         </div>
-                                        <h3 className="text-lg font-bold line-clamp-2 leading-tight group-hover:text-amber-400 transition-colors uppercase">
-                                            {review.movie_title || `Critique #${(review._id || review.id || '').slice(-4)}`}
-                                        </h3>
-                                        <p className="text-xs text-white/40 line-clamp-2 font-medium italic">
-                                            "{review.summary}"
-                                        </p>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-amber-500">
-                                        <Star size={12} fill="currentColor" />
-                                        <span className="text-sm font-black italic">{review.overall_rating}</span>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        ))}
-
-                        {!loading && filteredReviews.length === 0 && (
-                            <div className="col-span-full py-20 text-center space-y-4 opacity-40">
-                                <History size={48} className="mx-auto" />
-                                <p className="text-xs uppercase tracking-[0.4em] font-black">Sanctuary Empty</p>
-                            </div>
+                                    );
+                                }
+                                return null;
+                            }}
+                        />
+                        <Radar
+                            name="Sanctuary"
+                            dataKey="A"
+                            stroke="#f59e0b"
+                            fill="#f59e0b"
+                            fillOpacity={0.4}
+                            dot={{ r: 4, fill: '#f59e0b', fillOpacity: 0.8, stroke: '#fff', strokeWidth: 1 }}
+                            activeDot={{ r: 6, fill: '#fff', stroke: '#f59e0b', strokeWidth: 2 }}
+                            animationBegin={500}
+                            animationDuration={2000}
+                        />
+                    </RadarChart>
+                </ResponsiveContainer>
                         )}
-                    </div>
-                </motion.div>
+            </div>
+        </motion.div>
+
+                {/* History Gallery Section */ }
+    <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="lg:col-span-12 xl:col-span-7 space-y-8"
+    >
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4">
+            <div>
+                <div className="flex items-center gap-3 text-white/40 mb-2">
+                    <History size={20} />
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em]">Sanctuary Scroll</span>
+                </div>
+                <h2 className="text-3xl font-black italic">HISTORY <span className="text-amber-500">GALLERY</span></h2>
             </div>
 
-            {/* Review Details Modal */}
-            <ReviewDetailsModal
-                review={selectedReview}
-                isOpen={isModalOpen}
-                onClose={() => {
-                    setIsModalOpen(false);
-                    setTimeout(() => setSelectedReview(null), 300); // Wait for exit animation
-                }}
-                onDelete={handleDelete}
-            />
+            <div className="flex gap-4">
+                <div className="relative">
+                    <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" />
+                    <input
+                        type="text"
+                        placeholder="SEARCH VERDICTS..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="bg-white/5 border border-white/10 rounded-xl pl-12 pr-6 py-3 text-[10px] font-black uppercase tracking-widest focus:outline-none focus:border-amber-500/50 transition-all w-full md:w-64"
+                    />
+                </div>
+            </div>
         </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-20">
+            {loading ? (
+                [1, 2, 3, 4].map(i => (
+                    <div key={i} className="h-48 bg-white/5 rounded-3xl animate-pulse" />
+                ))
+            ) : filteredReviews.map((review, idx) => (
+                <motion.div
+                    key={review._id || review.id}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3 + (idx * 0.05) }}
+                    whileHover={{ scale: 1.02, y: -5 }}
+                    onClick={() => {
+                        setSelectedReview(review);
+                        setIsModalOpen(true);
+                    }}
+                    className="group bg-white/5 backdrop-blur-xl border border-white/5 p-6 rounded-[32px] flex gap-6 hover:border-amber-500/30 transition-all duration-500 cursor-pointer"
+                >
+                    <div className="w-24 aspect-[2/3] rounded-2xl overflow-hidden bg-white/5 shadow-xl transition-transform duration-700 group-hover:scale-110">
+                        <img
+                            src={failedPosters.has(review.movie_poster_url) || !review.movie_poster_url
+                                ? "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&q=80&w=800"
+                                : review.movie_poster_url}
+                            className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-700"
+                            alt={review.movie_title}
+                            onError={(e) => handlePosterError(e, review.movie_poster_url)}
+                        />
+                    </div>
+                    <div className="flex-1 flex flex-col justify-between py-2">
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                                <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">{review.verdict}</span>
+                                <div className="h-1 w-1 rounded-full bg-white/20" />
+                                <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">
+                                    {new Date(review.created_at).toLocaleDateString()}
+                                </span>
+                            </div>
+                            <h3 className="text-lg font-bold line-clamp-2 leading-tight group-hover:text-amber-400 transition-colors uppercase">
+                                {review.movie_title || `Critique #${(review._id || review.id || '').slice(-4)}`}
+                            </h3>
+                            <p className="text-xs text-white/40 line-clamp-2 font-medium italic">
+                                "{review.summary}"
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-2 text-amber-500">
+                            <Star size={12} fill="currentColor" />
+                            <span className="text-sm font-black italic">{review.overall_rating}</span>
+                        </div>
+                    </div>
+                </motion.div>
+            ))}
+
+            {!loading && filteredReviews.length === 0 && (
+                <div className="col-span-full py-20 text-center space-y-4 opacity-40">
+                    <History size={48} className="mx-auto" />
+                    <p className="text-xs uppercase tracking-[0.4em] font-black">Sanctuary Empty</p>
+                </div>
+            )}
+        </div>
+    </motion.div>
+            </div >
+
+    {/* Review Details Modal */ }
+    < ReviewDetailsModal
+review = { selectedReview }
+isOpen = { isModalOpen }
+onClose = {() => {
+    setIsModalOpen(false);
+    setTimeout(() => setSelectedReview(null), 300); // Wait for exit animation
+}}
+onDelete = { handleDelete }
+    />
+        </div >
     );
 };
 

@@ -349,6 +349,12 @@ export default function ReviewDetail() {
         return { ...g, avg: scores.length ? scores.reduce((a, b) => a + b) / scores.length : null };
     }).filter(g => g.avg !== null);
 
+    const radarData = Object.entries(aspects).map(([key, val]) => ({
+        subject: toLabel(key),
+        A: parseFloat(val?.score || 0),
+        fullMark: 10
+    })).filter(d => d.A > 0);
+
     return (
         <div style={{ background: '#080808', minHeight: '100vh', position: 'relative' }}>
             <BackgroundAtmosphere activeColor={vc.color} />
@@ -364,10 +370,10 @@ export default function ReviewDetail() {
                     <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: 'rgba(255,255,255,0.3)', fontSize: '11px', fontWeight: 600, textDecoration: 'none', letterSpacing: '0.05em', marginBottom: '14px', textTransform: 'uppercase' }}>
                         <ChevronLeft size={12} /> Archive
                     </Link>
-                    <h1 className="display" style={{ fontSize: 'clamp(2rem, 8vw, 4.2rem)', fontWeight: 800, color: '#f2f2f2', lineHeight: 1.05, letterSpacing: '-0.025em', marginBottom: '8px' }}>
+                    <h1 className="display" style={{ fontSize: 'clamp(24px, 10vw, 64px)', fontWeight: 800, color: '#f2f2f2', lineHeight: 1.05, letterSpacing: '-0.025em', marginBottom: '8px' }}>
                         {review.movie_title}
                     </h1>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'rgba(255,255,255,0.3)', fontWeight: 400 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px', fontSize: 'clamp(11px, 3vw, 13px)', color: 'rgba(255,255,255,0.3)', fontWeight: 400 }}>
                         {review.content_type === 'tv' && (
                             <span style={{ color: 'var(--accent-primary, rgba(245,166,35,0.6))', fontWeight: 700, textTransform: 'uppercase', fontSize: '11px', letterSpacing: '0.05em' }}>TV Show &bull;</span>
                         )}
@@ -413,21 +419,21 @@ export default function ReviewDetail() {
 
                         {/* Score + verdict card */}
                         <div style={{
-                            borderRadius: '16px', padding: '22px 20px', textAlign: 'center',
+                            borderRadius: '16px', padding: 'clamp(16px, 4vw, 24px) clamp(12px, 3vw, 20px)', textAlign: 'center',
                             background: vc.glow !== 'transparent' ? `linear-gradient(135deg, ${vc.glow}, rgba(17,17,17,0))` : '#111',
                             border: `1px solid ${vc.border}`,
                         }}>
                             <div style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '12px' }}>Overall Score</div>
                             <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '6px', marginBottom: '14px' }}>
                                 <Star size={18} fill="#f5a623" color="#f5a623" style={{ marginBottom: '4px' }} />
-                                <span style={{ fontSize: '52px', fontWeight: 900, color: '#f5a623', lineHeight: 1, letterSpacing: '-0.04em' }}>
+                                <span style={{ fontSize: 'clamp(40px, 12vw, 56px)', fontWeight: 900, color: '#f5a623', lineHeight: 1, letterSpacing: '-0.04em' }}>
                                     {parseFloat(review.overall_rating || 0).toFixed(1)}
                                 </span>
-                                <span style={{ fontSize: '18px', color: 'rgba(255,255,255,0.18)', fontWeight: 400 }}>/10</span>
+                                <span style={{ fontSize: 'clamp(14px, 4vw, 18px)', color: 'rgba(255,255,255,0.18)', fontWeight: 400 }}>/10</span>
                             </div>
                             <span style={{
-                                display: 'inline-block', padding: '5px 18px', borderRadius: '99px',
-                                fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
+                                display: 'inline-block', padding: '4px 16px', borderRadius: '99px',
+                                fontSize: 'clamp(9px, 2.5vw, 11px)', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
                                 background: vc.bg, color: vc.color, border: `1px solid ${vc.border}`,
                             }}>
                                 {review.verdict}
@@ -549,9 +555,9 @@ export default function ReviewDetail() {
                                 whileInView={{ y: 0, opacity: 1 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.8 }}
-                                style={{ position: 'relative', padding: '28px 32px', background: 'rgba(245,166,35,0.04)', border: '1px solid rgba(245,166,35,0.12)', borderRadius: '16px', borderLeft: '3px solid #f5a623' }}
+                                style={{ position: 'relative', padding: 'clamp(20px, 5vw, 32px)', background: 'rgba(245,166,35,0.04)', border: '1px solid rgba(245,166,35,0.12)', borderRadius: '16px', borderLeft: '3px solid #f5a623' }}
                             >
-                                <div style={{ fontSize: '19px', fontStyle: 'italic', fontWeight: 300, color: 'rgba(255,255,255,0.7)', lineHeight: 1.75, fontFamily: 'Playfair Display, Georgia, serif' }}>
+                                <div style={{ fontSize: 'clamp(16px, 4vw, 20px)', fontStyle: 'italic', fontWeight: 300, color: 'rgba(255,255,255,0.7)', lineHeight: 1.75, fontFamily: 'Playfair Display, Georgia, serif' }}>
                                     "{review.summary}"
                                 </div>
                             </motion.div>
@@ -571,7 +577,7 @@ export default function ReviewDetail() {
                                     The Critique
                                     <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.06)' }} />
                                 </div>
-                                <div style={{ fontSize: '15px', fontWeight: 300, color: 'rgba(255,255,255,0.52)', lineHeight: 1.9, whiteSpace: 'pre-wrap', letterSpacing: '0.01em' }}>
+                                <div style={{ fontSize: 'clamp(14px, 3.5vw, 15px)', fontWeight: 300, color: 'rgba(255,255,255,0.52)', lineHeight: 1.9, whiteSpace: 'pre-wrap', letterSpacing: '0.01em' }}>
                                     {review.content}
                                 </div>
                             </motion.div>
@@ -657,13 +663,9 @@ export default function ReviewDetail() {
                                 </div>
 
                                 {/* Radar Chart Integration */}
-                                <div style={{ height: '320px', minHeight: '320px', background: '#111', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '32px', padding: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <RadarChart cx="50%" cy="50%" outerRadius="80%" data={
-                                            Object.keys(aspects)
-                                                .filter(k => aspects[k]?.score > 0)
-                                                .map(k => ({ subject: toLabel(k), A: parseFloat(aspects[k].score), fullMark: 10 }))
-                                        }>
+                                <div style={{ height: 'clamp(280px, 70vw, 380px)', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '280px' }}>
+                                    <ResponsiveContainer width="100%" height="100%" minHeight={280}>
+                                        <RadarChart cx="50%" cy="50%" outerRadius="75%" data={radarData}>
                                             <PolarGrid stroke="rgba(255,255,255,0.1)" />
                                             <PolarAngleAxis dataKey="subject" tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 10, fontWeight: 600 }} />
                                             <PolarRadiusAxis angle={30} domain={[0, 10]} axisLine={false} tick={false} />

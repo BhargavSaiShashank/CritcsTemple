@@ -7,6 +7,7 @@ import Navbar from './components/Navbar'
 import Home from './pages/Home'
 import ReviewDetail from './pages/ReviewDetail'
 import HallOfFame from './pages/HallOfFame'
+import Compare from './pages/Compare'
 import CeremonyOracle from './components/CeremonyOracle'
 import SearchOverlay from './components/SearchOverlay'
 import { CapacitorUpdater } from '@capgo/capacitor-updater'
@@ -71,6 +72,7 @@ const App = () => {
               <Route path="/" element={<Home />} />
               <Route path="/review/:slug" element={<ReviewDetail />} />
               <Route path="/hall-of-fame" element={<HallOfFame />} />
+              <Route path="/compare" element={<Compare />} />
             </Routes>
           </main>
           <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
