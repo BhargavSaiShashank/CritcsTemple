@@ -83,10 +83,10 @@ const CeremonyOracle = () => {
                 onClick={() => setIsOpen(true)}
                 style={{
                     position: 'fixed',
-                    bottom: '30px',
-                    right: '30px',
-                    width: '64px',
-                    height: '64px',
+                    bottom: window.innerWidth < 768 ? '20px' : '30px',
+                    right: window.innerWidth < 768 ? '20px' : '30px',
+                    width: window.innerWidth < 768 ? '52px' : '64px',
+                    height: window.innerWidth < 768 ? '52px' : '64px',
                     borderRadius: '50%',
                     background: 'linear-gradient(135deg, #f5a623 0%, #d97706 100%)',
                     color: '#000',
