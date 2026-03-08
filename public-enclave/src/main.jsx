@@ -7,29 +7,30 @@ if (typeof window !== 'undefined') {
       const processed = args.map(arg => {
         if (typeof arg === 'object' && arg !== null) {
           try {
-            // Better identification of objects and improved JSON.stringify error handling
             const type = arg.constructor ? arg.constructor.name : 'Object';
             if (arg instanceof Error) {
               return `[ERROR_OBJ] ${arg.message} \nStack: ${arg.stack}`;
             }
 
+            // Performance Guard: Truncate large arrays or complex objects to prevent jank
+            if (Array.isArray(arg) && arg.length > 20) {
+              return `[SNIFFED_Array(${arg.length})] [${arg.slice(0, 3).map(i => typeof i).join(', ')} ... +${arg.length - 3} more]`;
+            }
+
             // Custom replacer for JSON.stringify to handle BigInt and circular references
             const customStringify = (obj) => {
               const cache = new Set();
-              return JSON.stringify(obj, (key, value) => {
+              const str = JSON.stringify(obj, (key, value) => {
                 if (typeof value === 'object' && value !== null) {
-                  if (cache.has(value)) {
-                    // Circular reference found, discard key
-                    return '[Circular]';
-                  }
-                  // Store value in our collection
+                  if (cache.has(value)) return '[Circular]';
                   cache.add(value);
                 }
-                if (typeof value === 'bigint') {
-                  return value.toString() + 'n'; // Append 'n' to indicate BigInt
-                }
+                if (typeof value === 'bigint') return value.toString() + 'n';
                 return value;
               });
+
+              // Prevent logging massive strings that freeze the bridge
+              return str.length > 1000 ? str.substring(0, 1000) + '... [TRUNCATED]' : str;
             };
 
             return `[SNIFFED_${type}] ${customStringify(arg)}`;

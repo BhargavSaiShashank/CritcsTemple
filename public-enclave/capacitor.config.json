@@ -18,7 +18,8 @@
     },
     "CapacitorUpdater": {
       "autoUpdate": true,
-      "statsUrl": "https://api.capgo.app/stats"
+      "statsUrl": "https://api.capgo.app/stats",
+      "defaultChannel": "production"
     }
   },
   "server": {

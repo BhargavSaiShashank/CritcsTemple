@@ -14,13 +14,16 @@ import { CapacitorUpdater } from '@capgo/capacitor-updater'
 import { API_URL } from './services/api'
 
 const PrimalPulse = () => {
+  const readySent = React.useRef(false);
+
   useEffect(() => {
     // Ping the backend immediately to wake it up from Render sleep phase
     console.log('[Primal Pulse] Waking up the Oracle...');
     fetch(`${API_URL}/health`).catch(() => { });
 
-    // Capgo OTA Update Check
-    if (Capacitor.isNativePlatform()) {
+    // Capgo OTA Update Check - Guarded to prevent duplicate native calls
+    if (Capacitor.isNativePlatform() && !readySent.current) {
+      readySent.current = true;
       CapacitorUpdater.notifyAppReady();
     }
   }, []);
