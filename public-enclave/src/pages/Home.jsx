@@ -25,13 +25,25 @@ export default function Home() {
     const [loading, setLoading] = useState(true);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const [search, setSearch] = useState('');
+    const containerRef = useRef(null);
+
+    const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+
+    useEffect(() => {
+        const handleResize = () => setWindowWidth(window.innerWidth);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const isSmall = windowWidth < 768;
+    const isUltraSmall = windowWidth < 400;
 
     const handleMouseMove = useCallback((e) => {
-        if (window.innerWidth < 768) return; // Disable parallax on mobile
+        if (isSmall) return; // Disable parallax on mobile
         const x = (e.clientX - window.innerWidth / 2) / 50;
         const y = (e.clientY - window.innerHeight / 2) / 50;
         setMousePos({ x, y });
-    }, []);
+    }, [isSmall]);
 
     // Filters
     const [verdictFilter, setVerdictFilter] = useState('All');
@@ -42,42 +54,6 @@ export default function Home() {
     const [pullDistance, setPullDistance] = useState(0);
     const startY = useRef(0);
     const isPulling = useRef(false);
-
-    const handleTouchStart = (e) => {
-        if (window.scrollY > 5) return; // Only allow pull if at the top
-        startY.current = e.touches[0].pageY;
-        isPulling.current = true;
-    };
-
-    const handleTouchMove = (e) => {
-        if (!isPulling.current) return;
-        const currentY = e.touches[0].pageY;
-        const diff = currentY - startY.current;
-        if (diff > 0) {
-            // Apply resistance: distance = log-ish or just factor
-            const distance = Math.min(diff * 0.4, 80);
-            setPullDistance(distance);
-            if (distance > 10) e.preventDefault(); // Prevent native bounce
-        }
-    };
-
-    const handleTouchEnd = () => {
-        if (!isPulling.current) return;
-        isPulling.current = false;
-        if (pullDistance > 60) {
-            // Trigger Refresh
-            setIsRefreshing(true);
-            setPullDistance(70); // Keep it visible during loading
-            fetchReviews(0, true).finally(() => {
-                setTimeout(() => {
-                    setIsRefreshing(false);
-                    setPullDistance(0);
-                }, 600);
-            });
-        } else {
-            setPullDistance(0);
-        }
-    };
 
     // Infinite Scroll State
     const [hasMore, setHasMore] = useState(true);
@@ -107,6 +83,55 @@ export default function Home() {
         }
     }, [search, verdictFilter, contentTypeFilter, sortOption]);
 
+    useEffect(() => {
+        const el = containerRef.current;
+        if (!el) return;
+
+        const handleStart = (e) => {
+            if (window.scrollY > 5) return;
+            startY.current = e.touches[0].pageY;
+            isPulling.current = true;
+        };
+
+        const handleMove = (e) => {
+            if (!isPulling.current) return;
+            const currentY = e.touches[0].pageY;
+            const diff = currentY - startY.current;
+            if (diff > 0) {
+                const distance = Math.min(diff * 0.4, 80);
+                setPullDistance(distance);
+                if (distance > 10 && e.cancelable) e.preventDefault();
+            }
+        };
+
+        const handleEnd = () => {
+            if (!isPulling.current) return;
+            isPulling.current = false;
+            if (pullDistance > 60) {
+                setIsRefreshing(true);
+                setPullDistance(70);
+                fetchReviews(0, true).finally(() => {
+                    setTimeout(() => {
+                        setIsRefreshing(false);
+                        setPullDistance(0);
+                    }, 600);
+                });
+            } else {
+                setPullDistance(0);
+            }
+        };
+
+        el.addEventListener('touchstart', handleStart, { passive: true });
+        el.addEventListener('touchmove', handleMove, { passive: false });
+        el.addEventListener('touchend', handleEnd, { passive: true });
+
+        return () => {
+            el.removeEventListener('touchstart', handleStart);
+            el.removeEventListener('touchmove', handleMove);
+            el.removeEventListener('touchend', handleEnd);
+        };
+    }, [pullDistance, fetchReviews]);
+
     // Fetch Featured Reviews once on mount
     useEffect(() => {
         getLatestReviews(5, 0, '', 'All', 'All', 'date', 'desc')
@@ -128,24 +153,12 @@ export default function Home() {
     }, [isAutoPlaying, featuredReviews.length]);
 
     useEffect(() => {
-        let isCurrent = true;
-
-        const clearTimer = setTimeout(() => {
-            if (isCurrent) {
-                setLoading(true);
-                setHasMore(true);
-            }
-        }, 0);
-
+        setLoading(true);
+        setHasMore(true);
         const timeout = setTimeout(() => {
-            if (isCurrent) fetchReviews();
+            fetchReviews(0, true);
         }, 300);
-
-        return () => {
-            isCurrent = false;
-            clearTimeout(clearTimer);
-            clearTimeout(timeout);
-        }
+        return () => clearTimeout(timeout);
     }, [fetchReviews]);
 
     const lastElementRef = useCallback(node => {
@@ -171,14 +184,10 @@ export default function Home() {
     // The backend now natively filters via MongoDB `$regex` so we pass reviews directly
     const filtered = reviews;
 
-    console.log(`[RENDER] Home State - Reviews: ${reviews.length}, Loading: ${loading}, Error: ${error}`);
-
     return (
         <div
+            ref={containerRef}
             onMouseMove={handleMouseMove}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
             style={{ background: '#080808', minHeight: '100vh', position: 'relative', touchAction: pullDistance > 0 ? 'none' : 'auto' }}
         >
             <Helmet>
@@ -224,9 +233,11 @@ export default function Home() {
                 onMouseLeave={() => setIsAutoPlaying(true)}
                 style={{
                     position: 'relative',
-                    minHeight: '90vh',
-                    paddingTop: 'calc(clamp(160px, 15vh, 220px) + var(--safe-top))',
-                    paddingBottom: '100px',
+                    minHeight: isSmall ? 'auto' : '90vh',
+                    paddingTop: isSmall
+                        ? 'calc(100px + var(--safe-top))'
+                        : 'calc(clamp(160px, 15vh, 220px) + var(--safe-top))',
+                    paddingBottom: isSmall ? '60px' : '100px',
                     overflow: 'hidden',
                     display: 'flex',
                     alignItems: 'center',
@@ -277,20 +288,38 @@ export default function Home() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
                             transition={{ duration: 0.6 }}
-                            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', alignItems: 'center', gap: 'clamp(2rem, 8vw, 6rem)' }}
+                            style={{
+                                display: 'grid',
+                                gridTemplateColumns: isSmall ? '1fr' : 'repeat(auto-fit, minmax(320px, 1fr))',
+                                alignItems: 'center',
+                                gap: isSmall ? '2.5rem' : 'clamp(2rem, 8vw, 6rem)',
+                                textAlign: isSmall ? 'center' : 'left'
+                            }}
                         >
                             {/* Left: Text */}
                             <motion.div
                                 style={{
-                                    transform: `translate(${mousePos.x}px, ${mousePos.y}px)`,
-                                    transition: 'transform 0.1s ease-out'
+                                    transform: isSmall ? 'none' : `translate(${mousePos.x}px, ${mousePos.y}px)`,
+                                    transition: 'transform 0.1s ease-out',
+                                    order: isSmall ? 2 : 1
                                 }}
                             >
                                 <motion.div
                                     initial={{ y: 10, opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
                                     transition={{ delay: 0.2 }}
-                                    style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', padding: '4px 12px', borderRadius: '99px', background: `${heroColor}14`, border: `1px solid ${heroColor}25`, marginBottom: '24px' }}
+                                    style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '7px',
+                                        padding: '4px 12px',
+                                        borderRadius: '99px',
+                                        background: `${heroColor}14`,
+                                        border: `1px solid ${heroColor}25`,
+                                        marginBottom: '12px',
+                                        marginLeft: isSmall ? 'auto' : '0',
+                                        marginRight: isSmall ? 'auto' : '0'
+                                    }}
                                 >
                                     <TrendingUp size={11} color={heroColor} />
                                     <span style={{ fontSize: '10px', fontWeight: 700, color: heroColor, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
@@ -299,24 +328,41 @@ export default function Home() {
                                 </motion.div>
 
                                 <h1 className="display" style={{
-                                    fontSize: 'clamp(2.5rem, 8vw, 6.5rem)',
+                                    fontSize: isSmall ? 'clamp(1.6rem, 10vw, 3rem)' : 'clamp(2.5rem, 8vw, 6.5rem)',
                                     fontWeight: 900,
                                     color: '#FFFFFF',
                                     lineHeight: 0.95,
                                     letterSpacing: '-0.04em',
-                                    marginBottom: '18px',
-                                    textShadow: '0 20px 40px rgba(0,0,0,0.5)'
+                                    marginBottom: '14px',
+                                    textShadow: '0 20px 40px rgba(0,0,0,0.5)',
+                                    wordBreak: 'break-word',
+                                    overflowWrap: 'break-word'
                                 }}>
                                     {hero?.movie_title || "Critic's Temple"}
                                 </h1>
 
                                 {hero?.summary && (
-                                    <p style={{ fontSize: 'clamp(14px, 1.5vw, 16px)', fontWeight: 300, color: 'rgba(255,255,255,0.45)', lineHeight: 1.8, maxWidth: '500px', marginBottom: '32px' }}>
+                                    <p style={{
+                                        fontSize: 'clamp(14px, 1.5vw, 16px)',
+                                        fontWeight: 300,
+                                        color: 'rgba(255,255,255,0.45)',
+                                        lineHeight: 1.8,
+                                        maxWidth: '500px',
+                                        marginBottom: '32px',
+                                        marginLeft: isSmall ? 'auto' : '0',
+                                        marginRight: isSmall ? 'auto' : '0'
+                                    }}>
                                         {hero.summary}
                                     </p>
                                 )}
 
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: isSmall ? 'center' : 'flex-start',
+                                    gap: '14px',
+                                    flexWrap: 'wrap'
+                                }}>
                                     {hero?.verdict && (
                                         <span style={{ padding: '5px 14px', borderRadius: '99px', fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', background: `${heroColor}18`, color: heroColor, border: `1px solid ${heroColor}30` }}>
                                             {hero.verdict}
@@ -345,13 +391,16 @@ export default function Home() {
                                     transition={{ duration: 0.8 }}
                                     style={{
                                         perspective: '1000px',
-                                        transform: `translate(${-mousePos.x}px, ${-mousePos.y}px)`,
-                                        transition: 'transform 0.1s ease-out'
+                                        transform: isSmall ? 'none' : `translate(${-mousePos.x}px, ${-mousePos.y}px)`,
+                                        transition: 'transform 0.1s ease-out',
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        order: isSmall ? 1 : 2
                                     }}
                                 >
                                     <div style={{
                                         width: '100%',
-                                        maxWidth: '340px',
+                                        maxWidth: isSmall ? (isUltraSmall ? '240px' : '280px') : '340px',
                                         justifySelf: 'center',
                                         borderRadius: '24px',
                                         overflow: 'hidden',
@@ -370,7 +419,16 @@ export default function Home() {
 
                     {/* Navigation Indicators */}
                     {featuredReviews.length > 1 && (
-                        <div style={{ position: 'absolute', bottom: '-40px', left: 0, display: 'flex', gap: '10px', zIndex: 10 }}>
+                        <div style={{
+                            position: 'absolute',
+                            bottom: '-40px',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            display: 'flex',
+                            gap: '10px',
+                            zIndex: 10,
+                            width: 'fit-content'
+                        }}>
                             {featuredReviews.map((_, idx) => (
                                 <button
                                     key={idx}
@@ -379,8 +437,10 @@ export default function Home() {
                                         setIsAutoPlaying(false);
                                     }}
                                     style={{
+                                        minWidth: idx === currentIndex ? '30px' : '8px',
                                         width: idx === currentIndex ? '30px' : '8px',
                                         height: '8px',
+                                        flexShrink: 0,
                                         borderRadius: '4px',
                                         background: idx === currentIndex ? heroColor : 'rgba(255,255,255,0.15)',
                                         border: 'none',
