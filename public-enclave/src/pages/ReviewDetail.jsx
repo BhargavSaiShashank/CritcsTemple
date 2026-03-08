@@ -11,26 +11,33 @@ import { getReviewBySlug, clapReview, unclapReview, reactReview, getRelatedRevie
 import ReviewExportCard from '../components/ReviewExportCard';
 import SanctuaryTicket from '../components/SanctuaryTicket';
 import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
+
 import { useColorHarmonizer } from '../hooks/useColorHarmonizer';
 
 const FALLBACK = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=1200';
 
 const VERDICT_MAP = {
-    Legendary: { color: '#f87171', bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.3)', glow: 'rgba(239,68,68,0.08)' },
-    Masterpiece: { color: '#f5a623', bg: 'rgba(245,166,35,0.12)', border: 'rgba(245,166,35,0.3)', glow: 'rgba(245,166,35,0.08)' },
-    Essential: { color: '#60a5fa', bg: 'rgba(59,130,246,0.12)', border: 'rgba(59,130,246,0.3)', glow: 'rgba(59,130,246,0.06)' },
-    Elite: { color: '#c084fc', bg: 'rgba(168,85,247,0.12)', border: 'rgba(168,85,247,0.3)', glow: 'rgba(168,85,247,0.06)' },
-    Great: { color: '#4ade80', bg: 'rgba(34,197,94,0.12)', border: 'rgba(34,197,94,0.3)', glow: 'rgba(34,197,94,0.06)' },
-    Good: { color: '#86efac', bg: 'rgba(34,197,94,0.08)', border: 'rgba(34,197,94,0.2)', glow: 'transparent' },
-    Decent: { color: '#fde047', bg: 'rgba(234,179,8,0.08)', border: 'rgba(234,179,8,0.2)', glow: 'transparent' },
-    Average: { color: '#9ca3af', bg: 'rgba(156,163,175,0.06)', border: 'rgba(156,163,175,0.15)', glow: 'transparent' },
-    Mediocre: { color: '#fb923c', bg: 'rgba(249,115,22,0.08)', border: 'rgba(249,115,22,0.2)', glow: 'transparent' },
-    Poor: { color: '#fca5a5', bg: 'rgba(239,68,68,0.06)', border: 'rgba(239,68,68,0.18)', glow: 'transparent' },
-    Bad: { color: '#f87171', bg: 'rgba(239,68,68,0.1)', border: 'rgba(239,68,68,0.22)', glow: 'transparent' },
-    Terrible: { color: '#ef4444', bg: 'rgba(220,38,38,0.12)', border: 'rgba(220,38,38,0.28)', glow: 'transparent' },
-    Disaster: { color: '#dc2626', bg: 'rgba(185,28,28,0.12)', border: 'rgba(185,28,28,0.28)', glow: 'transparent' },
-    Abomination: { color: '#b91c1c', bg: 'rgba(127,29,29,0.15)', border: 'rgba(127,29,29,0.32)', glow: 'transparent' },
-    Unwatchable: { color: '#991b1b', bg: 'rgba(69,10,10,0.18)', border: 'rgba(69,10,10,0.36)', glow: 'transparent' },
+    // Divine Tiers (Celestial & Archival Shimmer)
+    Legendary: { color: '#FFFFFF', bg: 'rgba(255,255,255,0.12)', border: 'rgba(255,255,255,0.3)', glow: 'rgba(255,255,255,0.25)', range: '9.6 - 10.0' },
+    Masterpiece: { color: '#FFD700', bg: 'rgba(255,215,0,0.12)', border: 'rgba(255,215,0,0.3)', glow: 'rgba(255,215,0,0.2)', range: '9.2 - 9.5' },
+    Essential: { color: '#FF00EA', bg: 'rgba(255,0,234,0.12)', border: 'rgba(255,0,234,0.3)', glow: 'rgba(255,0,234,0.15)', range: '8.8 - 9.1' },
+    Elite: { color: '#9D00FF', bg: 'rgba(157,0,255,0.12)', border: 'rgba(157,0,255,0.3)', glow: 'rgba(157,0,255,0.1)', range: '8.4 - 8.7' },
+
+    // Grace Tiers (Vibrant Performance)
+    Great: { color: '#00FF44', bg: 'rgba(0,255,68,0.12)', border: 'rgba(0,255,68,0.3)', glow: 'rgba(0,255,68,0.08)', range: '8.0 - 8.3' },
+    Good: { color: '#8FFF00', bg: 'rgba(143,255,0,0.12)', border: 'rgba(143,255,0,0.3)', glow: 'transparent', range: '7.5 - 7.9' },
+    Decent: { color: '#00D0FF', bg: 'rgba(0,208,255,0.1)', border: 'rgba(0,208,255,0.2)', glow: 'transparent', range: '7.0 - 7.4' },
+
+    // Mundane Tiers (Neutrality)
+    Average: { color: '#849BB3', bg: 'rgba(132,155,179,0.08)', border: 'rgba(132,155,179,0.15)', glow: 'transparent', range: '6.0 - 6.9' },
+    Mediocre: { color: '#FFFB00', bg: 'rgba(255,251,0,0.08)', border: 'rgba(255,251,0,0.15)', glow: 'transparent', range: '5.0 - 5.9' },
+
+    // Descent Tiers (Warning & Failure)
+    Poor: { color: '#FF9100', bg: 'rgba(255,145,0,0.1)', border: 'rgba(255,145,0,0.2)', glow: 'transparent', range: '4.0 - 4.9' },
+    Bad: { color: '#FF4D00', bg: 'rgba(255,77,0,0.1)', border: 'rgba(255,77,0,0.22)', glow: 'transparent', range: '3.0 - 3.9' },
+    Terrible: { color: '#FF0000', bg: 'rgba(255,0,0,0.12)', border: 'rgba(255,0,0,0.28)', glow: 'transparent', range: '2.0 - 2.9' },
+    Disaster: { color: '#990000', bg: 'rgba(153,0,0,0.12)', border: 'rgba(153,0,0,0.28)', glow: 'transparent', range: '1.0 - 1.9' },
+    Abomination: { color: '#2D0000', bg: 'rgba(45,0,0,0.15)', border: 'rgba(45,0,0,0.32)', glow: 'transparent', range: '0.0 - 0.9' },
 };
 const getV = (v) => VERDICT_MAP[v] || { color: '#9ca3af', bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.1)', glow: 'transparent' };
 
@@ -46,10 +53,20 @@ const toLabel = (k) => k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase(
 
 const scoreColor = (n) => {
     n = parseFloat(n) || 0;
-    if (n >= 8.5) return '#fbbf24';
-    if (n >= 7) return '#4ade80';
-    if (n >= 5) return '#60a5fa';
-    return '#f87171';
+    if (n >= 9.6) return '#FFFFFF'; // Legendary
+    if (n >= 9.2) return '#FFD700'; // Masterpiece
+    if (n >= 8.8) return '#FF00EA'; // Essential
+    if (n >= 8.4) return '#9D00FF'; // Elite
+    if (n >= 8.0) return '#00FF44'; // Great
+    if (n >= 7.5) return '#8FFF00'; // Good
+    if (n >= 7.0) return '#00D0FF'; // Decent
+    if (n >= 6.0) return '#849BB3'; // Average
+    if (n >= 5.0) return '#FFFB00'; // Mediocre
+    if (n >= 4.0) return '#FF9100'; // Poor
+    if (n >= 3.0) return '#FF4D00'; // Bad
+    if (n >= 2.0) return '#FF0000'; // Terrible
+    if (n >= 1.0) return '#990000'; // Disaster
+    return '#2D0000'; // Abomination
 };
 
 function ScoreBar({ name, score, comment, color }) {
@@ -121,6 +138,7 @@ export default function ReviewDetail() {
     const ticketRef = useRef(null);
     const [exportingTicket, setExportingTicket] = useState(false);
     const [isTrailerOpen, setIsTrailerOpen] = useState(false);
+
 
     // Dynamic Color Harmonization
     useColorHarmonizer(review?.movie_poster_url ? proxyImage(review.movie_poster_url) : null);
@@ -532,6 +550,26 @@ export default function ReviewDetail() {
                             )}
                         </div>
 
+                        {/* Temple Verdict Legend */}
+                        <div style={{ background: '#111', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '14px', padding: '16px' }}>
+                            <div style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '16px' }}>Temple Verdict Scale</div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                {[
+                                    'Legendary', 'Masterpiece', 'Essential', 'Elite', 'Great',
+                                    'Good', 'Decent', 'Average', 'Mediocre', 'Poor',
+                                    'Bad', 'Terrible', 'Disaster', 'Abomination'
+                                ].map(v => (
+                                    <div key={v} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: VERDICT_MAP[v].color, boxShadow: `0 0 8px ${VERDICT_MAP[v].color}40` }} />
+                                            <span style={{ fontSize: '10.5px', fontWeight: 600, color: 'rgba(255,255,255,0.45)' }}>{v}</span>
+                                        </div>
+                                        <span style={{ fontSize: '9.5px', color: 'rgba(255,255,255,0.2)', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>{VERDICT_MAP[v].range}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
                         {/* Table of Contents */}
                         <div style={{ background: '#111', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '14px', padding: '16px' }} className="hidden md:block">
                             <div style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '12px' }}>Contents</div>
@@ -562,6 +600,8 @@ export default function ReviewDetail() {
                                 </div>
                             </motion.div>
                         )}
+
+
 
                         {/* Written critique */}
                         {review.content && (
@@ -915,6 +955,8 @@ export default function ReviewDetail() {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+
         </div>
     );
 }
