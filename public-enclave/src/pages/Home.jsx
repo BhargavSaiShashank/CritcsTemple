@@ -301,7 +301,7 @@ export default function Home() {
                                 style={{
                                     transform: isSmall ? 'none' : `translate(${mousePos.x}px, ${mousePos.y}px)`,
                                     transition: 'transform 0.1s ease-out',
-                                    order: isSmall ? 2 : 1
+                                    order: 1
                                 }}
                             >
                                 <motion.div
@@ -376,11 +376,13 @@ export default function Home() {
                                         </div>
                                     )}
                                     {hero?.slug && (
-                                        <Link to={`/review/${hero.slug}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '12px 26px', borderRadius: '12px', background: heroColor, color: '#000', fontSize: '13px', fontWeight: 700, textDecoration: 'none', boxShadow: `0 10px 30px ${heroColor}30`, transition: 'all 0.3s ease' }}>
-                                            Read Full Review <ChevronRight size={14} />
+                                        <Link to={`/review/${hero.slug}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', borderRadius: '12px', background: heroColor, color: '#000', fontSize: '13px', fontWeight: 800, textDecoration: 'none', boxShadow: `0 10px 40px ${heroColor}40`, transition: 'all 0.3s ease' }}>
+                                            Read Full Review <ChevronRight size={14} strokeWidth={3} />
                                         </Link>
                                     )}
                                 </div>
+
+
                             </motion.div>
 
                             {/* Right: floating poster card */}
@@ -395,7 +397,7 @@ export default function Home() {
                                         transition: 'transform 0.1s ease-out',
                                         display: 'flex',
                                         justifyContent: 'center',
-                                        order: isSmall ? 1 : 2
+                                        order: isSmall ? 2 : 2
                                     }}
                                 >
                                     <div style={{
@@ -417,17 +419,14 @@ export default function Home() {
                         </motion.div>
                     </AnimatePresence>
 
-                    {/* Navigation Indicators */}
+                    {/* Navigation Indicators - Positioned below everything */}
                     {featuredReviews.length > 1 && (
                         <div style={{
-                            position: 'absolute',
-                            bottom: '-40px',
-                            left: '50%',
-                            transform: 'translateX(-50%)',
                             display: 'flex',
-                            gap: '10px',
-                            zIndex: 10,
-                            width: 'fit-content'
+                            gap: '8px',
+                            justifyContent: 'center',
+                            marginTop: isSmall ? '40px' : '60px',
+                            position: 'relative'
                         }}>
                             {featuredReviews.map((_, idx) => (
                                 <button
@@ -437,11 +436,11 @@ export default function Home() {
                                         setIsAutoPlaying(false);
                                     }}
                                     style={{
-                                        minWidth: idx === currentIndex ? '30px' : '8px',
-                                        width: idx === currentIndex ? '30px' : '8px',
-                                        height: '8px',
+                                        minWidth: idx === currentIndex ? '34px' : '8px',
+                                        width: idx === currentIndex ? '34px' : '8px',
+                                        height: '6px',
                                         flexShrink: 0,
-                                        borderRadius: '4px',
+                                        borderRadius: '3px',
                                         background: idx === currentIndex ? heroColor : 'rgba(255,255,255,0.15)',
                                         border: 'none',
                                         cursor: 'pointer',
@@ -453,6 +452,8 @@ export default function Home() {
                             ))}
                         </div>
                     )}
+
+
                 </div>
             </section>
 
