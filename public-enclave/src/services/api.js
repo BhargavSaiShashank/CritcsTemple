@@ -81,6 +81,7 @@ export const getCategories = () => api.get('/categories');
 export const getMovieDetails = (imdbId) => api.get(`/movie/${imdbId}`);
 export const getTVDetails = (tmdbId) => api.get(`/tv/${tmdbId}`);
 export const getOracleDebate = (slug) => api.post('/oracle/debate', { slug });
+export const getOracleDuel = (movie1, movie2) => api.post('/oracle/duel', { movie1, movie2 });
 export const proxyImage = (url) => `${API_URL}/proxy-image?url=${encodeURIComponent(url)}`;
 
 export default api;

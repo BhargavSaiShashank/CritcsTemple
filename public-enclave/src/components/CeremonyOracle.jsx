@@ -27,8 +27,9 @@ const CeremonyOracle = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [query, setQuery] = useState('');
     const [messages, setMessages] = useState([
-        { role: 'oracle', content: "Welcome, Seeker. What cinematic enlightenment do you seek within the Temple today?", isNew: false }
+        { role: 'oracle', content: "Welcome, Seeker. I am the Mystic. What cinematic enlightenment do you seek within the Temple today?", isNew: false }
     ]);
+    const [persona, setPersona] = useState('mystic');
     const [loading, setLoading] = useState(false);
     const scrollRef = useRef(null);
 
@@ -62,9 +63,29 @@ const CeremonyOracle = () => {
 
             const { data } = await axios.post(`${API_URL}/oracle/query`, {
                 query,
-                history
+                history,
+                persona
             });
-            setMessages(prev => [...prev, { role: 'oracle', content: data.response, isNew: true }]);
+
+            const content = data.response;
+            let dnaData = null;
+
+            // Extract Prophetic DNA if present
+            if (content.includes('PROPHETIC_DNA:')) {
+                try {
+                    const jsonStr = content.split('PROPHETIC_DNA:')[1].trim();
+                    dnaData = JSON.parse(jsonStr);
+                } catch (e) {
+                    console.error("DNA Parsing Error", e);
+                }
+            }
+
+            setMessages(prev => [...prev, {
+                role: 'oracle',
+                content: content.split('PROPHETIC_DNA:')[0].trim(),
+                isNew: true,
+                propheticDNA: dnaData
+            }]);
         } catch (err) {
             setMessages(prev => [...prev, { role: 'oracle', content: 'The winds of fate are turbulent. I cannot see clearly right now.', isNew: true }]);
         } finally {
@@ -88,7 +109,9 @@ const CeremonyOracle = () => {
                     width: window.innerWidth < 768 ? '52px' : '64px',
                     height: window.innerWidth < 768 ? '52px' : '64px',
                     borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #f5a623 0%, #d97706 100%)',
+                    background: persona === 'mystic' ? 'linear-gradient(135deg, #f5a623 0%, #d97706 100%)' :
+                        persona === 'scholar' ? 'linear-gradient(135deg, #60a5fa 0%, #2563eb 100%)' :
+                            'linear-gradient(135deg, #ef4444 0%, #991b1b 100%)',
                     color: '#000',
                     display: 'flex',
                     alignItems: 'center',
@@ -135,9 +158,9 @@ const CeremonyOracle = () => {
                                 right: 0,
                                 bottom: 0,
                                 width: 'min(400px, 100vw)',
-                                background: 'rgba(12,12,12,0.95)',
-                                backdropFilter: 'blur(20px)',
-                                borderLeft: '1px solid rgba(255,255,255,0.08)',
+                                background: 'rgba(12,12,12,0.98)',
+                                backdropFilter: 'blur(30px)',
+                                borderLeft: `1px solid ${persona === 'mystic' ? 'rgba(245,166,35,0.2)' : persona === 'scholar' ? 'rgba(96,165,250,0.2)' : 'rgba(239,68,68,0.2)'}`,
                                 display: 'flex',
                                 flexDirection: 'column',
                                 zIndex: 1002,
@@ -154,12 +177,31 @@ const CeremonyOracle = () => {
                                 justifyContent: 'space-between'
                             }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                    <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(245,166,35,0.1)', border: '1px solid rgba(245,166,35,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <Sparkles size={18} color="#f5a623" />
+                                    <div style={{
+                                        width: '36px', height: '36px', borderRadius: '10px',
+                                        background: persona === 'mystic' ? 'rgba(245,166,35,0.1)' : persona === 'scholar' ? 'rgba(96,165,250,0.1)' : 'rgba(239,68,68,0.1)',
+                                        border: `1px solid ${persona === 'mystic' ? 'rgba(245,166,35,0.2)' : persona === 'scholar' ? 'rgba(96,165,250,0.2)' : 'rgba(239,68,68,0.2)'}`,
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                    }}>
+                                        <Sparkles size={18} color={persona === 'mystic' ? '#f5a623' : persona === 'scholar' ? '#60a5fa' : '#ef4444'} />
                                     </div>
-                                    <div>
-                                        <div style={{ fontSize: '14px', fontWeight: 800, color: '#f2f2f2', letterSpacing: '0.02em' }}>The Temple Oracle</div>
-                                        <div style={{ fontSize: '10px', fontWeight: 600, color: 'rgba(245,166,35,0.6)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Guardian of Lore</div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                        <select
+                                            value={persona}
+                                            onChange={(e) => setPersona(e.target.value)}
+                                            style={{
+                                                background: 'none', border: 'none', color: '#fff', fontSize: '14px', fontWeight: 800,
+                                                outline: 'none', cursor: 'pointer', padding: 0, margin: 0, appearance: 'none',
+                                                textTransform: 'capitalize'
+                                            }}
+                                        >
+                                            <option value="mystic" style={{ background: '#111' }}>The Mystic</option>
+                                            <option value="scholar" style={{ background: '#111' }}>The Scholar</option>
+                                            <option value="critic" style={{ background: '#111' }}>The Critic</option>
+                                        </select>
+                                        <div style={{ fontSize: '10px', fontWeight: 600, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                                            {persona === 'mystic' ? 'Guardian of Lore' : persona === 'scholar' ? 'Archivist of Craft' : 'Ruthless Evaluator'}
+                                        </div>
                                     </div>
                                 </div>
                                 <button onClick={() => setIsOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', padding: '8px', borderRadius: '50%', display: 'flex', transition: 'all 0.2s' }}>
@@ -205,6 +247,20 @@ const CeremonyOracle = () => {
                                                     }}
                                                 />
                                             ) : m.content}
+
+                                            {/* Prophetic DNA Radar Chart */}
+                                            {m.propheticDNA && (
+                                                <div style={{ marginTop: '16px', height: '200px', width: '100%', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', padding: '12px' }}>
+                                                    <div style={{ textAlign: 'center', fontSize: '9px', fontWeight: 900, color: 'rgba(255,255,255,0.3)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Prophetic DNA Projection</div>
+                                                    <ResponsiveContainer width="100%" height="90%">
+                                                        <RadarChart cx="50%" cy="50%" outerRadius="70%" data={Object.entries(m.propheticDNA).map(([k, v]) => ({ subject: k.toUpperCase(), A: v }))}>
+                                                            <PolarGrid stroke="rgba(255,255,255,0.1)" />
+                                                            <PolarAngleAxis dataKey="subject" tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 8 }} />
+                                                            <Radar name="DNA" dataKey="A" stroke={persona === 'mystic' ? '#f5a623' : persona === 'scholar' ? '#60a5fa' : '#ef4444'} fill={persona === 'mystic' ? '#f5a623' : persona === 'scholar' ? '#60a5fa' : '#ef4444'} fillOpacity={0.6} />
+                                                        </RadarChart>
+                                                    </ResponsiveContainer>
+                                                </div>
+                                            )}
                                         </div>
                                     </motion.div>
                                 ))}

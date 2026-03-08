@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { Search, X, Zap, Camera, Music, Heart, QuoteIcon, Star, ArrowLeftRight } from 'lucide-react';
 import { motion, AnimatePresence, useScroll } from 'framer-motion';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, PolarRadiusAxis, Tooltip } from 'recharts';
-import { getLatestReviews, proxyImage } from '../services/api';
+import { getLatestReviews, proxyImage, getOracleDuel } from '../services/api';
 import { useColorHarmonizer } from '../hooks/useColorHarmonizer';
 import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
 
@@ -287,6 +287,8 @@ export default function Compare() {
     const [searchParams, setSearchParams] = useSearchParams();
     const [item1, setItem1] = useState(null);
     const [item2, setItem2] = useState(null);
+    const [oracleReport, setOracleReport] = useState(null);
+    const [isOracleLoading, setIsOracleLoading] = useState(false);
     const [isStickyVisible, setIsStickyVisible] = useState(false);
     const { scrollY } = useScroll();
 
@@ -352,6 +354,20 @@ export default function Compare() {
         const temp1 = item1;
         setItem1(item2);
         setItem2(temp1);
+        setOracleReport(null);
+    };
+
+    const handleOracleConsult = async () => {
+        if (!item1 || !item2 || isOracleLoading) return;
+        setIsOracleLoading(true);
+        try {
+            const { data } = await getOracleDuel(item1, item2);
+            setOracleReport(data.report);
+        } catch (err) {
+            console.error("Oracle Duel Error", err);
+        } finally {
+            setIsOracleLoading(false);
+        }
     };
 
     // Dynamic Color Harmonization Hook based on primary selected item
@@ -500,6 +516,51 @@ export default function Compare() {
                                     <span style={{ fontSize: '13px', color: '#fff', fontWeight: 700, letterSpacing: '0.02em' }}>{item2.movie_title}</span>
                                 </div>
                             </div>
+                        </motion.div>
+
+                        {/* Oracle Duel Report */}
+                        <motion.div
+                            className="glass-premium"
+                            style={{
+                                borderRadius: '32px', padding: 'clamp(24px, 5vw, 40px)',
+                                background: 'linear-gradient(135deg, rgba(245,166,35,0.05) 0%, rgba(10,10,10,0.4) 100%)',
+                                border: '1px solid rgba(245,166,35,0.15)',
+                                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px'
+                            }}
+                        >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <Sparkles size={24} color="#f5a623" />
+                                <h3 className="display" style={{ fontSize: '20px', fontWeight: 900, color: '#f5a623', margin: 0, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Oracle Duel Decree</h3>
+                            </div>
+
+                            {!oracleReport ? (
+                                <button
+                                    onClick={handleOracleConsult}
+                                    disabled={isOracleLoading}
+                                    style={{
+                                        padding: '12px 32px', borderRadius: '99px', background: 'rgba(245,166,35,0.1)',
+                                        border: '1px solid rgba(245,166,35,0.3)', color: '#f5a623', fontSize: '12px', fontWeight: 800,
+                                        cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.3s'
+                                    }}
+                                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(245,166,35,0.2)'; e.currentTarget.style.transform = 'scale(1.05)'; }}
+                                    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(245,166,35,0.1)'; e.currentTarget.style.transform = 'scale(1)'; }}
+                                >
+                                    {isOracleLoading ? <Loader2 size={16} className="animate-spin" /> : <Zap size={16} />}
+                                    CONSULT THE DIVINE REFEREE
+                                </button>
+                            ) : (
+                                <div style={{ textAlign: 'center', maxWidth: '700px' }}>
+                                    <p style={{ fontSize: '15px', lineHeight: 1.8, color: 'rgba(255,255,255,0.9)', fontStyle: 'italic', fontStyle: 'italic', margin: 0, whiteSpace: 'pre-wrap' }}>
+                                        "{oracleReport}"
+                                    </p>
+                                    <button
+                                        onClick={() => setOracleReport(null)}
+                                        style={{ marginTop: '24px', background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', fontSize: '10px', fontWeight: 700, cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.1em' }}
+                                    >
+                                        Dismiss Revelation
+                                    </button>
+                                </div>
+                            )}
                         </motion.div>
 
                         {/* Category Averages breakdown */}
