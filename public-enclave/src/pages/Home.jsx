@@ -235,7 +235,7 @@ export default function Home() {
                     position: 'relative',
                     minHeight: isSmall ? 'auto' : '90vh',
                     paddingTop: isSmall
-                        ? 'calc(100px + var(--safe-top))'
+                        ? 'calc(130px + var(--safe-top))'
                         : 'calc(clamp(160px, 15vh, 220px) + var(--safe-top))',
                     paddingBottom: isSmall ? '60px' : '100px',
                     overflow: 'hidden',
@@ -400,7 +400,7 @@ export default function Home() {
                                 >
                                     <div style={{
                                         width: '100%',
-                                        maxWidth: isSmall ? (isUltraSmall ? '240px' : '280px') : '340px',
+                                        maxWidth: isSmall ? (isUltraSmall ? '260px' : '300px') : '340px',
                                         justifySelf: 'center',
                                         borderRadius: '24px',
                                         overflow: 'hidden',
