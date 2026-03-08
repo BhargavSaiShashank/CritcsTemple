@@ -53,7 +53,10 @@ export default function Home() {
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [pullDistance, setPullDistance] = useState(0);
     const startY = useRef(0);
+    const startX = useRef(0);
     const isPulling = useRef(false);
+    const isHorizontalSwipe = useRef(false);
+    const hasDeterminedDirection = useRef(false);
 
     // Infinite Scroll State
     const [hasMore, setHasMore] = useState(true);
@@ -88,36 +91,67 @@ export default function Home() {
         if (!el) return;
 
         const handleStart = (e) => {
-            if (window.scrollY > 5) return;
             startY.current = e.touches[0].pageY;
-            isPulling.current = true;
+            startX.current = e.touches[0].pageX;
+            isPulling.current = false;
+            isHorizontalSwipe.current = false;
+            hasDeterminedDirection.current = false;
         };
 
         const handleMove = (e) => {
-            if (!isPulling.current) return;
             const currentY = e.touches[0].pageY;
-            const diff = currentY - startY.current;
-            if (diff > 0) {
-                const distance = Math.min(diff * 0.4, 80);
+            const currentX = e.touches[0].pageX;
+            const diffY = currentY - startY.current;
+            const diffX = currentX - startX.current;
+
+            if (!hasDeterminedDirection.current) {
+                if (Math.abs(diffX) > 10 || Math.abs(diffY) > 10) {
+                    hasDeterminedDirection.current = true;
+                    if (Math.abs(diffX) > Math.abs(diffY)) {
+                        isHorizontalSwipe.current = true;
+                    } else if (diffY > 0 && window.scrollY <= 5) {
+                        isPulling.current = true;
+                    }
+                }
+            }
+
+            if (isPulling.current) {
+                const distance = Math.min(diffY * 0.4, 80);
                 setPullDistance(distance);
                 if (distance > 10 && e.cancelable) e.preventDefault();
+            } else if (isHorizontalSwipe.current) {
+                if (e.cancelable) e.preventDefault();
             }
         };
 
-        const handleEnd = () => {
-            if (!isPulling.current) return;
-            isPulling.current = false;
-            if (pullDistance > 60) {
-                setIsRefreshing(true);
-                setPullDistance(70);
-                fetchReviews(0, true).finally(() => {
-                    setTimeout(() => {
-                        setIsRefreshing(false);
-                        setPullDistance(0);
-                    }, 600);
-                });
-            } else {
-                setPullDistance(0);
+        const handleEnd = (e) => {
+            const currentX = e.changedTouches[0].pageX;
+            const diffX = currentX - startX.current;
+
+            if (isPulling.current) {
+                isPulling.current = false;
+                if (pullDistance > 60) {
+                    setIsRefreshing(true);
+                    setPullDistance(70);
+                    fetchReviews(0, true).finally(() => {
+                        setTimeout(() => {
+                            setIsRefreshing(false);
+                            setPullDistance(0);
+                        }, 600);
+                    });
+                } else {
+                    setPullDistance(0);
+                }
+            } else if (isHorizontalSwipe.current) {
+                isHorizontalSwipe.current = false;
+                if (Math.abs(diffX) > 50) {
+                    setIsAutoPlaying(false);
+                    if (diffX > 0) {
+                        setCurrentIndex(prev => (prev - 1 + featuredReviews.length) % featuredReviews.length);
+                    } else {
+                        setCurrentIndex(prev => (prev + 1) % featuredReviews.length);
+                    }
+                }
             }
         };
 
@@ -130,7 +164,7 @@ export default function Home() {
             el.removeEventListener('touchmove', handleMove);
             el.removeEventListener('touchend', handleEnd);
         };
-    }, [pullDistance, fetchReviews]);
+    }, [pullDistance, fetchReviews, featuredReviews.length]);
 
     // Fetch Featured Reviews once on mount
     useEffect(() => {
