@@ -7,26 +7,39 @@ import { Capacitor } from '@capacitor/core';
 const FALLBACK = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=1200';
 
 const VERDICT_MAP = {
-    Legendary: { color: '#f87171', bg: 'rgba(248,113,113,0.1)', border: 'rgba(248,113,113,0.2)' },
-    Masterpiece: { color: '#f5a623', bg: 'rgba(245,166,35,0.1)', border: 'rgba(245,166,35,0.2)' },
-    Essential: { color: '#60a5fa', bg: 'rgba(96,165,250,0.1)', border: 'rgba(96,165,250,0.2)' },
-    Elite: { color: '#c084fc', bg: 'rgba(192,132,252,0.1)', border: 'rgba(192,132,252,0.2)' },
-    Great: { color: '#4ade80', bg: 'rgba(74,222,128,0.1)', border: 'rgba(74,222,128,0.2)' },
-    Good: { color: '#86efac', bg: 'rgba(134,239,172,0.1)', border: 'rgba(134,239,172,0.2)' },
-    Decent: { color: '#fcd34d', bg: 'rgba(252,211,77,0.1)', border: 'rgba(252,211,77,0.2)' },
-    Average: { color: '#9ca3af', bg: 'rgba(156,163,175,0.1)', border: 'rgba(156,163,175,0.2)' },
-    Mediocre: { color: '#d1d5db', bg: 'rgba(209,213,219,0.1)', border: 'rgba(209,213,219,0.2)' },
-    Poor: { color: '#f87171', bg: 'rgba(248,113,113,0.1)', border: 'rgba(248,113,113,0.2)' },
+    Legendary: { color: '#FFFFFF', bg: 'rgba(255,255,255,0.1)', border: 'rgba(255,255,255,0.2)' },
+    Masterpiece: { color: '#FFD700', bg: 'rgba(255,215,0,0.1)', border: 'rgba(255,215,0,0.2)' },
+    Essential: { color: '#FF00EA', bg: 'rgba(255,0,234,0.1)', border: 'rgba(255,0,234,0.2)' },
+    Elite: { color: '#9D00FF', bg: 'rgba(157,0,255,0.1)', border: 'rgba(157,0,255,0.2)' },
+    Great: { color: '#00FF44', bg: 'rgba(0,255,68,0.1)', border: 'rgba(0,255,68,0.2)' },
+    Good: { color: '#8FFF00', bg: 'rgba(143,255,0,0.1)', border: 'rgba(143,255,0,0.2)' },
+    Decent: { color: '#00D0FF', bg: 'rgba(0,208,255,0.1)', border: 'rgba(0,208,255,0.2)' },
+    Average: { color: '#849BB3', bg: 'rgba(132,155,179,0.1)', border: 'rgba(132,155,179,0.2)' },
+    Mediocre: { color: '#FFFB00', bg: 'rgba(255,251,0,0.1)', border: 'rgba(255,251,0,0.2)' },
+    Poor: { color: '#FF9100', bg: 'rgba(255,145,0,0.1)', border: 'rgba(255,145,0,0.2)' },
+    Bad: { color: '#FF4D00', bg: 'rgba(255,77,0,0.1)', border: 'rgba(255,77,0,0.2)' },
+    Terrible: { color: '#FF0000', bg: 'rgba(255,0,0,0.1)', border: 'rgba(255,0,0,0.2)' },
+    Disaster: { color: '#990000', bg: 'rgba(153,0,0,0.1)', border: 'rgba(153,0,0,0.2)' },
+    Abomination: { color: '#2D0000', bg: 'rgba(45,0,0,0.1)', border: 'rgba(45,0,0,0.2)' },
 };
 
 const getV = (v) => VERDICT_MAP[v] || { color: '#9ca3af', bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.1)' };
 
 const scoreColor = (score) => {
-    if (score >= 9) return '#f5a623';
-    if (score >= 8) return '#4ade80';
-    if (score >= 7) return '#60a5fa';
-    if (score >= 5) return '#fcd34d';
-    return '#f87171';
+    if (score >= 9.6) return '#FFFFFF';
+    if (score >= 9.2) return '#FFD700';
+    if (score >= 8.8) return '#FF00EA';
+    if (score >= 8.4) return '#9D00FF';
+    if (score >= 8.0) return '#00FF44';
+    if (score >= 7.5) return '#8FFF00';
+    if (score >= 7.0) return '#00D0FF';
+    if (score >= 6.0) return '#849BB3';
+    if (score >= 5.0) return '#FFFB00';
+    if (score >= 4.0) return '#FF9100';
+    if (score >= 3.0) return '#FF4D00';
+    if (score >= 2.0) return '#FF0000';
+    if (score >= 1.0) return '#990000';
+    return '#2D0000';
 };
 
 const ReviewCard = React.memo(({ review, index }) => {

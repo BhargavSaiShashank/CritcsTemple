@@ -9,15 +9,20 @@ import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
 
 const FALLBACK = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=1200';
 const VERDICT_COLOR = {
-    Legendary: '#f87171', Masterpiece: '#f5a623', Essential: '#60a5fa',
-    Elite: '#c084fc', Great: '#4ade80', Good: '#86efac',
+    Legendary: '#FFFFFF', Masterpiece: '#FFD700', Essential: '#FF00EA',
+    Elite: '#9D00FF', Great: '#00FF44', Good: '#8FFF00',
+    Decent: '#00D0FF', Average: '#849BB3', Mediocre: '#FFFB00',
+    Poor: '#FF9100', Bad: '#FF4D00', Terrible: '#FF0000',
+    Disaster: '#990000', Abomination: '#2D0000'
 };
 
 export default function Home() {
+    const [featuredReviews, setFeaturedReviews] = useState([]);
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+    const [error, setError] = useState(null);
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [featuredReview, setFeaturedReview] = useState(null);
-    const [error, setError] = useState(null);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const [search, setSearch] = useState('');
 
@@ -102,15 +107,25 @@ export default function Home() {
         }
     }, [search, verdictFilter, contentTypeFilter, sortOption]);
 
-    // Fetch Featured Review once on mount
+    // Fetch Featured Reviews once on mount
     useEffect(() => {
-        // Correct order: limit, offset, search, verdict, content_type, sortBy, order
-        getLatestReviews(1, 0, '', 'All', 'All', 'date', 'desc')
+        getLatestReviews(5, 0, '', 'All', 'All', 'date', 'desc')
             .then(({ data }) => {
-                if (data && data.length > 0) setFeaturedReview(data[0]);
+                if (data && data.length > 0) setFeaturedReviews(data);
             })
             .catch(console.error);
     }, []);
+
+    // Auto-play Logic
+    useEffect(() => {
+        if (!isAutoPlaying || featuredReviews.length <= 1) return;
+
+        const interval = setInterval(() => {
+            setCurrentIndex(prev => (prev + 1) % featuredReviews.length);
+        }, 8000);
+
+        return () => clearInterval(interval);
+    }, [isAutoPlaying, featuredReviews.length]);
 
     useEffect(() => {
         let isCurrent = true;
@@ -150,8 +165,8 @@ export default function Home() {
         if (node) observer.current.observe(node);
     }, [loading, loadingMore, hasMore, fetchReviews, reviews.length]);
 
-    const hero = featuredReview;
-    const heroColor = VERDICT_COLOR[hero?.verdict] || '#f5a623';
+    const hero = featuredReviews[currentIndex];
+    const heroColor = VERDICT_COLOR[hero?.verdict] || '#FFFFFF';
 
     // The backend now natively filters via MongoDB `$regex` so we pass reviews directly
     const filtered = reviews;
@@ -204,36 +219,40 @@ export default function Home() {
             <BackgroundAtmosphere activeColor={heroColor} />
 
             {/* ── HERO ── */}
-            <section style={{
-                position: 'relative',
-                minHeight: '90vh',
-                paddingTop: 'calc(clamp(160px, 15vh, 220px) + var(--safe-top))',
-                paddingBottom: '80px',
-                overflow: 'hidden',
-                display: 'flex',
-                alignItems: 'center',
-            }}>
+            <section
+                onMouseEnter={() => setIsAutoPlaying(false)}
+                onMouseLeave={() => setIsAutoPlaying(true)}
+                style={{
+                    position: 'relative',
+                    minHeight: '90vh',
+                    paddingTop: 'calc(clamp(160px, 15vh, 220px) + var(--safe-top))',
+                    paddingBottom: '100px',
+                    overflow: 'hidden',
+                    display: 'flex',
+                    alignItems: 'center',
+                }}
+            >
                 {/* Background Ken Burns */}
                 <AnimatePresence mode="wait">
                     {hero?.movie_poster_url && (
                         <motion.div
-                            key={hero._id}
+                            key={`bg-${hero._id}`}
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            transition={{ duration: 2 }}
+                            transition={{ duration: 1.5 }}
                             style={{ position: 'absolute', inset: 0, zIndex: 0 }}
                         >
                             <motion.img
                                 src={hero.movie_poster_url}
                                 alt=""
                                 animate={{
-                                    scale: [1, 1.15],
-                                    x: [0, -20],
-                                    y: [0, -10]
+                                    scale: [1, 1.1],
+                                    x: [0, -10],
+                                    y: [0, -5]
                                 }}
                                 transition={{
-                                    duration: 30,
+                                    duration: 20,
                                     repeat: Infinity,
                                     repeatType: "reverse",
                                     ease: "linear"
@@ -242,103 +261,137 @@ export default function Home() {
                                     width: '100%',
                                     height: '100%',
                                     objectFit: 'cover',
-                                    filter: 'brightness(0.12) saturate(0.6) blur(15px)'
+                                    filter: 'brightness(0.15) saturate(0.6) blur(20px)'
                                 }}
                             />
-                            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, #080808 0%, rgba(8,8,8,0.6) 50%, #080808 100%)' }} />
+                            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, #080808 0%, rgba(8,8,8,0.4) 50%, #080808 100%)' }} />
                         </motion.div>
                     )}
                 </AnimatePresence>
 
-                <div className="max-w-container" style={{ position: 'relative', zIndex: 1, width: '100%', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', alignItems: 'center', gap: 'clamp(2rem, 8vw, 6rem)' }}>
-                    {/* Left: Text */}
-                    <motion.div
-                        initial={{ x: -30, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ duration: 1, delay: 0.2 }}
-                        style={{
-                            transform: `translate(${mousePos.x}px, ${mousePos.y}px)`,
-                            transition: 'transform 0.1s ease-out'
-                        }}
-                    >
+                <div className="max-w-container" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
+                    <AnimatePresence mode="wait">
                         <motion.div
-                            initial={{ y: 10, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            transition={{ delay: 0.4 }}
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', padding: '4px 12px', borderRadius: '99px', background: `${heroColor}14`, border: `1px solid ${heroColor}25`, marginBottom: '24px' }}
+                            key={`content-${hero?._id}`}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.6 }}
+                            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', alignItems: 'center', gap: 'clamp(2rem, 8vw, 6rem)' }}
                         >
-                            <TrendingUp size={11} color={heroColor} />
-                            <span style={{ fontSize: '10px', fontWeight: 700, color: heroColor, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-                                Latest Imprint
-                            </span>
-                        </motion.div>
+                            {/* Left: Text */}
+                            <motion.div
+                                style={{
+                                    transform: `translate(${mousePos.x}px, ${mousePos.y}px)`,
+                                    transition: 'transform 0.1s ease-out'
+                                }}
+                            >
+                                <motion.div
+                                    initial={{ y: 10, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ delay: 0.2 }}
+                                    style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', padding: '4px 12px', borderRadius: '99px', background: `${heroColor}14`, border: `1px solid ${heroColor}25`, marginBottom: '24px' }}
+                                >
+                                    <TrendingUp size={11} color={heroColor} />
+                                    <span style={{ fontSize: '10px', fontWeight: 700, color: heroColor, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+                                        Latest Imprint
+                                    </span>
+                                </motion.div>
 
-                        <h1 className="display" style={{
-                            fontSize: 'clamp(2.5rem, 8vw, 6.5rem)',
-                            fontWeight: 900,
-                            color: '#f2f2f2',
-                            lineHeight: 0.95,
-                            letterSpacing: '-0.04em',
-                            marginBottom: '18px',
-                            textShadow: '0 20px 40px rgba(0,0,0,0.5)'
-                        }}>
-                            {hero?.movie_title || "Critic's Temple"}
-                        </h1>
+                                <h1 className="display" style={{
+                                    fontSize: 'clamp(2.5rem, 8vw, 6.5rem)',
+                                    fontWeight: 900,
+                                    color: '#FFFFFF',
+                                    lineHeight: 0.95,
+                                    letterSpacing: '-0.04em',
+                                    marginBottom: '18px',
+                                    textShadow: '0 20px 40px rgba(0,0,0,0.5)'
+                                }}>
+                                    {hero?.movie_title || "Critic's Temple"}
+                                </h1>
 
-                        {hero?.summary && hero.summary.length > 6 && (
-                            <p style={{ fontSize: 'clamp(14px, 1.5vw, 16px)', fontWeight: 300, color: 'rgba(255,255,255,0.45)', lineHeight: 1.8, maxWidth: '500px', marginBottom: '32px' }}>
-                                {hero.summary}
-                            </p>
-                        )}
+                                {hero?.summary && (
+                                    <p style={{ fontSize: 'clamp(14px, 1.5vw, 16px)', fontWeight: 300, color: 'rgba(255,255,255,0.45)', lineHeight: 1.8, maxWidth: '500px', marginBottom: '32px' }}>
+                                        {hero.summary}
+                                    </p>
+                                )}
 
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-                            {hero?.verdict && (
-                                <span style={{ padding: '5px 14px', borderRadius: '99px', fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', background: `${heroColor}18`, color: heroColor, border: `1px solid ${heroColor}30` }}>
-                                    {hero.verdict}
-                                </span>
-                            )}
-                            {hero?.overall_rating != null && (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '15px', fontWeight: 700, color: '#f5a623' }}>
-                                    <Star size={14} fill="#f5a623" color="#f5a623" />
-                                    {parseFloat(hero.overall_rating).toFixed(1)}
-                                    <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.25)', fontWeight: 400 }}>/10</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+                                    {hero?.verdict && (
+                                        <span style={{ padding: '5px 14px', borderRadius: '99px', fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', background: `${heroColor}18`, color: heroColor, border: `1px solid ${heroColor}30` }}>
+                                            {hero.verdict}
+                                        </span>
+                                    )}
+                                    {hero?.overall_rating != null && (
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '15px', fontWeight: 700, color: heroColor }}>
+                                            <Star size={14} fill={heroColor} color={heroColor} />
+                                            {parseFloat(hero.overall_rating).toFixed(1)}
+                                            <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.25)', fontWeight: 400 }}>/10</span>
+                                        </div>
+                                    )}
+                                    {hero?.slug && (
+                                        <Link to={`/review/${hero.slug}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '12px 26px', borderRadius: '12px', background: heroColor, color: '#000', fontSize: '13px', fontWeight: 700, textDecoration: 'none', boxShadow: `0 10px 30px ${heroColor}30`, transition: 'all 0.3s ease' }}>
+                                            Read Full Review <ChevronRight size={14} />
+                                        </Link>
+                                    )}
                                 </div>
+                            </motion.div>
+
+                            {/* Right: floating poster card */}
+                            {hero?.movie_poster_url && (
+                                <motion.div
+                                    initial={{ scale: 0.9, opacity: 0, rotateY: 10 }}
+                                    animate={{ scale: 1, opacity: 1, rotateY: 0 }}
+                                    transition={{ duration: 0.8 }}
+                                    style={{
+                                        perspective: '1000px',
+                                        transform: `translate(${-mousePos.x}px, ${-mousePos.y}px)`,
+                                        transition: 'transform 0.1s ease-out'
+                                    }}
+                                >
+                                    <div style={{
+                                        width: '100%',
+                                        maxWidth: '340px',
+                                        justifySelf: 'center',
+                                        borderRadius: '24px',
+                                        overflow: 'hidden',
+                                        boxShadow: '0 50px 100px rgba(0,0,0,0.9)',
+                                        border: '1px solid rgba(255,255,255,0.1)',
+                                        background: '#111'
+                                    }}>
+                                        <div style={{ aspectRatio: '2 / 3', width: '100%', overflow: 'hidden' }}>
+                                            <img src={hero.movie_poster_url} alt={hero.movie_title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        </div>
+                                    </div>
+                                </motion.div>
                             )}
-                            {hero?.slug && (
-                                <Link to={`/review/${hero.slug}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 22px', borderRadius: '12px', background: '#f5a623', color: '#000', fontSize: '13px', fontWeight: 700, textDecoration: 'none', boxShadow: '0 0 30px rgba(245,166,35,0.25)' }}>
-                                    Read Full Review <ChevronRight size={14} />
-                                </Link>
-                            )}
+                        </motion.div>
+                    </AnimatePresence>
+
+                    {/* Navigation Indicators */}
+                    {featuredReviews.length > 1 && (
+                        <div style={{ position: 'absolute', bottom: '-40px', left: 0, display: 'flex', gap: '10px', zIndex: 10 }}>
+                            {featuredReviews.map((_, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => {
+                                        setCurrentIndex(idx);
+                                        setIsAutoPlaying(false);
+                                    }}
+                                    style={{
+                                        width: idx === currentIndex ? '30px' : '8px',
+                                        height: '8px',
+                                        borderRadius: '4px',
+                                        background: idx === currentIndex ? heroColor : 'rgba(255,255,255,0.15)',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                                        padding: 0
+                                    }}
+                                    title={`Slide ${idx + 1}`}
+                                />
+                            ))}
                         </div>
-                    </motion.div>
-
-                    {/* Right: floating poster card */}
-                    {hero?.movie_poster_url && (
-                        <motion.div
-                            initial={{ scale: 0.8, opacity: 0, rotateY: 20 }}
-                            animate={{ scale: 1, opacity: 1, rotateY: 0 }}
-                            transition={{ duration: 1.2, delay: 0.4 }}
-                            style={{
-                                perspective: '1000px',
-                                transform: `translate(${-mousePos.x}px, ${-mousePos.y}px)`,
-                                transition: 'transform 0.1s ease-out'
-                            }}
-                        >
-                            <div style={{
-                                width: '100%',
-                                maxWidth: '340px',
-                                justifySelf: 'center',
-                                borderRadius: '24px',
-                                overflow: 'hidden',
-                                boxShadow: '0 50px 100px rgba(0,0,0,0.9)',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                background: '#111'
-                            }}>
-                                <div style={{ aspectRatio: '2 / 3', width: '100%', overflow: 'hidden' }}>
-                                    <img src={hero.movie_poster_url} alt={hero.movie_title} style={{ width: '100%', height: '100%', minHeight: '100%', minWidth: '100%', objectFit: 'cover' }} />
-                                </div>
-                            </div>
-                        </motion.div>
                     )}
                 </div>
             </section>

@@ -89,3 +89,7 @@ The Commandments:
         except Exception as e:
             print(f"Oracle Error: {e}")
             raise HTTPException(status_code=500, detail="The Oracle is currently deep in meditation and unresponsive to the mortal realm.")
+
+
+# End of Oracle Routes
+
