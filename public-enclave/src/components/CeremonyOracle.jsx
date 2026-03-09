@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, X, Send, MessageSquare, Loader2 } from 'lucide-react';
+import { Sparkles, X, Send, Loader2 } from 'lucide-react';
 import { API_URL } from '../services/api';
 import axios from 'axios';
+import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, Radar, Tooltip } from 'recharts';
 
 const TypeWriter = ({ text, speed = 20, onComplete }) => {
     const [displayedText, setDisplayedText] = useState('');
@@ -70,11 +71,16 @@ const CeremonyOracle = () => {
             const content = data.response;
             let dnaData = null;
 
-            // Extract Prophetic DNA if present
+            // Robust Prophetic DNA Extraction
             if (content.includes('PROPHETIC_DNA:')) {
                 try {
-                    const jsonStr = content.split('PROPHETIC_DNA:')[1].trim();
-                    dnaData = JSON.parse(jsonStr);
+                    const parts = content.split('PROPHETIC_DNA:');
+                    const jsonPart = parts[1].trim();
+                    // Match the first JSON object block to avoid trailing text issues
+                    const jsonMatch = jsonPart.match(/\{[\s\S]*?\}/);
+                    if (jsonMatch) {
+                        dnaData = JSON.parse(jsonMatch[0]);
+                    }
                 } catch (e) {
                     console.error("DNA Parsing Error", e);
                 }
@@ -126,12 +132,12 @@ const CeremonyOracle = () => {
                 <Sparkles size={28} />
 
                 <style>{`
-                    @keyframes pulse-ring {
-                        0% { transform: scale(0.95); opacity: 0.8; }
-                        50% { transform: scale(1.1); opacity: 0.4; }
-                        100% { transform: scale(0.95); opacity: 0.8; }
-                    }
-                `}</style>
+@keyframes pulse - ring {
+    0 % { transform: scale(0.95); opacity: 0.8; }
+    50 % { transform: scale(1.1); opacity: 0.4; }
+    100 % { transform: scale(0.95); opacity: 0.8; }
+}
+`}</style>
             </motion.button>
 
             {/* Oracle Chat Sidebar */}
@@ -160,7 +166,7 @@ const CeremonyOracle = () => {
                                 width: 'min(400px, 100vw)',
                                 background: 'rgba(12,12,12,0.98)',
                                 backdropFilter: 'blur(30px)',
-                                borderLeft: `1px solid ${persona === 'mystic' ? 'rgba(245,166,35,0.2)' : persona === 'scholar' ? 'rgba(96,165,250,0.2)' : 'rgba(239,68,68,0.2)'}`,
+                                borderLeft: `1px solid ${persona === 'mystic' ? 'rgba(245,166,35,0.2)' : persona === 'scholar' ? 'rgba(96,165,250,0.2)' : 'rgba(239,68,68,0.2)'} `,
                                 display: 'flex',
                                 flexDirection: 'column',
                                 zIndex: 1002,
@@ -180,7 +186,7 @@ const CeremonyOracle = () => {
                                     <div style={{
                                         width: '36px', height: '36px', borderRadius: '10px',
                                         background: persona === 'mystic' ? 'rgba(245,166,35,0.1)' : persona === 'scholar' ? 'rgba(96,165,250,0.1)' : 'rgba(239,68,68,0.1)',
-                                        border: `1px solid ${persona === 'mystic' ? 'rgba(245,166,35,0.2)' : persona === 'scholar' ? 'rgba(96,165,250,0.2)' : 'rgba(239,68,68,0.2)'}`,
+                                        border: `1px solid ${persona === 'mystic' ? 'rgba(245,166,35,0.2)' : persona === 'scholar' ? 'rgba(96,165,250,0.2)' : 'rgba(239,68,68,0.2)'} `,
                                         display: 'flex', alignItems: 'center', justifyContent: 'center'
                                     }}>
                                         <Sparkles size={18} color={persona === 'mystic' ? '#f5a623' : persona === 'scholar' ? '#60a5fa' : '#ef4444'} />
@@ -231,7 +237,7 @@ const CeremonyOracle = () => {
                                             padding: '12px 16px',
                                             borderRadius: m.role === 'user' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
                                             background: m.role === 'user' ? 'rgba(245,166,35,0.1)' : 'rgba(255,255,255,0.03)',
-                                            border: `1px solid ${m.role === 'user' ? 'rgba(245,166,35,0.2)' : 'rgba(255,255,255,0.06)'}`,
+                                            border: `1px solid ${m.role === 'user' ? 'rgba(245,166,35,0.2)' : 'rgba(255,255,255,0.06)'} `,
                                             fontSize: '14px',
                                             lineHeight: 1.6,
                                             color: m.role === 'user' ? '#fff' : 'rgba(255,255,255,0.8)',
@@ -250,15 +256,42 @@ const CeremonyOracle = () => {
 
                                             {/* Prophetic DNA Radar Chart */}
                                             {m.propheticDNA && (
-                                                <div style={{ marginTop: '16px', height: '200px', width: '100%', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', padding: '12px' }}>
+                                                <div style={{ marginTop: '16px', height: '240px', width: '100%', minHeight: '240px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', padding: '12px', position: 'relative', display: 'block' }}>
                                                     <div style={{ textAlign: 'center', fontSize: '9px', fontWeight: 900, color: 'rgba(255,255,255,0.3)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Prophetic DNA Projection</div>
-                                                    <ResponsiveContainer width="100%" height="90%">
-                                                        <RadarChart cx="50%" cy="50%" outerRadius="70%" data={Object.entries(m.propheticDNA).map(([k, v]) => ({ subject: k.toUpperCase(), A: v }))}>
-                                                            <PolarGrid stroke="rgba(255,255,255,0.1)" />
-                                                            <PolarAngleAxis dataKey="subject" tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 8 }} />
-                                                            <Radar name="DNA" dataKey="A" stroke={persona === 'mystic' ? '#f5a623' : persona === 'scholar' ? '#60a5fa' : '#ef4444'} fill={persona === 'mystic' ? '#f5a623' : persona === 'scholar' ? '#60a5fa' : '#ef4444'} fillOpacity={0.6} />
-                                                        </RadarChart>
-                                                    </ResponsiveContainer>
+                                                    <div style={{ position: 'absolute', inset: '40px 12px 12px 12px' }}>
+                                                        <ResponsiveContainer width="99%" height="99%" minHeight={180}>
+                                                            <RadarChart cx="50%" cy="50%" outerRadius="70%" data={Object.entries(m.propheticDNA).map(([k, v]) => ({ subject: k.toUpperCase(), A: v }))}>
+                                                                <PolarGrid stroke="rgba(255,255,255,0.1)" />
+                                                                <PolarAngleAxis dataKey="subject" tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 8 }} />
+                                                                <Tooltip
+                                                                    content={({ active, payload }) => {
+                                                                        if (active && payload && payload.length) {
+                                                                            const data = payload[0].payload;
+                                                                            const color = persona === 'mystic' ? '#f5a623' : persona === 'scholar' ? '#60a5fa' : '#ef4444';
+                                                                            return (
+                                                                                <div style={{
+                                                                                    background: 'rgba(15, 15, 15, 0.9)',
+                                                                                    backdropFilter: 'blur(8px)',
+                                                                                    border: `1px solid ${color} 40`,
+                                                                                    padding: '8px 12px',
+                                                                                    borderRadius: '8px',
+                                                                                    boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                                                                                    display: 'flex',
+                                                                                    flexDirection: 'column',
+                                                                                    gap: '2px'
+                                                                                }}>
+                                                                                    <div style={{ fontSize: '9px', fontWeight: 900, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>{data.subject}</div>
+                                                                                    <div style={{ fontSize: '16px', fontWeight: 900, color: color, fontFamily: 'serif' }}>{data.A.toFixed(1)}</div>
+                                                                                </div>
+                                                                            );
+                                                                        }
+                                                                        return null;
+                                                                    }}
+                                                                />
+                                                                <Radar name="DNA" dataKey="A" stroke={persona === 'mystic' ? '#f5a623' : persona === 'scholar' ? '#60a5fa' : '#ef4444'} fill={persona === 'mystic' ? '#f5a623' : persona === 'scholar' ? '#60a5fa' : '#ef4444'} fillOpacity={0.6} />
+                                                            </RadarChart>
+                                                        </ResponsiveContainer>
+                                                    </div>
                                                 </div>
                                             )}
                                         </div>

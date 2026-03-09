@@ -677,7 +677,7 @@ export default function ReviewDetail() {
 
                                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
                                     <Link
-                                        to={`/duel/${review.slug}`}
+                                        to={`/compare?c1=${review._id}`}
                                         style={{
                                             display: 'inline-flex',
                                             alignItems: 'center',
@@ -703,8 +703,8 @@ export default function ReviewDetail() {
                                 </div>
 
                                 {/* Radar Chart Integration */}
-                                <div style={{ height: 'clamp(280px, 70vw, 380px)', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '280px' }}>
-                                    <ResponsiveContainer width="100%" height="100%" minHeight={280}>
+                                <div style={{ height: 'clamp(280px, 70vw, 380px)', width: '100%', display: 'block', minHeight: '280px', position: 'relative' }}>
+                                    <ResponsiveContainer width="99%" height="99%" minHeight={280}>
                                         <RadarChart cx="50%" cy="50%" outerRadius="75%" data={radarData}>
                                             <PolarGrid stroke="rgba(255,255,255,0.1)" />
                                             <PolarAngleAxis dataKey="subject" tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 10, fontWeight: 600 }} />

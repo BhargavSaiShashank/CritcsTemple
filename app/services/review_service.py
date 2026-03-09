@@ -184,7 +184,8 @@ class ReviewService:
             "summary": 1,
             "tags": 1,
             "slug": 1,
-            "movie_year": 1
+            "movie_year": 1,
+            "aspects": 1
         })
         reviews = await cursor.to_list(length=100)
         return [self.serialize_doc(r) for r in reviews]

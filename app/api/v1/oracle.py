@@ -55,32 +55,43 @@ async def oracle_query(
         print(f"Database Error in Oracle: {e}")
         reviews = []
     
-    # Format context
-    context_str = "\n".join([
-        f"- {r['movie_title']} ({r.get('movie_year', 'N/A')}): Verdict {r['verdict']}, Rating {r['overall_rating']}/10. Summary: {r.get('summary', 'No summary available.')}"
-        for r in reviews
-    ])
+    # Format context with explicit DNA aspects for perfect archive synchronization
+    context_list = []
+    for r in reviews:
+        # Extract specific scores from the nested aspect structure
+        raw_aspects = r.get('aspects', {})
+        processed_aspects = {}
+        for key, val in raw_aspects.items():
+            if isinstance(val, dict) and 'score' in val:
+                processed_aspects[key] = val['score']
+            elif isinstance(val, (int, float)):
+                processed_aspects[key] = val
+        
+        aspects_str = ", ".join([f"{k}: {v}" for k, v in processed_aspects.items()])
+        
+        context_list.append(
+            f"MOVIE: {r['movie_title']} | RELEASE: {r.get('movie_year', 'N/A')} | DNA_SCORES: {{{aspects_str}}} | VERDICT: {r['verdict']} | TOTAL: {r['overall_rating']}/10"
+        )
+    context_str = "\n".join(context_list)
     
     # Logging for debugging
-    print(f"Oracle Query: '{query}' | History: {len(history)} | Context Reviews: {len(reviews)}")
+    print(f"Oracle Query: '{query}' | Persona: {persona_type} | Archives: {len(reviews)}")
 
     system_prompt = f"""{persona['prompt']}
     
-ADAPTIVE WISDOM PROTOCOL:
-- **Depth Detection**: Analyze the query's complexity.
-- **Short Responses**: For simple greetings or basic info, 1-2 punchy sentences.
-- **Cinematic Deep-Dives**: For complex speculation or analysis, 3-6 insightful, atmospheric sentences.
-- **DNA Extraction**: If the user asks for the DNA or ratings of a movie not in the imprints below, provide a JSON block at the end of your response in the format: 
-  `PROPHETIC_DNA: {{"story": 0, "direction": 0, "cinematography": 0, "soul": 0, "pacing": 0}}` (scores 1-10).
+DIVINE INTELLIGENCE CALIBRATION:
+- **Archive Fidelity**: You have access to the 'Library of Imprints' below. If a user asks about a movie in this library, you MUST mirror its DNA_SCORES exactly.
+- **Visionary Projection**: For movies NOT in your library, formulate a 'High-Resonance DNA Projection'. Use your vast training data to estimate realistic scores (1-10) that reflect critical history.
+- **DNA Visualization**: When providing scores, you MUST append a JSON block at the very end. The keys MUST be: "story", "direction", "cinematography", "soul", "pacing". Map archive categories to these 5 if they differ.
+- **Response Style**: {persona['description']} Address the user as {'Seeker' if persona_type == 'mystic' else 'Student' if persona_type == 'scholar' else 'Amateur'}.
 
-Review Imprints (Your Ground Truth):
-{context_str if context_str else "Empty."}
+Library of Imprints (Your Absolute Truth):
+{context_str if context_str else "The library is currently vacant."}
 
 The Commandments:
-1. **Tone**: Use the {persona['name']} persona guidelines.
-2. **Speculation**: Use imprints to fuel creative theories.
-3. **Internal Data**: Only reference movies in the 'Review Imprints' as 'Official Records'. Others are 'Visions'.
-4. **Follow-up**: End with a short, relevant cinematic question.
+1. **Consistency**: Your narrative analysis must explain the scores you provide.
+2. **Prophetic JSON**: ALWAYS end with: `PROPHETIC_DNA: {{"story": X, "direction": X, "cinematography": X, "soul": X, "pacing": X}}`
+3. **Questioning**: End the spoken part with a thematic inquiry.
 """
 
     messages = [{"role": "system", "content": system_prompt}]

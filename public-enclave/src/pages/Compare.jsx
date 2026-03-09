@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Search, X, Zap, Camera, Music, Heart, QuoteIcon, Star, ArrowLeftRight } from 'lucide-react';
+import { Search, X, Zap, Camera, Music, Heart, QuoteIcon, Star, ArrowLeftRight, Sparkles, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence, useScroll } from 'framer-motion';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, PolarRadiusAxis, Tooltip } from 'recharts';
 import { getLatestReviews, proxyImage, getOracleDuel } from '../services/api';
@@ -456,8 +456,8 @@ export default function Compare() {
                             </div>
 
                             {radarData.length > 0 ? (
-                                <div style={{ height: 'clamp(300px, 70vw, 480px)', width: '100%', maxWidth: '800px', minHeight: '300px' }}>
-                                    <ResponsiveContainer width="100%" height="100%" minHeight={300}>
+                                <div style={{ height: 'clamp(300px, 70vw, 480px)', width: '100%', maxWidth: '800px', minHeight: '300px', position: 'relative' }}>
+                                    <ResponsiveContainer width="100%" height="100%">
                                         <RadarChart cx="50%" cy="50%" outerRadius="75%" data={radarData}>
                                             <PolarGrid stroke="rgba(255,255,255,0.08)" />
                                             <PolarAngleAxis dataKey="subject" tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em' }} />
@@ -550,7 +550,7 @@ export default function Compare() {
                                 </button>
                             ) : (
                                 <div style={{ textAlign: 'center', maxWidth: '700px' }}>
-                                    <p style={{ fontSize: '15px', lineHeight: 1.8, color: 'rgba(255,255,255,0.9)', fontStyle: 'italic', fontStyle: 'italic', margin: 0, whiteSpace: 'pre-wrap' }}>
+                                    <p style={{ fontSize: '15px', lineHeight: 1.8, color: 'rgba(255,255,255,0.9)', fontStyle: 'italic', margin: 0, whiteSpace: 'pre-wrap' }}>
                                         "{oracleReport}"
                                     </p>
                                     <button
