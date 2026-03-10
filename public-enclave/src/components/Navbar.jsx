@@ -21,10 +21,10 @@ export default function Navbar({ onSearchOpen }) {
             left: 0,
             right: 0,
             zIndex: 1000,
-            paddingTop: scrolled ? 'calc(8px + var(--safe-top))' : 'calc(16px + var(--safe-top))',
-            paddingBottom: scrolled ? '8px' : '16px',
+            paddingTop: 'calc(16px + var(--safe-top))',
+            paddingBottom: '16px',
             transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-            background: scrolled ? 'rgba(8, 8, 8, 0.85)' : 'transparent',
+            background: scrolled ? 'rgba(8, 8, 8, 0.95)' : 'transparent',
             backdropFilter: scrolled ? 'blur(20px)' : 'none',
             borderBottom: scrolled ? '1px solid rgba(255, 255, 255, 0.05)' : '1px solid transparent',
         }}>
@@ -63,10 +63,7 @@ export default function Navbar({ onSearchOpen }) {
                         background: 'linear-gradient(to bottom, #fff, #aaa)',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
-                        maxWidth: 'clamp(120px, 30vw, 200px)',
-                        overflow: 'hidden',
-                        whiteSpace: 'nowrap',
-                        textOverflow: 'ellipsis'
+                        whiteSpace: 'nowrap'
                     }}>
                         CRITIC'S TEMPLE
                     </span>
