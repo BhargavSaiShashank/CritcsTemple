@@ -51,8 +51,8 @@ body,
 }
 
 body.is-native {
-  /* On native, if env() fails, we want at least 44px of top gap (to cover most notches) */
-  --safe-top: env(safe-area-inset-top, 44px);
+  /* On native, if env() fails, we want at least 56px of top gap (to cover modern hole-punch cutouts) */
+  --safe-top: env(safe-area-inset-top, 56px);
 }
 
 .max-w-container {
