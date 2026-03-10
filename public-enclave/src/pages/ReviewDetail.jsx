@@ -76,7 +76,7 @@ function ScoreBar({ name, score, comment, color }) {
         <div style={{ marginBottom: '16px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                 <span style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.5)' }}>{name}</span>
-                <span style={{ fontSize: '14px', fontWeight: 800, color: scoreColor(n), fontVariantNumeric: 'tabular-nums' }}>{n.toFixed(2)}</span>
+                <span style={{ fontSize: '14px', fontWeight: 800, color: scoreColor(n), fontVariantNumeric: 'tabular-nums' }}>{n.toFixed(1)}</span>
             </div>
             {/* Track */}
             <div style={{ height: '5px', borderRadius: '99px', background: 'rgba(255,255,255,0.05)', position: 'relative', overflow: 'hidden' }}>
