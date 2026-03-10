@@ -7,8 +7,16 @@ from fastapi import HTTPException
 class ReviewService:
     @staticmethod
     def serialize_doc(doc: dict) -> dict:
-        if doc and "_id" in doc:
+        if not doc:
+            return doc
+        
+        if "_id" in doc:
             doc["_id"] = str(doc["_id"])
+            
+        # Ensure aspects exist for legacy records
+        if "aspects" not in doc:
+            doc["aspects"] = {}
+            
         return doc
 
     def _get_publication_query(self) -> dict:

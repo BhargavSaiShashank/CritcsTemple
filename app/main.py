@@ -45,9 +45,16 @@ async def startup_db_client():
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
+    origin = request.headers.get("origin")
+    headers = {}
+    if origin:
+        headers["Access-Control-Allow-Origin"] = origin
+        headers["Access-Control-Allow-Credentials"] = "true"
+        
     return JSONResponse(
         status_code=exc.status_code,
         content={"success": False, "error": exc.detail},
+        headers=headers
     )
 
 @app.exception_handler(Exception)
@@ -60,9 +67,16 @@ async def generic_exception_handler(request: Request, exc: Exception):
     except:
         pass
         
+    origin = request.headers.get("origin")
+    headers = {}
+    if origin:
+        headers["Access-Control-Allow-Origin"] = origin
+        headers["Access-Control-Allow-Credentials"] = "true"
+
     return JSONResponse(
         status_code=500,
         content={"success": False, "error": "Internal Server Error", "details": str(exc)},
+        headers=headers
     )
 
 @app.on_event("shutdown")

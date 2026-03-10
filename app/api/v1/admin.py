@@ -230,9 +230,13 @@ async def list_reviews(
         reviews = await db.reviews.find(query).sort("created_at", -1).to_list(1000)
         return [review_service.serialize_doc(r) for r in reviews]
     except Exception as e:
-        print(f"ADMIN ERROR in list_reviews: {str(e)}")
-        import traceback
-        traceback.print_exc()
+        error_msg = f"ADMIN ERROR in list_reviews: {str(e)}\n{traceback.format_exc()}"
+        print(error_msg)
+        try:
+            with open("server_errors.log", "a") as f:
+                f.write(f"\n--- {datetime.now()} [ADMIN] ---\n{error_msg}\n")
+        except:
+            pass
         raise HTTPException(status_code=500, detail=f"Database Query Error: {str(e)}")
 
 @router.get("/analytics/dna")
