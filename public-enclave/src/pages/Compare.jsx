@@ -157,7 +157,7 @@ function SearchSlot({ slotId, selected, onSelect, onClear }) {
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
                         <Star size={20} fill={vc.color} color={vc.color} style={{ filter: `drop-shadow(0 0 8px ${vc.color})` }} />
                         <span style={{ fontSize: 'clamp(28px, 6vw, 42px)', fontWeight: 900, color: vc.color, lineHeight: 1, textShadow: `0 0 30px ${vc.color}60` }}>
-                            {parseFloat(selected.overall_rating || 0).toFixed(1)}
+                            {parseFloat(selected.overall_rating || 0).toFixed(2)}
                         </span>
                         <span style={{ fontSize: '16px', color: 'rgba(255,255,255,0.3)', fontWeight: 500 }}>/10</span>
                     </div>
@@ -263,7 +263,7 @@ function SearchSlot({ slotId, selected, onSelect, onClear }) {
                                                             <span style={{ color: 'rgba(255,255,255,0.2)' }}>&bull;</span>
                                                             <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
                                                                 <Star size={10} fill={rVc.color} color={rVc.color} />
-                                                                <span style={{ fontSize: '11px', color: '#fff', fontWeight: 700 }}>{parseFloat(r.overall_rating || 0).toFixed(1)}</span>
+                                                                <span style={{ fontSize: '11px', color: '#fff', fontWeight: 700 }}>{parseFloat(r.overall_rating || 0).toFixed(2)}</span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -477,14 +477,14 @@ export default function Compare() {
                                                                             <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: colorA, boxShadow: `0 0 10px ${colorA}` }} />
                                                                             <span style={{ fontSize: '12px', fontWeight: 600, color: '#fff', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item1.movie_title}</span>
                                                                         </div>
-                                                                        <span style={{ fontSize: '16px', fontWeight: 900, color: colorA, textShadow: `0 0 15px ${colorA}80` }}>{data.A > 0 ? data.A.toFixed(1) : '-'}</span>
+                                                                        <span style={{ fontSize: '16px', fontWeight: 900, color: colorA, textShadow: `0 0 15px ${colorA}80` }}>{data.A > 0 ? data.A.toFixed(2) : '-'}</span>
                                                                     </div>
                                                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '24px' }}>
                                                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                                             <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: colorB, boxShadow: `0 0 10px ${colorB}` }} />
                                                                             <span style={{ fontSize: '12px', fontWeight: 600, color: '#fff', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item2.movie_title}</span>
                                                                         </div>
-                                                                        <span style={{ fontSize: '16px', fontWeight: 900, color: colorB, textShadow: `0 0 15px ${colorB}80` }}>{data.B > 0 ? data.B.toFixed(1) : '-'}</span>
+                                                                        <span style={{ fontSize: '16px', fontWeight: 900, color: colorB, textShadow: `0 0 15px ${colorB}80` }}>{data.B > 0 ? data.B.toFixed(2) : '-'}</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -617,7 +617,7 @@ export default function Compare() {
                                                 {/* Left side (Item 1) */}
                                                 <div style={{ textAlign: 'right' }}>
                                                     <span style={{ fontSize: 'clamp(16px, 2vw, 20px)', fontWeight: 900, color: textC1, textShadow: shadowC1, transition: 'all 0.4s' }}>
-                                                        {avg1 > 0 ? avg1.toFixed(1) : '-'}
+                                                        {avg1 > 0 ? avg1.toFixed(2) : '-'}
                                                     </span>
                                                 </div>
 
@@ -649,7 +649,7 @@ export default function Compare() {
                                                 {/* Right side (Item 2) */}
                                                 <div style={{ textAlign: 'left' }}>
                                                     <span style={{ fontSize: 'clamp(16px, 2vw, 20px)', fontWeight: 900, color: textC2, textShadow: shadowC2, transition: 'all 0.4s' }}>
-                                                        {avg2 > 0 ? avg2.toFixed(1) : '-'}
+                                                        {avg2 > 0 ? avg2.toFixed(2) : '-'}
                                                     </span>
                                                 </div>
                                             </div>

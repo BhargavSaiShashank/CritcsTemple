@@ -151,7 +151,7 @@ const Intelligence = () => {
                                                     <div className="bg-black/80 backdrop-blur-xl border border-amber-500/30 p-4 rounded-2xl shadow-2xl flex flex-col gap-1">
                                                         <div className="text-[10px] font-black text-white/30 uppercase tracking-widest">{data.subject}</div>
                                                         <div className="text-2xl font-black text-amber-500 italic">
-                                                            {data.A.toFixed(1)}
+                                                            {data.A.toFixed(2)}
                                                             <span className="text-xs text-white/10 not-italic ml-2 font-black">/ 10</span>
                                                         </div>
                                                     </div>

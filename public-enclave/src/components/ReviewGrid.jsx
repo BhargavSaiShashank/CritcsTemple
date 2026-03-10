@@ -107,7 +107,7 @@ const ReviewCard = React.memo(({ review, index }) => {
                             fontSize: '12px', fontWeight: 800, color: scoreColor(review.overall_rating),
                         }}>
                             <Star size={10} fill="currentColor" color="currentColor" />
-                            {parseFloat(review.overall_rating || 0).toFixed(1)}
+                            {parseFloat(review.overall_rating || 0).toFixed(2)}
                         </div>
                     </div>
 

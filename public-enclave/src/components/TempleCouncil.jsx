@@ -47,7 +47,7 @@ const DomainGauge = ({ score, color, label }) => {
                         strokeLinecap="round"
                     />
                 </svg>
-                <span style={{ position: 'absolute', fontSize: '13px', fontWeight: 900, color: color }}>{n.toFixed(1)}</span>
+                <span style={{ position: 'absolute', fontSize: '13px', fontWeight: 900, color: color }}>{n.toFixed(2)}</span>
             </div>
             <span style={{ fontSize: '9px', fontWeight: 800, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{label}</span>
         </div>
@@ -371,7 +371,7 @@ const TempleCouncil = ({ slug, isOpen, onClose, movieTitle }) => {
                                             transition={{ duration: 2, repeat: Infinity }}
                                             style={{ fontSize: '56px', fontWeight: 950, color: '#f5a623', fontFamily: 'serif', fontStyle: 'italic', lineHeight: 1 }}
                                         >
-                                            {councilAverage.toFixed(1)}
+                                            {councilAverage.toFixed(2)}
                                         </motion.span>
                                         <span style={{ fontSize: '16px', color: 'rgba(255,255,255,0.2)', fontWeight: 800 }}> / 10</span>
                                     </div>

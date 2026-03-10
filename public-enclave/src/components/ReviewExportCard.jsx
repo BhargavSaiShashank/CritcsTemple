@@ -37,7 +37,7 @@ const ReviewExportCard = React.forwardRef(({ review }, ref) => {
     if (!review) return null;
 
     const vc = getV(review.verdict);
-    const score = parseFloat(review.overall_rating || 0).toFixed(1);
+    const score = parseFloat(review.overall_rating || 0).toFixed(2);
 
     const aspects = review.aspects || {};
     const groupAverages = ASPECT_GROUPS.map(g => {
@@ -151,7 +151,7 @@ const ReviewExportCard = React.forwardRef(({ review }, ref) => {
                                 {groupAverages.slice(0, 3).map(g => (
                                     <div key={g.name} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '20px', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '4px', minWidth: '100px', flex: 1 }}>
                                         <span style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.15em' }}>{g.name}</span>
-                                        <span style={{ fontSize: '28px', fontWeight: 800, color: g.color }}>{g.avg.toFixed(1)}</span>
+                                        <span style={{ fontSize: '28px', fontWeight: 800, color: g.color }}>{g.avg.toFixed(2)}</span>
                                     </div>
                                 ))}
                             </div>

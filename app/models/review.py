@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, validator, ConfigDict
 from typing import List, Optional, Dict
 from datetime import datetime
 from enum import Enum
@@ -111,5 +111,4 @@ class ReviewInDB(ReviewBase):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     history: List[Dict] = []
 
-    class Config:
-        populate_by_name = True
+    model_config = ConfigDict(populate_by_name=True)

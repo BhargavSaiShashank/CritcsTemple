@@ -173,11 +173,98 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
     }
 
     const averageScore = useMemo(() => {
-        const scores = Object.values(formData.aspects)
-            .map(a => parseFloat(a.score))
-            .filter(s => isFinite(s) && s > 0);
-        if (scores.length === 0) return "0.0";
-        return (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1);
+        const aspects = formData.aspects || {};
+
+        const categories = {
+            'Narrative': { keys: ['story', 'screenplay', 'originality', 'opening', 'climax'], weight: 0.25 },
+            'Direction': { keys: ['direction', 'acting', 'dialogues'], weight: 0.25 },
+            'Soul': { keys: ['pacing', 'emotional_impact', 'rewatch_value'], weight: 0.20 },
+            'Visuals': { keys: ['cinematography', 'editing', 'production_design', 'vfx'], weight: 0.15 },
+            'Audio': { keys: ['bg_score', 'music'], weight: 0.15 }
+        };
+
+        let weightedScore = 0.0;
+        let activeWeightTotal = 0.0;
+        let craftPenalty = 0.0;
+        let catAverages = {};
+
+        // Step 1: Base Score & Craft Penalty
+        for (const [catName, info] of Object.entries(categories)) {
+            const catScores = [];
+            for (const key of info.keys) {
+                if (aspects[key] && isFinite(parseFloat(aspects[key].score))) {
+                    const scoreVal = parseFloat(aspects[key].score);
+                    if (scoreVal > 0) {
+                        catScores.push(scoreVal);
+                        if (scoreVal <= 4.5) {
+                            craftPenalty += 0.03;
+                        }
+                    }
+                }
+            }
+            if (catScores.length > 0) {
+                const catAvg = catScores.reduce((a, b) => a + b, 0) / catScores.length;
+                catAverages[catName] = catAvg;
+                weightedScore += (catAvg * info.weight);
+                activeWeightTotal += info.weight;
+            }
+        }
+
+        if (activeWeightTotal === 0) return "0.00";
+
+        const baseScore = weightedScore / activeWeightTotal;
+
+        // Step 2: Variance Penalty
+        const catVals = Object.values(catAverages);
+        let variancePenalty = 0.0;
+        if (catVals.length > 0) {
+            const maxCat = Math.max(...catVals);
+            const minCat = Math.min(...catVals);
+            const variance = maxCat - minCat;
+            if (variance >= 3) variancePenalty = 0.10;
+            else if (variance >= 2) variancePenalty = 0.05;
+        }
+
+        // Step 3: Foundation Penalty
+        let foundationPenalty = 0.0;
+        if (catAverages['Narrative'] !== undefined && catAverages['Narrative'] < 6.5) {
+            foundationPenalty += 0.10;
+        }
+        if (catAverages['Direction'] !== undefined && catAverages['Direction'] < 6.5) {
+            foundationPenalty += 0.05;
+        }
+
+        // Step 4: Greatness Boost
+        const above85 = catVals.filter(v => v >= 8.5).length;
+        const above83 = catVals.filter(v => v >= 8.3).length;
+        let boost = 0.0;
+        if (above85 >= 4) {
+            boost = 0.10;
+        } else if (above83 >= 3) {
+            boost = 0.05;
+        }
+
+        // Step 5: Emotion Adjustment
+        let emotionAdj = 0.0;
+        if (aspects['emotional_impact'] && isFinite(parseFloat(aspects['emotional_impact'].score))) {
+            const eiScore = parseFloat(aspects['emotional_impact'].score);
+            if (eiScore > 0) {
+                const narrAvg = catAverages['Narrative'] || 0;
+                if (eiScore >= 8.5 && narrAvg >= 7.0) {
+                    emotionAdj = 0.05;
+                } else if (eiScore <= 5.5) {
+                    emotionAdj = -0.05;
+                }
+            }
+        }
+
+        // Step 6: Final Score Compilation
+        let finalScore = baseScore + boost + emotionAdj - variancePenalty - foundationPenalty - craftPenalty;
+
+        if (finalScore > 10.0) finalScore = 10.0;
+        if (finalScore < 0.0) finalScore = 0.0;
+
+        return finalScore.toFixed(2);
     }, [formData.aspects])
 
     const handleAspectChange = (aspect, field, value) => {

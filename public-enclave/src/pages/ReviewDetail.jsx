@@ -76,7 +76,7 @@ function ScoreBar({ name, score, comment, color }) {
         <div style={{ marginBottom: '16px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                 <span style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.5)' }}>{name}</span>
-                <span style={{ fontSize: '14px', fontWeight: 800, color: scoreColor(n), fontVariantNumeric: 'tabular-nums' }}>{n.toFixed(1)}</span>
+                <span style={{ fontSize: '14px', fontWeight: 800, color: scoreColor(n), fontVariantNumeric: 'tabular-nums' }}>{n.toFixed(2)}</span>
             </div>
             {/* Track */}
             <div style={{ height: '5px', borderRadius: '99px', background: 'rgba(255,255,255,0.05)', position: 'relative', overflow: 'hidden' }}>
@@ -114,7 +114,7 @@ function GroupSection({ group, aspects }) {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.25)', fontWeight: 500 }}>avg</span>
-                    <span style={{ fontSize: '18px', fontWeight: 900, color: group.color, lineHeight: 1 }}>{avg.toFixed(1)}</span>
+                    <span style={{ fontSize: '18px', fontWeight: 900, color: group.color, lineHeight: 1 }}>{avg.toFixed(2)}</span>
                 </div>
             </div>
             <div style={{ padding: '18px 20px' }}>
@@ -445,7 +445,7 @@ export default function ReviewDetail() {
                             <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '6px', marginBottom: '14px' }}>
                                 <Star size={18} fill="#f5a623" color="#f5a623" style={{ marginBottom: '4px' }} />
                                 <span style={{ fontSize: 'clamp(40px, 12vw, 56px)', fontWeight: 900, color: '#f5a623', lineHeight: 1, letterSpacing: '-0.04em' }}>
-                                    {parseFloat(review.overall_rating || 0).toFixed(1)}
+                                    {parseFloat(review.overall_rating || 0).toFixed(2)}
                                 </span>
                                 <span style={{ fontSize: 'clamp(14px, 4vw, 18px)', color: 'rgba(255,255,255,0.18)', fontWeight: 400 }}>/10</span>
                             </div>
@@ -468,7 +468,7 @@ export default function ReviewDetail() {
                                         <div style={{ flex: 1, height: '4px', borderRadius: '99px', background: 'rgba(255,255,255,0.05)', position: 'relative', overflow: 'hidden' }}>
                                             <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${(g.avg / 10) * 100}%`, background: g.color, borderRadius: '99px', opacity: 0.75 }} />
                                         </div>
-                                        <span style={{ fontSize: '12px', fontWeight: 700, color: g.color, width: '28px', textAlign: 'right' }}>{g.avg.toFixed(1)}</span>
+                                        <span style={{ fontSize: '12px', fontWeight: 700, color: g.color, width: '28px', textAlign: 'right' }}>{g.avg.toFixed(2)}</span>
                                     </div>
                                 ))}
                             </div>
@@ -726,7 +726,7 @@ export default function ReviewDetail() {
                                                                 gap: '4px'
                                                             }}>
                                                                 <div style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{data.subject}</div>
-                                                                <div style={{ fontSize: '20px', fontWeight: 900, color: vc.color, fontFamily: 'serif', fontStyle: 'italic' }}>{data.A.toFixed(1)}<span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.2)', fontStyle: 'normal', marginLeft: '4px' }}>/ 10</span></div>
+                                                                <div style={{ fontSize: '20px', fontWeight: 900, color: vc.color, fontFamily: 'serif', fontStyle: 'italic' }}>{data.A.toFixed(2)}<span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.2)', fontStyle: 'normal', marginLeft: '4px' }}>/ 10</span></div>
                                                             </div>
                                                         );
                                                     }
@@ -868,7 +868,7 @@ export default function ReviewDetail() {
                                         <Link key={r.slug} to={`/review/${r.slug}`} style={{ textDecoration: 'none', background: '#111', borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.06)', transition: 'transform 0.2s, border-color 0.2s' }} className="group hover:-translate-y-1 hover:border-amber-500/30 font-premium">
                                             <div style={{ height: '120px', overflow: 'hidden', position: 'relative' }}>
                                                 <img src={r.movie_poster_url || FALLBACK} style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.5)' }} />
-                                                <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', padding: '4px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 800, color: '#f5a623' }}>{parseFloat(r.overall_rating).toFixed(1)}</div>
+                                                <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', padding: '4px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 800, color: '#f5a623' }}>{parseFloat(r.overall_rating).toFixed(2)}</div>
                                             </div>
                                             <div style={{ padding: '16px' }}>
                                                 <div style={{ fontSize: '14px', fontWeight: 800, color: '#f2f2f2', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.movie_title}</div>

@@ -21,7 +21,7 @@ const SanctuaryTicket = React.forwardRef(({ review }, ref) => {
     if (!review) return null;
 
     const color = VERDICT_COLOR[review.verdict] || '#f5a623';
-    const score = parseFloat(review.overall_rating || 0).toFixed(1);
+    const score = parseFloat(review.overall_rating || 0).toFixed(2);
     const date = review.published_at ? new Date(review.published_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A';
 
     return (

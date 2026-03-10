@@ -56,8 +56,8 @@ const SanctuaryCard = ({ movie, review, cardRef }) => {
                 const s = typeof aspect === 'object' ? aspect?.score : aspect;
                 return isFinite(s) ? parseFloat(s) : null;
             }).filter(v => v !== null);
-            if (scores.length === 0) return '0.0';
-            return (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1);
+            if (scores.length === 0) return '0.00';
+            return (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2);
         };
 
         return [

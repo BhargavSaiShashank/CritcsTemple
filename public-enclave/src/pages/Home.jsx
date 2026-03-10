@@ -405,7 +405,7 @@ export default function Home() {
                                     {hero?.overall_rating != null && (
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '15px', fontWeight: 700, color: heroColor }}>
                                             <Star size={14} fill={heroColor} color={heroColor} />
-                                            {parseFloat(hero.overall_rating).toFixed(1)}
+                                            {parseFloat(hero.overall_rating).toFixed(2)}
                                             <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.25)', fontWeight: 400 }}>/10</span>
                                         </div>
                                     )}

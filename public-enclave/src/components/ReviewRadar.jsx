@@ -35,7 +35,7 @@ const ReviewRadar = ({ aspects }) => {
                                     <div className="bg-black/90 backdrop-blur-xl border border-amber-500/40 p-3 rounded-xl shadow-2xl flex flex-col gap-1">
                                         <div className="text-[8px] font-black text-white/40 uppercase tracking-widest">{data.subject}</div>
                                         <div className="text-xl font-black text-amber-500 italic">
-                                            {data.A.toFixed(1)}
+                                            {data.A.toFixed(2)}
                                             <span className="text-[10px] text-white/10 not-italic ml-1 font-black">/ 10</span>
                                         </div>
                                     </div>

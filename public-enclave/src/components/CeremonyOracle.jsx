@@ -281,7 +281,7 @@ const CeremonyOracle = () => {
                                                                                     gap: '2px'
                                                                                 }}>
                                                                                     <div style={{ fontSize: '9px', fontWeight: 900, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>{data.subject}</div>
-                                                                                    <div style={{ fontSize: '16px', fontWeight: 900, color: color, fontFamily: 'serif' }}>{data.A.toFixed(1)}</div>
+                                                                                    <div style={{ fontSize: '16px', fontWeight: 900, color: color, fontFamily: 'serif' }}>{data.A.toFixed(2)}</div>
                                                                                 </div>
                                                                             );
                                                                         }
