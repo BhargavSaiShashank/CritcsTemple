@@ -16,7 +16,7 @@ const BackgroundAtmosphere = memo(({ activeColor = '#f5a623', secondaryColor = n
                     height: '80%',
                     borderRadius: '50%',
                     background: `radial-gradient(circle, var(--accent-glow, ${activeColor}08) 0%, transparent 70%)`,
-                    transition: 'all 1.5s ease-in-out',
+                    transition: 'all 0.6s ease-out',
                     filter: 'blur(60px)',
                 }}
             />
@@ -33,9 +33,9 @@ const BackgroundAtmosphere = memo(({ activeColor = '#f5a623', secondaryColor = n
                     height: '70%',
                     borderRadius: '50%',
                     background: `radial-gradient(circle, var(--accent-glow, ${secondaryColor || activeColor}05) 0%, transparent 70%)`,
-                    transition: 'all 2s ease-in-out',
+                    transition: 'all 0.8s ease-out',
                     filter: 'blur(80px)',
-                    transitionDelay: '0.2s'
+                    transitionDelay: '0.1s'
                 }}
             />
 

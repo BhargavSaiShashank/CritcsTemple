@@ -43,6 +43,11 @@ export const createCategory = (data) => api.post('/admin/categories', data);
 export const updateCategory = (id, data) => api.put(`/admin/categories/${id}`, data);
 export const deleteCategory = (id) => api.delete(`/admin/categories/${id}`);
 
+// Upcoming Movies (Predictions)
+export const createUpcomingMovie = (data) => api.post('/admin/upcoming-movies', data);
+export const getUpcomingMovies = () => api.get('/admin/upcoming-movies');
+export const resolveUpcomingMovie = (id, actual_verdict) => api.patch(`/admin/upcoming-movies/${id}/resolve`, { actual_verdict });
+
 // Image Proxy
 export const getProxyImageUrl = (url) => {
     if (!url) return '';

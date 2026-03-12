@@ -8,6 +8,7 @@ import Home from './pages/Home'
 import ReviewDetail from './pages/ReviewDetail'
 import HallOfFame from './pages/HallOfFame'
 import Compare from './pages/Compare'
+import Predictions from './pages/Predictions'
 import CeremonyOracle from './components/CeremonyOracle'
 import SearchOverlay from './components/SearchOverlay'
 import { CapacitorUpdater } from '@capgo/capacitor-updater'
@@ -76,6 +77,7 @@ const App = () => {
               <Route path="/review/:slug" element={<ReviewDetail />} />
               <Route path="/hall-of-fame" element={<HallOfFame />} />
               <Route path="/compare" element={<Compare />} />
+              <Route path="/predictions" element={<Predictions />} />
             </Routes>
           </main>
           <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />

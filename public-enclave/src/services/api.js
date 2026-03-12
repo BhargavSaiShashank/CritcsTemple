@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Capacitor } from '@capacitor/core';
+import { auth } from './firebase';
 
 const BASE_URL = Capacitor.isNativePlatform()
     ? 'https://temple-backend-zgu3.onrender.com/api/v1'
@@ -22,12 +23,19 @@ const api = axios.create({
     baseURL: API_URL,
 });
 
-// Detailed Logging Interceptors
-api.interceptors.request.use(request => {
-    if (Capacitor.isNativePlatform()) {
-        console.log(`[API Request] ${request.method?.toUpperCase()} ${request.url}`);
+api.interceptors.request.use(async (config) => {
+    if (auth && auth.currentUser) {
+        try {
+            const token = await auth.currentUser.getIdToken();
+            config.headers.Authorization = `Bearer ${token}`;
+        } catch (error) {
+            console.error("[API Auth] Failed to attach token", error);
+        }
     }
-    return request;
+    if (Capacitor.isNativePlatform()) {
+        console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`);
+    }
+    return config;
 });
 
 api.interceptors.response.use(
@@ -83,5 +91,10 @@ export const getTVDetails = (tmdbId) => api.get(`/tv/${tmdbId}`);
 export const getOracleDebate = (slug) => api.post('/oracle/debate', { slug });
 export const getOracleDuel = (movie1, movie2) => api.post('/oracle/duel', { movie1, movie2 });
 export const proxyImage = (url) => `${API_URL}/proxy-image?url=${encodeURIComponent(url)}`;
+
+export const getMyProfile = () => api.get('/predictions/me');
+export const getUpcomingPublicMovies = () => api.get('/predictions/upcoming');
+export const makePrediction = (upcoming_movie_id, predicted_verdict) => api.post('/predictions/', { upcoming_movie_id, predicted_verdict });
+export const getMyPredictions = () => api.get('/predictions/my-predictions');
 
 export default api;

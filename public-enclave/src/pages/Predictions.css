@@ -1,0 +1,733 @@
+/* Predictions.css - Ritualistic & Premium Temple Aesthetics */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,800&display=swap');
+
+.predictions-page {
+    min-height: 100vh;
+    background-color: var(--bg);
+    color: var(--text);
+    position: relative;
+    overflow-x: hidden;
+    font-family: 'Outfit', sans-serif;
+}
+
+/* Ritual Surface - Balanced Padding to clear navbar */
+.predictions-page .ritual-surface {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    /* Aggressively reduced vertical padding */
+    padding-top: calc(var(--safe-top) + clamp(100px, 15vh, 140px));
+    padding-bottom: clamp(60px, 12vh, 140px);
+    padding-left: var(--page-padding);
+    padding-right: var(--page-padding);
+    position: relative;
+    z-index: 10;
+}
+
+/* Hero Section - The Grand Invocation */
+.hero-section {
+    text-align: center;
+    margin-bottom: clamp(3rem, 10vw, 6rem);
+    position: relative;
+}
+
+.prophecy-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 2rem;
+    background: rgba(245, 166, 35, 0.05);
+    border: 1px solid rgba(245, 166, 35, 0.2);
+    border-radius: 99px;
+    color: var(--amber);
+    font-size: clamp(9px, 2vw, 11px);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5em;
+    margin-bottom: 2.5rem;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 30px rgba(245, 166, 35, 0.1);
+}
+
+.hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 12vw, 6rem);
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 2rem;
+    color: #fff;
+    letter-spacing: -0.02em;
+}
+
+.hero-title span {
+    background: linear-gradient(to bottom, #fff 0%, #aaa 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
+.hero-description {
+    color: var(--text-2);
+    font-size: clamp(1rem, 3vw, 1.35rem);
+    font-weight: 300;
+    font-style: italic;
+    max-width: 750px;
+    margin: 0 auto;
+    line-height: 1.6;
+    letter-spacing: 0.04em;
+    opacity: 0.8;
+}
+
+.decorative-divider {
+    width: clamp(150px, 40vw, 300px);
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--amber), transparent);
+    margin: clamp(3rem, 8vw, 5rem) auto 0;
+    position: relative;
+    opacity: 0.3;
+}
+
+.decorative-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    background: var(--amber);
+    border-radius: 50%;
+    box-shadow: 0 0 15px var(--amber);
+}
+
+/* Layout Grid */
+.predictions-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(3rem, 8vw, 6rem);
+    align-items: start;
+}
+
+@media (min-width: 1100px) {
+    .predictions-layout {
+        grid-template-columns: 420px 1fr;
+    }
+}
+
+/* Sidebar & Sticky Behavior */
+.sidebar {
+    position: sticky;
+    top: 140px;
+    z-index: 20;
+}
+
+@media (max-width: 1100px) {
+    .sidebar {
+        position: static;
+        order: 2;
+        /* Move profile below content on smaller screens but above if preferred */
+    }
+}
+
+/* Auth Card & Profile Card Unification */
+.auth-card,
+.profile-card {
+    background: linear-gradient(165deg, var(--surface), var(--bg));
+    backdrop-filter: blur(60px);
+    border: 1px solid var(--border);
+    border-radius: clamp(1.5rem, 4vw, 2.5rem);
+    padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1.5rem, 4vw, 3rem);
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+        0 80px 160px -40px rgba(0, 0, 0, 1),
+        inset 0 1px 1px rgba(255, 255, 255, 0.05);
+}
+
+.auth-card::after,
+.profile-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, rgba(245, 166, 35, 0.04) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+/* Auth Specifics */
+.auth-card {
+    text-align: center;
+}
+
+.auth-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 2.5rem);
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 1rem;
+    letter-spacing: -0.01em;
+}
+
+.auth-card p {
+    color: var(--text-2);
+    font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+    font-style: italic;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    opacity: 0.7;
+}
+
+.google-btn {
+    width: 100%;
+    height: clamp(54px, 10vw, 64px);
+    background: #fff;
+    color: #000;
+    border-radius: 18px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-size: clamp(11px, 2vw, 13px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.google-btn:hover {
+    background: var(--amber);
+    transform: translateY(-5px);
+    box-shadow: 0 20px 50px rgba(245, 166, 35, 0.3);
+}
+
+/* Profile Specifics */
+.level-badge-large {
+    position: relative;
+    width: clamp(100px, 25vw, 140px);
+    height: clamp(100px, 25vw, 140px);
+    margin: 0 auto 2.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle, rgba(245, 166, 35, 0.12) 0%, rgba(0, 0, 0, 0.6) 80%);
+    border: 2px solid rgba(245, 166, 35, 0.3);
+    border-radius: 50%;
+    box-shadow: 0 0 40px rgba(245, 166, 35, 0.15);
+}
+
+.level-badge-large span.label {
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: var(--amber);
+    margin-bottom: -2px;
+}
+
+.level-badge-large span.value {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 8vw, 4rem);
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 0 25px rgba(245, 166, 35, 0.5);
+}
+
+.user-identity {
+    text-align: center;
+    margin-bottom: clamp(2rem, 6vw, 3.5rem);
+}
+
+.user-identity h3 {
+    font-size: clamp(1.25rem, 4vw, 1.75rem);
+    word-break: break-word;
+}
+
+.user-identity p.email {
+    font-size: clamp(10px, 2.5vw, 12px);
+    font-weight: 400;
+    color: var(--text-3);
+    letter-spacing: 0.05em;
+    margin-top: 0.6rem;
+    opacity: 0.6;
+    word-break: break-all;
+}
+
+.logout-btn {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: clamp(40px, 8vw, 44px);
+    height: clamp(40px, 8vw, 44px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    color: var(--text-3);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.logout-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.2);
+    transform: scale(1.1);
+}
+
+.stats-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.stat-item {
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    border-radius: 1.5rem;
+    padding: clamp(1.5rem, 4vw, 2rem);
+}
+
+.stat-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--text-3);
+    margin-bottom: 0.75rem;
+}
+
+.stat-value {
+    color: var(--amber);
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.75rem, 5vw, 2.25rem);
+    font-weight: 700;
+}
+
+.progress-container {
+    margin-top: 1.5rem;
+}
+
+.progress-track {
+    width: 100%;
+    height: clamp(4px, 1.5vw, 6px);
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 99px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #92400e, var(--amber));
+    box-shadow: 0 0 20px rgba(245, 166, 35, 0.3);
+}
+
+.progress-hint {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--text-3);
+    margin-top: 0.75rem;
+    text-align: center;
+    opacity: 0.6;
+}
+
+.badges-section {
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.badges-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--text-3);
+    margin-bottom: 1.5rem;
+}
+
+.badge-tag {
+    padding: 0.4rem 0.8rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--amber);
+    border-radius: 8px;
+    font-size: clamp(8px, 1.8vw, 9px);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.badges-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+/* Main Content Area */
+.main-content {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(2.5rem, 6vw, 3.5rem);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.section-header h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(1rem, 3.5vw, 1.25rem);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: clamp(0.2em, 0.5vw, 0.4em);
+    color: #fff;
+    opacity: 0.8;
+}
+
+.section-header .icon {
+    color: var(--amber);
+    opacity: 0.7;
+}
+
+/* Movie List - Ritual Cards */
+.movie-grid {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+.movie-ritual-card {
+    background: rgba(12, 12, 12, 0.4);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.02);
+    border-radius: clamp(1.5rem, 4vw, 2.5rem);
+    padding: clamp(1.5rem, 5vw, 2.5rem);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.5rem, 5vw, 3rem);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+@media (min-width: 850px) {
+    .movie-ritual-card {
+        flex-direction: row;
+        align-items: stretch;
+    }
+}
+
+.movie-ritual-card:hover {
+    border-color: rgba(255, 255, 255, 0.06);
+    background: rgba(18, 18, 18, 0.5);
+    transform: translateY(-5px);
+}
+
+.ritual-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(245, 166, 35, 0.02), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    pointer-events: none;
+}
+
+.movie-ritual-card:hover .ritual-glow {
+    opacity: 1;
+}
+
+.poster-box {
+    width: clamp(120px, 40vw, 200px);
+    aspect-ratio: 2/3;
+    background: #000;
+    border-radius: 1.25rem;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+}
+
+@media (max-width: 850px) {
+    .poster-box {
+        margin: 0 auto;
+    }
+}
+
+.poster-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.2s cubic-bezier(0, 0, 0, 1);
+}
+
+.movie-ritual-card:hover .poster-box img {
+    transform: scale(1.06);
+}
+
+.movie-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+}
+
+@media (min-width: 850px) {
+    .movie-info {
+        text-align: left;
+    }
+}
+
+.info-header p {
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: var(--text-3);
+    margin-bottom: 0.75rem;
+    opacity: 0.6;
+}
+
+.info-header h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.75rem, 6vw, 2.5rem);
+    font-weight: 800;
+    line-height: 1.15;
+    color: #fff;
+    letter-spacing: -0.01em;
+}
+
+/* Prediction States */
+.prediction-area {
+    margin-top: clamp(1.5rem, 5vw, 3rem);
+}
+
+.locked-prediction {
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    border-radius: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+@media (min-width: 450px) {
+    .locked-prediction {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+
+.locked-prediction label {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: var(--text-3);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.locked-prediction .verdict-val {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 5vw, 2rem);
+    font-weight: 900;
+    color: var(--amber);
+    text-shadow: 0 0 15px rgba(245, 166, 35, 0.2);
+}
+
+.resolved-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: clamp(1rem, 3vw, 1.5rem);
+}
+
+.res-box {
+    padding: 1.25rem;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.02);
+    border-radius: 1.25rem;
+}
+
+.res-box.correct {
+    border-color: rgba(34, 197, 94, 0.2);
+    background: rgba(34, 197, 94, 0.03);
+}
+
+.res-box.wrong {
+    border-color: rgba(239, 68, 68, 0.2);
+    background: rgba(239, 68, 68, 0.03);
+}
+
+.res-label {
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--text-3);
+    margin-bottom: 0.75rem;
+}
+
+.res-value {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.25rem, 4vw, 1.5rem);
+    font-weight: 800;
+    color: #fff;
+}
+
+.res-box.correct .res-value {
+    color: #22c55e;
+}
+
+.res-box.wrong .res-value {
+    color: #ef4444;
+}
+
+.ritual-controls {
+    background: rgba(0, 0, 0, 0.2);
+    padding: clamp(1.5rem, 5vw, 2.5rem);
+    border-radius: 1.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.control-label {
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: var(--text-3);
+    margin-bottom: 1.5rem;
+    display: block;
+    text-align: center;
+    opacity: 0.7;
+}
+
+.verdict-selector {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.verdict-btn {
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 99px;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    transition: all 0.3s ease;
+}
+
+@media (max-width: 480px) {
+    .verdict-btn {
+        flex: 1 1 40%;
+        text-align: center;
+    }
+}
+
+.verdict-btn:hover {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.verdict-btn.active {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+}
+
+.seal-btn {
+    width: 100%;
+    max-width: 260px;
+    margin: 2rem auto 0;
+    height: 52px;
+    background: transparent;
+    border: 1px solid var(--amber);
+    color: #fff;
+    border-radius: 99px;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    transition: all 0.4s ease;
+}
+
+.seal-btn:not(:disabled):hover {
+    background: var(--amber);
+    color: #000;
+    box-shadow: 0 0 30px rgba(245, 166, 35, 0.3);
+    transform: translateY(-2px);
+}
+
+.seal-btn:disabled {
+    opacity: 0.1;
+    border-color: var(--text-3);
+}
+
+/* Empty State - The Ritual Void */
+.empty-temple {
+    padding: clamp(5rem, 15vh, 10rem) var(--page-padding);
+    text-align: center;
+    position: relative;
+}
+
+.empty-temple .icon {
+    margin: 0 auto 2.5rem;
+    color: var(--amber);
+    opacity: 0.1;
+    filter: drop-shadow(0 0 30px var(--amber));
+}
+
+.empty-temple h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 6vw, 2.75rem);
+    font-weight: 800;
+    color: #fff;
+    opacity: 0.5;
+    letter-spacing: 0.02em;
+}
+
+.empty-temple p {
+    font-size: clamp(1rem, 2.5vw, 1.15rem);
+    color: var(--text-3);
+    font-weight: 300;
+    font-style: italic;
+    margin-top: 1.5rem;
+    letter-spacing: 0.05em;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0.6;
+}
+
+.loading-center {
+    display: flex;
+    justify-content: center;
+    padding: clamp(80px, 20vh, 160px) 0;
+}

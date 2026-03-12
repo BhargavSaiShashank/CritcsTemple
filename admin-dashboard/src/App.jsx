@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard'
 import Intelligence from './pages/Intelligence'
 import EditReview from './pages/EditReview'
 import HallOfFame from './pages/HallOfFame'
+import UpcomingMovies from './pages/UpcomingMovies'
 import PrivateRoute from './components/PrivateRoute'
 import { auth } from './services/firebase'
 
@@ -45,6 +46,14 @@ const App = () => {
                             </PrivateRoute>
                         }
                     />
+                    <Route
+                        path="/upcoming-movies"
+                        element={
+                            <PrivateRoute>
+                                <UpcomingMovies />
+                            </PrivateRoute>
+                        }
+                    />
                     <Route path="*" element={<Navigate to="/dashboard" />} />
                 </Routes>
             </div>
@@ -53,4 +62,4 @@ const App = () => {
 }
 
 export default App
- 
+

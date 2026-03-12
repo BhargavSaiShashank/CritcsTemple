@@ -184,6 +184,14 @@ const Dashboard = () => {
                         <Star size={18} className="text-amber-500/50 group-hover:text-amber-500 transition-colors" />
                     </Link>
 
+                    <Link
+                        to="/upcoming-movies"
+                        className="p-3 bg-white/5 hover:bg-white/10 border border-white/5 rounded-2xl transition-all group"
+                        title="Upcoming Movies (Predictions)"
+                    >
+                        <Calendar size={18} className="text-amber-500/50 group-hover:text-amber-500 transition-colors" />
+                    </Link>
+
                     <div className="relative">
                         <button
                             onClick={() => {

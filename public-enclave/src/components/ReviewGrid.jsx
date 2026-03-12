@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Star, ArrowRight } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
+import { getVerdictFromScore } from '../utils/verdict';
 
 const FALLBACK = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=1200';
 
@@ -44,7 +45,8 @@ const scoreColor = (score) => {
 
 const ReviewCard = React.memo(({ review, index }) => {
     const [src, setSrc] = useState(review.movie_poster_url || FALLBACK);
-    const vc = getV(review.verdict);
+    const derivedVerdict = getVerdictFromScore(review.overall_rating || 0);
+    const vc = getV(derivedVerdict);
 
     return (
         <motion.div
@@ -115,14 +117,14 @@ const ReviewCard = React.memo(({ review, index }) => {
                     <div style={{ padding: '16px 18px 18px', flex: 1, display: 'flex', flexDirection: 'column' }}>
                         {/* Verdict & Type */}
                         <div style={{ height: '24px', marginBottom: '10px', display: 'flex', gap: '8px' }}>
-                            {review.verdict && (
+                            {review && (
                                 <span style={{
                                     display: 'inline-block',
                                     padding: '2px 10px', borderRadius: '99px',
                                     fontSize: '9px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
                                     background: vc.bg, color: vc.color, border: `1px solid ${vc.border}`,
                                 }}>
-                                    {review.verdict}
+                                    {derivedVerdict}
                                 </span>
                             )}
                             {review.content_type === 'tv' && (

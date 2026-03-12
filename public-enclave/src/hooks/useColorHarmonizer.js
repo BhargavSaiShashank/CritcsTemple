@@ -25,7 +25,7 @@ export const useColorHarmonizer = (imageUrl) => {
 
                 const primaryRgb = `rgb(${p[0]}, ${p[1]}, ${p[2]})`;
                 const accentRgb = `rgb(${s[0]}, ${s[1]}, ${s[2]})`;
-                const glowRgba = `rgba(${p[0]}, ${p[1]}, ${p[2]}, 0.35)`;
+                const glowRgba = `rgba(${p[0]}, ${p[1]}, ${p[2]}, 0.15)`;
                 const darkRgb = `rgb(${Math.max(0, p[0] - 40)}, ${Math.max(0, p[1] - 40)}, ${Math.max(0, p[2] - 40)})`;
 
                 const newPalette = {

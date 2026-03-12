@@ -41,7 +41,7 @@ body,
   --max-width: 1400px;
 
   /* Safe area defaults */
-  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-top: max(env(safe-area-inset-top, 0px), 0px);
 
   /* Dynamic Accent Defaults */
   --accent-primary: var(--amber);
@@ -51,8 +51,8 @@ body,
 }
 
 body.is-native {
-  /* On native, if env() fails, we want at least 56px of top gap (to cover modern hole-punch cutouts) */
-  --safe-top: env(safe-area-inset-top, 56px);
+  /* Enforce a minimum of 48px top clearance for native devices (specifically Android hole-punches) */
+  --safe-top: max(env(safe-area-inset-top, 0px), 48px);
 }
 
 .max-w-container {
@@ -67,14 +67,27 @@ body.is-native {
   font-size: clamp(2rem, 8vw, 6rem);
 }
 
+/* Responsive display utilities */
 .mobile-hidden {
   display: none !important;
 }
 
-@media (min-width: 768px) {
+.desktop-hidden {
+  display: flex !important;
+}
+
+@media (min-width: 1024px) {
   .mobile-hidden {
     display: flex !important;
   }
+
+  .desktop-hidden {
+    display: none !important;
+  }
+}
+
+.no-wrap {
+  white-space: nowrap !important;
 }
 
 html {

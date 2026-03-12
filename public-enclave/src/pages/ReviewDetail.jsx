@@ -13,6 +13,7 @@ import SanctuaryTicket from '../components/SanctuaryTicket';
 import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
 
 import { useColorHarmonizer } from '../hooks/useColorHarmonizer';
+import { getVerdictFromScore } from '../utils/verdict';
 
 const FALLBACK = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=1200';
 
@@ -356,7 +357,8 @@ export default function ReviewDetail() {
         </div>
     );
 
-    const vc = getV(review.verdict);
+    const derivedVerdict = getVerdictFromScore(review.overall_rating);
+    const vc = getV(derivedVerdict);
     const aspects = review.aspects || {};
     const hasAspects = Object.values(aspects).some(a => a && parseFloat(a?.score) > 0);
     const wordCount = review.content ? review.content.split(/\s+/).length : 0;
@@ -454,7 +456,7 @@ export default function ReviewDetail() {
                                 fontSize: 'clamp(9px, 2.5vw, 11px)', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
                                 background: vc.bg, color: vc.color, border: `1px solid ${vc.border}`,
                             }}>
-                                {review.verdict}
+                                {derivedVerdict}
                             </span>
                         </div>
 
@@ -872,7 +874,7 @@ export default function ReviewDetail() {
                                             </div>
                                             <div style={{ padding: '16px' }}>
                                                 <div style={{ fontSize: '14px', fontWeight: 800, color: '#f2f2f2', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.movie_title}</div>
-                                                <div style={{ fontSize: '11px', color: getV(r.verdict).color, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{r.verdict}</div>
+                                                <div style={{ fontSize: '11px', color: getV(getVerdictFromScore(r.overall_rating)).color, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{getVerdictFromScore(r.overall_rating)}</div>
                                             </div>
                                         </Link>
                                     ))}

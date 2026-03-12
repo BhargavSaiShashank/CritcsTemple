@@ -5,10 +5,11 @@ import json
 import traceback
 from typing import List, Any, Optional, Dict
 from app.db.mongodb import get_database
-from app.models.review import ReviewCreate, ReviewUpdate, ReviewInDB
+from app.models.review import ReviewCreate, ReviewUpdate, ReviewInDB, Verdict
 from app.models.movie import MovieCreate, MovieInDB
 from app.models.show import ShowCreate
 from app.models.category import CategoryCreate, CategoryUpdate, CategoryInDB
+from app.models.prediction import UpcomingMovieCreate, UpcomingMovieInDB
 from app.services.tmdb import tmdb_service
 from app.services.movie_service import movie_service
 from app.services.show_service import show_service
@@ -16,6 +17,7 @@ from app.services.analytics_service import analytics_service
 from app.services.review_service import review_service
 from app.services.images import image_service
 from app.services.category_service import category_service
+from app.services.prediction_service import prediction_service
 from app.core.auth import get_current_admin
 from app.core.utils import calculate_overall_score
 import os
@@ -297,6 +299,30 @@ async def delete_category(
     admin = Depends(get_current_admin)
 ):
     return await category_service.delete_category(db, category_id)
+
+@router.post("/upcoming-movies", response_model=UpcomingMovieInDB)
+async def create_upcoming_movie(
+    movie_data: UpcomingMovieCreate,
+    db = Depends(get_database),
+    admin = Depends(get_current_admin)
+):
+    return await prediction_service.create_upcoming_movie(db, movie_data)
+
+@router.get("/upcoming-movies", response_model=List[UpcomingMovieInDB])
+async def list_all_upcoming_movies(
+    db = Depends(get_database),
+    admin = Depends(get_current_admin)
+):
+    return await prediction_service.list_all_upcoming_movies(db)
+
+@router.patch("/upcoming-movies/{movie_id}/resolve")
+async def resolve_upcoming_movie(
+    movie_id: str,
+    actual_verdict: Verdict = Body(..., embed=True),
+    db = Depends(get_database),
+    admin = Depends(get_current_admin)
+):
+    return await prediction_service.resolve_upcoming_movie(db, movie_id, actual_verdict)
 
 import httpx
 from fastapi.responses import StreamingResponse

@@ -4,4 +4,5 @@
     <string name="title_activity_main">Critic\'s Temple</string>
     <string name="package_name">com.sanctuary.app</string>
     <string name="custom_url_scheme">com.sanctuary.app</string>
+    <string name="server_client_id">932473722147-33q9acgdq83hdf495ag8pulu0r0sgh05.apps.googleusercontent.com</string>
 </resources>

@@ -24,8 +24,16 @@ async def get_current_admin(res: HTTPAuthorizationCredentials = Security(securit
     try:
         decoded_token = auth.verify_id_token(token)
         # You can add email verification here if you want to lock it to YOUR email
-        # if decoded_token['email'] != "your_official_email@gmail.com":
+        # if decoded_token.get('email') != "your_official_email@gmail.com":
         #     raise HTTPException(status_code=403, detail="Unauthorized Email")
+        return decoded_token
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=f"Invalid Authentication: {str(e)}")
+
+async def get_current_user(res: HTTPAuthorizationCredentials = Security(security)):
+    token = res.credentials
+    try:
+        decoded_token = auth.verify_id_token(token)
         return decoded_token
     except Exception as e:
         raise HTTPException(status_code=401, detail=f"Invalid Authentication: {str(e)}")

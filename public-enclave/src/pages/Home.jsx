@@ -6,6 +6,7 @@ import { Zap, Camera, Music, Heart, QuoteIcon, Star, TrendingUp, ChevronRight, S
 import { getLatestReviews } from '../services/api';
 import ReviewGrid from '../components/ReviewGrid';
 import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
+import { getVerdictFromScore } from '../utils/verdict';
 
 const FALLBACK = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=1200';
 const VERDICT_COLOR = {
@@ -213,7 +214,8 @@ export default function Home() {
     }, [loading, loadingMore, hasMore, fetchReviews, reviews.length]);
 
     const hero = featuredReviews[currentIndex];
-    const heroColor = VERDICT_COLOR[hero?.verdict] || '#FFFFFF';
+    const derivedVerdict = getVerdictFromScore(hero?.overall_rating || 0);
+    const heroColor = VERDICT_COLOR[derivedVerdict] || '#FFFFFF';
 
     // The backend now natively filters via MongoDB `$regex` so we pass reviews directly
     const filtered = reviews;
@@ -397,9 +399,9 @@ export default function Home() {
                                     gap: '14px',
                                     flexWrap: 'wrap'
                                 }}>
-                                    {hero?.verdict && (
+                                    {hero && (
                                         <span style={{ padding: '5px 14px', borderRadius: '99px', fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', background: `${heroColor}18`, color: heroColor, border: `1px solid ${heroColor}30` }}>
-                                            {hero.verdict}
+                                            {derivedVerdict}
                                         </span>
                                     )}
                                     {hero?.overall_rating != null && (
