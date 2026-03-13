@@ -8,7 +8,9 @@ const PrivateRoute = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        console.log("[PrivateRoute] Checking auth state...");
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            console.log("[PrivateRoute] Current User:", currentUser ? currentUser.email : "NULL");
             setUser(currentUser);
             setLoading(false);
         });
