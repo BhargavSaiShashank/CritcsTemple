@@ -2,8 +2,8 @@ name: Keep Backend Awake
 
 on:
   schedule:
-    # Runs every 5 minutes
-    - cron: '*/5 * * * *'
+    # Runs every minute (Note: GitHub Actions enforces a minimum of 5-10 minutes on free tier)
+    - cron: '* * * * *'
   workflow_dispatch: # Allows manual triggering
 
 jobs:
