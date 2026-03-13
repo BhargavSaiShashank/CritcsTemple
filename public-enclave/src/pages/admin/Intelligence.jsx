@@ -127,43 +127,48 @@ const Intelligence = () => {
                                 <Loader2 className="animate-spin text-amber-500" size={40} />
                             </div>
                         ) : (
-                            angle = { 30}
+                            <ResponsiveContainer width="100%" height="100%">
+                                <RadarChart cx="50%" cy="50%" outerRadius="80%" data={dnaData}>
+                                    <PolarGrid stroke="#fff" strokeOpacity={0.05} />
+                                    <PolarAngleAxis dataKey="subject" tick={{ fill: '#fff', fontSize: 10, opacity: 0.3 }} />
+                                    <PolarRadiusAxis
+                                        angle={30}
                                         domain={[0, 10]}
-                        axisLine={false}
-                        tick={false}
+                                        axisLine={false}
+                                        tick={false}
                                     />
-                        <Tooltip
-                            content={({ active, payload }) => {
-                                if (active && payload && payload.length) {
-                                    const data = payload[0].payload;
-                                    return (
-                                        <div className="bg-black/80 backdrop-blur-xl border border-amber-500/30 p-4 rounded-2xl shadow-2xl flex flex-col gap-1">
-                                            <div className="text-[10px] font-black text-white/30 uppercase tracking-widest">{data.subject}</div>
-                                            <div className="text-2xl font-black text-amber-500 italic">
-                                                {data.A.toFixed(2)}
-                                                <span className="text-xs text-white/10 not-italic ml-2 font-black">/ 10</span>
-                                            </div>
-                                        </div>
-                                    );
-                                }
-                                return null;
-                            }}
-                        />
-                        <Radar
-                            name="Sanctuary"
-                            dataKey="A"
-                            stroke="#f59e0b"
-                            fill="#f59e0b"
-                            fillOpacity={0.4}
-                            dot={{ r: 4, fill: '#f59e0b', fillOpacity: 0.8, stroke: '#fff', strokeWidth: 1 }}
-                            activeDot={{ r: 6, fill: '#fff', stroke: '#f59e0b', strokeWidth: 2 }}
-                            animationBegin={500}
-                            animationDuration={2000}
-                        />
-                    </RadarChart>
-                </ResponsiveContainer>
+                                    <Tooltip
+                                        content={({ active, payload }) => {
+                                            if (active && payload && payload.length) {
+                                                const data = payload[0].payload;
+                                                return (
+                                                    <div className="bg-black/80 backdrop-blur-xl border border-amber-500/30 p-4 rounded-2xl shadow-2xl flex flex-col gap-1">
+                                                        <div className="text-[10px] font-black text-white/30 uppercase tracking-widest">{data.subject}</div>
+                                                        <div className="text-2xl font-black text-amber-500 italic">
+                                                            {data.A.toFixed(2)}
+                                                            <span className="text-xs text-white/10 not-italic ml-2 font-black">/ 10</span>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            }
+                                            return null;
+                                        }}
+                                    />
+                                    <Radar
+                                        name="Sanctuary"
+                                        dataKey="A"
+                                        stroke="#f59e0b"
+                                        fill="#f59e0b"
+                                        fillOpacity={0.4}
+                                        dot={{ r: 4, fill: '#f59e0b', fillOpacity: 0.8, stroke: '#fff', strokeWidth: 1 }}
+                                        activeDot={{ r: 6, fill: '#fff', stroke: '#f59e0b', strokeWidth: 2 }}
+                                        animationBegin={500}
+                                        animationDuration={2000}
+                                    />
+                                </RadarChart>
+                            </ResponsiveContainer>
                         )}
-            </div>
+                    </div>
         </motion.div>
 
                 {/* History Gallery Section */ }
@@ -256,19 +261,19 @@ const Intelligence = () => {
             )}
         </div>
     </motion.div>
-            </div >
+            </div>
 
-    {/* Review Details Modal */ }
-    < ReviewDetailsModal
-review = { selectedReview }
-isOpen = { isModalOpen }
-onClose = {() => {
-    setIsModalOpen(false);
-    setTimeout(() => setSelectedReview(null), 300); // Wait for exit animation
-}}
-onDelete = { handleDelete }
-    />
-        </div >
+            {/* Review Details Modal */}
+            <ReviewDetailsModal
+                review={selectedReview}
+                isOpen={isModalOpen}
+                onClose={() => {
+                    setIsModalOpen(false);
+                    setTimeout(() => setSelectedReview(null), 300); // Wait for exit animation
+                }}
+                onDelete={handleDelete}
+            />
+        </div>
     );
 };
 
