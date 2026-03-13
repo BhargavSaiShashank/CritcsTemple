@@ -13,6 +13,7 @@ import CeremonyOracle from './components/CeremonyOracle'
 import SearchOverlay from './components/SearchOverlay'
 import { CapacitorUpdater } from '@capgo/capacitor-updater'
 import { API_URL } from './services/api'
+import { FirebaseMessagingService } from './services/FirebaseMessaging.service'
 
 const PrimalPulse = () => {
   const readySent = React.useRef(false);
@@ -61,6 +62,8 @@ const App = () => {
   useEffect(() => {
     if (Capacitor.isNativePlatform()) {
       document.body.classList.add('is-native');
+      // Initialize Firebase Messaging
+      FirebaseMessagingService.init();
     }
   }, []);
 

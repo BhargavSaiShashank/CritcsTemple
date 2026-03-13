@@ -12,7 +12,20 @@
           "package_name": "com.sanctuary.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "932473722147-3pjnu3mn4naftakjam6u6gai2eujlh49.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sanctuary.app",
+            "certificate_hash": "fd5780f4af54e13b9d6bfafa8dcfd255512c3892"
+          }
+        },
+        {
+          "client_id": "932473722147-33q9acgdq83hdf495ag8pulu0r0sgh05.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyC3Yw_R7HMQIVvQZhUnibq8_SKI9XnKerE"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "932473722147-33q9acgdq83hdf495ag8pulu0r0sgh05.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

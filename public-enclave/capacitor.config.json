@@ -20,6 +20,13 @@
       "autoUpdate": true,
       "statsUrl": "https://api.capgo.app/stats",
       "defaultChannel": "production"
+    },
+    "FirebaseAuthentication": {
+      "providers": ["google.com"],
+      "skipNativeAuth": false
+    },
+    "FirebaseMessaging": {
+      "presentationOptions": ["badge", "sound", "alert"]
     }
   },
   "server": {

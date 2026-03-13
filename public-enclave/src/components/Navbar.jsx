@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Film, Award, Archive, Search, Target, Menu, X, LogIn, LogOut, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { auth } from '../services/firebase';
-import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
+import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signInWithCredential, signOut } from 'firebase/auth';
 
 import { Capacitor } from '@capacitor/core';
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
@@ -34,12 +34,23 @@ export default function Navbar({ onSearchOpen }) {
 
     const handleLogin = async () => {
         try {
-            if (Capacitor.isNativePlatform()) {
-                await FirebaseAuthentication.signInWithGoogle();
-            } else {
-                const provider = new GoogleAuthProvider();
-                await signInWithPopup(auth, provider);
+            // Attempt Native Auth first
+            let nativeResult = null;
+            try {
+                nativeResult = await FirebaseAuthentication.signInWithGoogle();
+                if (nativeResult?.credential?.idToken) {
+                    const credential = GoogleAuthProvider.credential(nativeResult.credential.idToken);
+                    await signInWithCredential(auth, credential);
+                    return; // Success, exit function
+                }
+            } catch (nativeErr) {
+                console.error("NATIVE AUTH ERROR:", nativeErr.message || nativeErr);
+                console.log("Native auth unavailable or failed, falling back to Web Auth.", nativeErr);
             }
+
+            // Fallback to Web Auth if native failed or was unavailable
+            const provider = new GoogleAuthProvider();
+            await signInWithPopup(auth, provider);
         } catch (err) {
             console.error("Login failed:", err);
         }
@@ -47,8 +58,10 @@ export default function Navbar({ onSearchOpen }) {
 
     const handleLogout = async () => {
         try {
-            if (Capacitor.isNativePlatform()) {
+            try {
                 await FirebaseAuthentication.signOut();
+            } catch (nativeErr) {
+                console.log("Native sign out logic bypassed.", nativeErr);
             }
             await signOut(auth);
         } catch (err) {
