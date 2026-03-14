@@ -64,6 +64,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
         if (initialData) {
             return {
                 summary: initialData.summary || '',
+                movie_title: initialData.movie_title || '',
                 content: initialData.content || '',
                 verdict: initialData.verdict || 'Good',
                 status: initialData.status || 'published',
@@ -86,6 +87,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
 
         return {
             summary: '',
+            movie_title: movie?.title || '',
             content: '',
             verdict: '',
             status: 'published',
@@ -109,6 +111,24 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
     React.useEffect(() => {
         localStorage.setItem(draftKey, JSON.stringify(formData));
     }, [formData, draftKey]);
+
+    // Reload form data if draftKey changes (e.g. user selects a different draft in dashboard)
+    React.useEffect(() => {
+        const savedDraft = localStorage.getItem(draftKey);
+        if (savedDraft) {
+            try {
+                const parsed = JSON.parse(savedDraft);
+                setFormData(prev => ({
+                    ...prev,
+                    ...parsed,
+                    // Ensure the title is synced if it was missing in the draft but present in the movie prop
+                    movie_title: parsed.movie_title || movie?.title || prev.movie_title
+                }));
+            } catch (e) {
+                console.error("Failed to parse draft on key change", e);
+            }
+        }
+    }, [draftKey]);
 
     const [newTag, setNewTag] = useState('')
     const [activeGroup, setActiveGroup] = useState(0)
@@ -308,7 +328,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             status,
             content_type: formData.content_type || movie.content_type || 'movie',
             movie_id: parseInt(movie.id) || 0,
-            movie_title: movie.title,
+            movie_title: formData.movie_title || movie.title,
             movie_poster_url: formData.movie_poster_url || movie.poster_url,
             watch_links: formData.watch_links,
             trailer_url: formData.trailer_url,
