@@ -180,10 +180,10 @@ const UpcomingMovies = () => {
                                 <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
                                     <button
                                         onClick={() => handleDelete(m._id, m.title)}
-                                        className="p-1.5 rounded-lg bg-red-500/10 text-red-500/40 hover:text-red-500 hover:bg-red-500/20 opacity-0 group-hover:opacity-100 transition-all border border-red-500/10"
+                                        className="p-3 lg:p-1.5 rounded-xl lg:rounded-lg bg-red-500/10 text-red-500/60 lg:text-red-500/40 hover:text-red-500 hover:bg-red-500/20 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all border border-red-500/10"
                                         title="Delete Target"
                                     >
-                                        <Trash2 size={12} />
+                                        <Trash2 size={14} className="lg:size-[12px]" />
                                     </button>
                                     <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${m.status === 'resolved'
                                             ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
