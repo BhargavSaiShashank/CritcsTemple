@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronRight, Star, Quote, AlignLeft, Layout, Zap, Heart, Music, Camera, Plus, Loader2, Sparkles, Download, Eye } from 'lucide-react'
+import { ChevronRight, Star, Quote, AlignLeft, Layout, Zap, Heart, Music, Camera, Plus, Loader2, Sparkles, Download, Eye, MoreVertical, X } from 'lucide-react'
 import { createReview, updateReview, getProxyImageUrl } from '../services/api'
 import SanctuaryCard from './SanctuaryCard';
 import PublicPreview from './PublicPreview';
@@ -442,7 +442,63 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-12 xl:grid-cols-16 gap-8 md:gap-12 pb-24 font-premium">
+        <div className="relative">
+            {/* Mobile Preview Trigger */}
+            <div className="xl:hidden fixed top-6 right-6 z-[60]">
+                <button
+                    onClick={() => setShowPreview(true)}
+                    className="w-12 h-12 rounded-2xl glass-obsidian border border-amber-500/20 flex items-center justify-center text-amber-500 shadow-2xl shadow-amber-500/10 active:scale-95 transition-all"
+                >
+                    <MoreVertical size={20} />
+                </button>
+            </div>
+
+            {/* Mobile Preview Overlay */}
+            <AnimatePresence>
+                {showPreview && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="xl:hidden fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl p-4 overflow-y-auto"
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 50, scale: 0.95 }}
+                            className="max-w-md mx-auto relative pt-12 pb-20"
+                        >
+                            <button
+                                onClick={() => setShowPreview(false)}
+                                className="absolute top-0 right-0 w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/40 hover:text-white"
+                            >
+                                <X size={20} />
+                            </button>
+                            
+                            <PublicPreview
+                                movie={{
+                                    title: movie.title,
+                                    poster_url: formData.movie_poster_url || movie.poster_url,
+                                    release_year: formData.movie_year || movie.release_year,
+                                    director: movie.director || 'Visionary',
+                                    runtime: movie.runtime,
+                                    genres: movie.genres || [movie.genre]
+                                }}
+                                review={{
+                                    ...formData,
+                                    overall_rating: averageScore,
+                                }}
+                            />
+
+                            <div className="text-center mt-8">
+                                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">Temporal Imprint Preview</p>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <div className="grid grid-cols-1 md:grid-cols-12 xl:grid-cols-16 gap-8 md:gap-12 pb-24 font-premium">
             {/* Aspect Controller */}
             <div className="md:col-span-4 xl:col-span-3 space-y-10">
                 <motion.div
@@ -848,7 +904,8 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                 </div>
             </div>
         </div>
-    )
+    </div>
+)
 }
 
 export default ReviewForm
