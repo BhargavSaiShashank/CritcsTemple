@@ -3,9 +3,9 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     ChevronLeft, Plus, Loader2, Search, Calendar, Film,
-    CheckCircle2, AlertCircle, TrendingUp
+    CheckCircle2, AlertCircle, TrendingUp, Trash2
 } from 'lucide-react';
-import { getUpcomingMovies, createUpcomingMovie, resolveUpcomingMovie } from '../services/api';
+import { getUpcomingMovies, createUpcomingMovie, resolveUpcomingMovie, deleteUpcomingMovie } from '../services/api';
 
 const UpcomingMovies = () => {
     const navigate = useNavigate();
@@ -72,6 +72,18 @@ const UpcomingMovies = () => {
         } catch (error) {
             console.error("Failed to resolve movie", error);
             alert("Failed to resolve movie.");
+        }
+    };
+
+    const handleDelete = async (id, title) => {
+        if (!window.confirm(`Are you sure you want to delete the prediction target for '${title}'? This will remove all associated data and predictions.`)) return;
+        
+        try {
+            await deleteUpcomingMovie(id);
+            loadMovies();
+        } catch (error) {
+            console.error("Failed to delete movie", error);
+            alert("Failed to delete movie target.");
         }
     };
 
@@ -165,7 +177,14 @@ const UpcomingMovies = () => {
                                 animate={{ opacity: 1, y: 0 }}
                                 className="bg-white/5 border border-white/10 rounded-3xl p-6 relative overflow-hidden group"
                             >
-                                <div className="absolute top-4 right-4 z-10">
+                                <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+                                    <button
+                                        onClick={() => handleDelete(m._id, m.title)}
+                                        className="p-1.5 rounded-lg bg-red-500/10 text-red-500/40 hover:text-red-500 hover:bg-red-500/20 opacity-0 group-hover:opacity-100 transition-all border border-red-500/10"
+                                        title="Delete Target"
+                                    >
+                                        <Trash2 size={12} />
+                                    </button>
                                     <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${m.status === 'resolved'
                                             ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
                                             : 'bg-green-500/10 text-green-500 border border-green-500/20'
