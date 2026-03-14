@@ -324,6 +324,14 @@ async def resolve_upcoming_movie(
 ):
     return await prediction_service.resolve_upcoming_movie(db, movie_id, actual_verdict)
 
+@router.delete("/upcoming-movies/{movie_id}")
+async def delete_upcoming_movie(
+    movie_id: str,
+    db = Depends(get_database),
+    admin = Depends(get_current_admin)
+):
+    return await prediction_service.delete_upcoming_movie(db, movie_id)
+
 import httpx
 from fastapi.responses import StreamingResponse
 

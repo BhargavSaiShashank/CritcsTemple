@@ -200,4 +200,18 @@ class PredictionService:
             "incorrect_predictions": len(incorrect_uids)
         }
 
+    async def delete_upcoming_movie(self, db, movie_id: str) -> bool:
+        try:
+            obj_id = ObjectId(movie_id)
+        except InvalidId:
+            raise HTTPException(status_code=400, detail="Invalid movie ID")
+
+        # Delete the movie
+        result = await db.upcoming_movies.delete_one({"_id": obj_id})
+        
+        # Also clean up any associated predictions
+        await db.predictions.delete_many({"upcoming_movie_id": movie_id})
+        
+        return result.deleted_count > 0
+
 prediction_service = PredictionService()
