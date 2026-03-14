@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
     Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, 
-    BarChart, Bar, XAxis, YAxis, Tooltip, AreaChart, Area, Cell, PieChart, Pie
+    BarChart, Bar, XAxis, YAxis, Tooltip, AreaChart, Area, Cell, PieChart, Pie, LabelList
 } from 'recharts';
 import { 
     Activity, Globe, Zap, Clock, Star, TrendingUp, Sparkles, 
