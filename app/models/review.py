@@ -58,6 +58,7 @@ class ReviewBase(BaseModel):
     overall_rating: float = Field(0.0, ge=0, le=10)
     verdict: Optional[Verdict] = None
     summary: Optional[str] = None
+    language: Optional[str] = None # Manual Linguistic DNA override
     content: Optional[str] = None # Markdown
     spoiler_section: Optional[str] = None
     cast_performances: Optional[str] = None

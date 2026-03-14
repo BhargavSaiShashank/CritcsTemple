@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronRight, Star, Quote, AlignLeft, Layout, Zap, Heart, Music, Camera, Plus, Loader2, Sparkles, Download, Eye, MoreVertical, X } from 'lucide-react'
+import { ChevronRight, Star, Quote, AlignLeft, Layout, Zap, Heart, Music, Camera, Plus, Loader2, Sparkles, Download, Eye, MoreVertical, X, Globe } from 'lucide-react'
 import { createReview, updateReview, getProxyImageUrl } from '../services/api'
 import SanctuaryCard from './SanctuaryCard';
 import PublicPreview from './PublicPreview';
@@ -78,6 +78,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                 viewing_context: initialData.viewing_context || '',
                 trivia_and_details: initialData.trivia_and_details || '',
                 tags: initialData.tags || [],
+                language: initialData.language || '',
                 trailer_url: initialData.trailer_url || '',
                 movie_year: initialData.movie_year || '',
                 scheduled_date: initialData.scheduled_date ? initialData.scheduled_date.slice(0, 16) : '',
@@ -101,6 +102,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             viewing_context: '',
             trivia_and_details: '',
             tags: [],
+            language: '',
             trailer_url: movie?.trailer_url || '',
             movie_year: movie?.release_year || '',
             scheduled_date: '',
@@ -399,6 +401,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             movie_title: formData.movie_title || movie.title,
             movie_poster_url: formData.movie_poster_url || movie.poster_url,
             watch_links: formData.watch_links,
+            language: formData.language || null,
             trailer_url: formData.trailer_url,
             movie_year: parseInt(formData.movie_year) || null,
             scheduled_date: formData.status === 'scheduled' ? formData.scheduled_date : null,
@@ -598,6 +601,33 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                             placeholder="Capture the soul..."
                             className="w-full bg-transparent border-b border-white/5 py-4 md:py-8 text-2xl md:text-4xl font-black text-white outline-none focus:border-amber-500/30 transition-all placeholder:text-white/5 tracking-tighter italic"
                         />
+
+                        <div className="flex flex-wrap items-center gap-4">
+                            <div className="flex items-center gap-3 px-6 py-3 bg-white/5 border border-white/10 rounded-2xl group focus-within:border-amber-500/30 transition-all">
+                                <Globe size={16} className="text-amber-500/50 group-focus-within:text-amber-500" />
+                                <select
+                                    value={formData.language}
+                                    onChange={e => setFormData({ ...formData, language: e.target.value })}
+                                    className="bg-transparent text-xs font-black uppercase tracking-widest text-white/60 outline-none cursor-pointer"
+                                >
+                                    <option value="" className="bg-[#111]">Auto Detect Language</option>
+                                    <optgroup label="Primary" className="bg-[#111]">
+                                        <option value="en" className="bg-[#111]">English</option>
+                                        <option value="te" className="bg-[#111]">Telugu</option>
+                                        <option value="hi" className="bg-[#111]">Hindi</option>
+                                        <option value="ta" className="bg-[#111]">Tamil</option>
+                                    </optgroup>
+                                    <optgroup label="International" className="bg-[#111]">
+                                        <option value="it" className="bg-[#111]">Italian</option>
+                                        <option value="fr" className="bg-[#111]">French</option>
+                                        <option value="ko" className="bg-[#111]">Korean</option>
+                                        <option value="ja" className="bg-[#111]">Japanese</option>
+                                        <option value="es" className="bg-[#111]">Spanish</option>
+                                        <option value="de" className="bg-[#111]">German</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="space-y-6">

@@ -128,11 +128,13 @@ class OracleAnalyticsService:
                     except: val = 0
                 row[aspect_name.lower()] = val
             
-            # 3b. Synthetic 'Soul' Score (Average of Emotional Impact and Rewatch Value)
+            # 3b. Synthetic 'Soul' Score (Average of Pacing, Emotional Impact, and Rewatch Value)
             # This matches the 'Soul' group in ReviewForm.jsx
+            pacing = row.get('pacing', 0)
             ei = row.get('emotional_impact', 0)
             rv = row.get('rewatch_value', 0)
-            row['soul'] = (ei + rv) / 2 if (ei or rv) else 0
+            soul_aspects = [v for v in [pacing, ei, rv] if v > 0]
+            row['soul'] = sum(soul_aspects) / len(soul_aspects) if soul_aspects else 0
                     
             df_list.append(row)
             
@@ -143,6 +145,7 @@ class OracleAnalyticsService:
         lang_dna = lang_group.rename(columns={'mean': 'avg_score'}).to_dict('records')
 
         # 2. Aspect Correlation
+        # We explicitly include 'soul' in the correlation list now
         aspect_cols = ["story", "direction", "cinematography", "soul", "pacing", "acting", "screenplay"]
         correlations = {}
         for col in aspect_cols:
@@ -154,7 +157,10 @@ class OracleAnalyticsService:
         # 3. Prime Radar
         prime_radar = {}
         for col in ["story", "direction", "cinematography", "soul", "pacing"]:
-            prime_radar[col] = float(df[col].mean()) if col in df.columns else 5.0
+            if col in df.columns:
+                prime_radar[col] = float(df[col].mean())
+            else:
+                prime_radar[col] = 5.0
 
         # 4. Temporal Imprints
         df['date'] = pd.to_datetime(df['published_at'])
