@@ -79,6 +79,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                 trailer_url: initialData.trailer_url || '',
                 movie_year: initialData.movie_year || '',
                 scheduled_date: initialData.scheduled_date ? initialData.scheduled_date.slice(0, 16) : '',
+                content_type: initialData.content_type || 'movie',
                 aspects: { ...defaultAspects, ...(initialData.aspects || {}) }
             };
         }
@@ -100,6 +101,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             trailer_url: movie?.trailer_url || '',
             movie_year: movie?.release_year || '',
             scheduled_date: '',
+            content_type: movie?.content_type || 'movie',
             aspects: defaultAspects
         };
     });
@@ -304,7 +306,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             aspects: cleanedAspects,
             slug,
             status,
-            content_type: movie.content_type || 'movie',
+            content_type: formData.content_type || movie.content_type || 'movie',
             movie_id: parseInt(movie.id) || 0,
             movie_title: movie.title,
             movie_poster_url: formData.movie_poster_url || movie.poster_url,

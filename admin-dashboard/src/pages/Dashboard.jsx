@@ -128,7 +128,7 @@ const Dashboard = () => {
         e.target.src = "https://images.unsplash.com/photo-1485846234645-a62644f84728?q=30&w=1000";
     };
 
-    const handleSelectMovie = async (item) => {
+    const handleSelectMovie = async (item, draftData = null) => {
         setLoading(true)
         try {
             const isTV = item.Type === 'tv'
@@ -139,9 +139,8 @@ const Dashboard = () => {
             // Normalize for the form/preview
             const normalized = {
                 ...data,
-                id: data.tmdb_id,
+                id: data.tmdb_id || data.id,
                 content_type: isTV ? 'tv' : 'movie',
-                // Map show fields to movie fields if needed for common UI
                 release_year: isTV ? data.first_air_year : data.release_year,
                 director: isTV ? (data.crew?.find(c => c.job === 'Executive Producer')?.name || 'Showrunner') : (data.crew?.find(c => c.job === 'Director')?.name || 'Visionary')
             }
@@ -150,6 +149,27 @@ const Dashboard = () => {
             setSearchTerm('')
         } catch (err) {
             console.error("Fetch failed:", err)
+            // Resilient Fallback: If we have draft data, use it to reconstruct a minimal movie object
+            if (draftData) {
+                console.log("[Resilience] API Failed, using draft data fallback");
+                const normalized = {
+                    title: draftData.movie_title || "Unknown Title",
+                    id: item.imdbID,
+                    imdb_id: item.imdbID,
+                    poster_url: draftData.movie_poster_url,
+                    content_type: item.Type || 'movie',
+                    release_year: draftData.movie_year,
+                    genres: [],
+                    crew: [],
+                    ratings: [],
+                    synopsis: draftData.summary || "Draft content restored without API link."
+                };
+                setMovie(normalized);
+                setSearchResults([]);
+                setSearchTerm('');
+            } else {
+                alert("Neural link to external databases failed (500). If you are in a restricted region, please use local drafts if available.");
+            }
         } finally {
             setLoading(false)
         }
@@ -227,7 +247,11 @@ const Dashboard = () => {
                                                             navigate(`/edit/${editId}`);
                                                         } else if (draft.key.startsWith('review_draft_movie_')) {
                                                             const movieId = draft.key.replace('review_draft_movie_', '');
-                                                            handleSelectMovie(movieId);
+                                                            // Pass as object with proper type inference
+                                                            handleSelectMovie({
+                                                                imdbID: movieId,
+                                                                Type: movieId.startsWith('tt') ? 'movie' : 'tv'
+                                                            }, draft);
                                                             setTimeout(() => {
                                                                 window.scrollTo({ top: 800, behavior: 'smooth' });
                                                             }, 600);
@@ -236,7 +260,9 @@ const Dashboard = () => {
                                                     className="p-4 bg-white/5 border border-white/5 rounded-2xl hover:border-amber-500/30 transition-all flex flex-col gap-2 relative group flex-shrink-0 cursor-pointer"
                                                 >
                                                     <div className="flex justify-between items-start">
-                                                        <h4 className="font-bold text-sm text-white/90 truncate pr-4">{draft.movie_title || draft.key.replace('review_draft_', '')}</h4>
+                                                        <h4 className="font-bold text-sm text-white/90 truncate pr-4">
+                                                            {draft.movie_title || draft.key.replace('review_draft_movie_', '').replace('review_draft_edit_', '')}
+                                                        </h4>
                                                         <button
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
