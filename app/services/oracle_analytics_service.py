@@ -15,7 +15,7 @@ class OracleAnalyticsService:
             'en': 'English', 'te': 'Telugu', 'hi': 'Hindi', 'ta': 'Tamil', 
             'ml': 'Malayalam', 'kn': 'Kannada', 'es': 'Spanish', 'ko': 'Korean', 
             'ja': 'Japanese', 'fr': 'French', 'it': 'Italian', 'de': 'German',
-            'ru': 'Russian', 'pt': 'Portuguese'
+            'ru': 'Russian', 'pt': 'Portuguese', 'zh': 'Chinese', 'ar': 'Arabic'
         }
         self.common_genres = [
             "Action", "Adventure", "Animation", "Comedy", "Crime", "Documentary", 
@@ -89,9 +89,9 @@ class OracleAnalyticsService:
                 text_to_scan = (r.get("content", "") + " " + r.get("summary", "") + " " + r.get("movie_title", "")).lower()
                 
                 found_lang = None
-                # Check mapping
+                # Check mapping (check both code and full name)
                 for code, full_name in self.lang_map.items():
-                    if code in tags or full_name.lower() in tags or full_name.lower() in text_to_scan:
+                    if code.lower() in tags or full_name.lower() in tags or full_name.lower() in text_to_scan:
                         found_lang = code
                         break
                 
@@ -100,6 +100,14 @@ class OracleAnalyticsService:
             
             if not lang:
                 lang = "en"
+            
+            # Normalize display name
+            # If lang is already a full name (e.g. from manual entry), try to keep it or map it
+            display_lang = self.lang_map.get(lang)
+            if not display_lang:
+                # Check if 'lang' itself is one of our values
+                inv_map = {v.lower(): v for v in self.lang_map.values()}
+                display_lang = inv_map.get(lang.lower(), lang.upper())
             
             # 2. Extract Genre
             genre = "Other"
@@ -113,7 +121,7 @@ class OracleAnalyticsService:
                 "id": str(r["_id"]),
                 "overall_rating": float(r.get("overall_rating", 0)),
                 "published_at": r.get("published_at") or r.get("created_at") or datetime.now(),
-                "language": self.lang_map.get(lang, lang.upper()),
+                "language": display_lang,
                 "genre": genre
             }
             

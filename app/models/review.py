@@ -87,6 +87,7 @@ class ReviewUpdate(BaseModel):
     overall_rating: Optional[float] = None
     verdict: Optional[Verdict] = None
     summary: Optional[str] = None
+    language: Optional[str] = None
     content: Optional[str] = None
     spoiler_section: Optional[str] = None
     cast_performances: Optional[str] = None
