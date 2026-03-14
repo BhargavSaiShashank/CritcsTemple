@@ -9,6 +9,8 @@ import './Predictions.css';
 import {
     Sparkles, LogIn, LogOut, Shield, ChevronRight, Loader2, Award, Target, HelpCircle
 } from 'lucide-react';
+import { Capacitor } from '@capacitor/core';
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 
 const verdicts = [
     "Legendary", "Masterpiece", "Essential", "Elite", "Great",
@@ -84,6 +86,9 @@ const Predictions = () => {
         setSubmittingId(movieId);
         try {
             await makePrediction(movieId, verdict);
+            if (Capacitor.isNativePlatform()) {
+                Haptics.notification({ type: NotificationType.Success }).catch(() => Haptics.vibrate());
+            }
             await loadUserData(); // Reload to get updated myPredictions list
         } catch (err) {
             console.error("Prediction failed:", err);
@@ -326,7 +331,12 @@ const Predictions = () => {
                                                                     {verdicts.map(v => (
                                                                         <button
                                                                             key={v}
-                                                                            onClick={() => setActivePrediction({ ...activePrediction, [m._id]: v })}
+                                                                            onClick={() => {
+                                                                                setActivePrediction({ ...activePrediction, [m._id]: v });
+                                                                                if (Capacitor.isNativePlatform()) {
+                                                                                    Haptics.impact({ style: ImpactStyle.Medium }).catch(() => Haptics.vibrate());
+                                                                                }
+                                                                            }}
                                                                             className={`verdict-btn ${activePrediction[m._id] === v ? 'active' : ''}`}
                                                                         >
                                                                             {v}

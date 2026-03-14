@@ -6,6 +6,7 @@ import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, Pola
 import * as htmlToImage from 'html-to-image';
 import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { getReviewBySlug, clapReview, unclapReview, reactReview, getRelatedReviews, proxyImage } from '../services/api';
 import ReviewExportCard from '../components/ReviewExportCard';
@@ -306,6 +307,11 @@ export default function ReviewDetail() {
             setClaps(prev => Math.max(0, prev - 1));
             setHasClapped(false);
             localStorage.removeItem(`clap_${review?.slug}`);
+            
+            if (Capacitor.isNativePlatform()) {
+                Haptics.impact({ style: ImpactStyle.Light }).catch(() => Haptics.vibrate());
+            }
+
             try {
                 await unclapReview(review.slug);
             } catch (e) {
@@ -320,6 +326,11 @@ export default function ReviewDetail() {
             setClaps(prev => prev + 1);
             setHasClapped(true);
             localStorage.setItem(`clap_${review?.slug}`, 'true');
+
+            if (Capacitor.isNativePlatform()) {
+                Haptics.impact({ style: ImpactStyle.Heavy }).catch(() => Haptics.vibrate());
+            }
+
             try {
                 await clapReview(review.slug);
             } catch (e) {
@@ -334,12 +345,22 @@ export default function ReviewDetail() {
 
     const handleShare = async () => {
         const textToCopy = `https://critiquetemplesanctuary.vercel.app/review/${review.slug}`;
-        try {
-            await navigator.clipboard?.writeText(textToCopy);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        } catch (e) {
-            console.error("Failed to copy", e);
+        
+        if (Capacitor.isNativePlatform()) {
+            await Share.share({
+                title: review.movie_title,
+                text: `Check out this cinematic critique of ${review.movie_title}!`,
+                url: textToCopy,
+                dialogTitle: 'Share Review'
+            });
+        } else {
+            try {
+                await navigator.clipboard?.writeText(textToCopy);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+            } catch (e) {
+                console.error("Failed to copy", e);
+            }
         }
     };
 

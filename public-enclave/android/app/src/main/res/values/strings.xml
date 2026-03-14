@@ -5,4 +5,10 @@
     <string name="package_name">com.sanctuary.app</string>
     <string name="custom_url_scheme">com.sanctuary.app</string>
     <string name="server_client_id">932473722147-33q9acgdq83hdf495ag8pulu0r0sgh05.apps.googleusercontent.com</string>
+
+    <!-- Shortcut Strings -->
+    <string name="shortcut_search_short">Search</string>
+    <string name="shortcut_search_long">Search The Temple</string>
+    <string name="shortcut_oracle_short">The Oracle</string>
+    <string name="shortcut_oracle_long">Invoke The Oracle</string>
 </resources>

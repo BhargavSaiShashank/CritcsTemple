@@ -32,14 +32,59 @@ const PrimalPulse = () => {
   return null;
 };
 
-const NativeListener = () => {
+const NativeListener = ({ onSearchOpen }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const handleRoute = (url) => {
+    if (!url) return;
+    console.log('[NativeRoute] Processing URL:', url);
+    
+    let path = '';
+    try {
+      // Handle sanctuary:// scheme
+      if (url.startsWith('sanctuary://')) {
+        path = '/' + url.split('://')[1];
+      } else {
+        const urlObj = new URL(url);
+        path = urlObj.pathname;
+      }
+    } catch (e) {
+      console.warn('[NativeRoute] URL Parse Error:', e);
+      path = url.split('.com')[1] || url.split('://')[1]?.split('/').slice(1).join('/') || '/';
+    }
+
+    console.log('[NativeRoute] Derived Path:', path);
+
+    if (path === '/search') {
+      onSearchOpen();
+      // Stay on current page or home, but trigger overlay
+      if (window.location.pathname === '/' || window.location.pathname === '/search') {
+         navigate('/');
+      }
+    } else if (path && path !== '/') {
+      const route = path.startsWith('/') ? path : `/${path}`;
+      navigate(route);
+    }
+  };
+
   useEffect(() => {
-    // Only register the back button listener on native platforms (Android/iOS)
     if (!Capacitor.isNativePlatform()) return;
 
+    // Handle initial launch URL (Cold start)
+    // Adding a slight delay to ensure the Router and useLocation are fully ready
+    const timer = setTimeout(() => {
+      CapacitorApp.getLaunchUrl().then(data => {
+        if (data && data.url) {
+          console.log('[NativeRoute] Cold Start Launch URL:', data.url);
+          handleRoute(data.url);
+        } else {
+          console.log('[NativeRoute] No cold start URL found');
+        }
+      });
+    }, 500);
+
+    // Back Button Handler
     const backListener = CapacitorApp.addListener('backButton', () => {
       if (location.pathname === '/') {
         CapacitorApp.exitApp();
@@ -48,10 +93,18 @@ const NativeListener = () => {
       }
     });
 
+    // Deep Linking Handler (Warm start)
+    const urlListener = CapacitorApp.addListener('appUrlOpen', data => {
+      console.log('[NativeRoute] Warm Start App URL:', data.url);
+      handleRoute(data.url);
+    });
+
     return () => {
+      clearTimeout(timer);
       backListener.then(l => l.remove());
+      urlListener.then(l => l.remove());
     };
-  }, [location.pathname, navigate]);
+  }, [navigate, onSearchOpen]);
 
   return null;
 };
@@ -70,7 +123,7 @@ const App = () => {
   return (
     <HelmetProvider>
       <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <NativeListener />
+        <NativeListener onSearchOpen={() => setIsSearchOpen(true)} />
         <PrimalPulse />
         <div className="min-h-screen bg-[#0c0c0c] text-white">
           <Navbar onSearchOpen={() => setIsSearchOpen(true)} />

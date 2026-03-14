@@ -81,17 +81,18 @@ async def oracle_query(
     
 DIVINE INTELLIGENCE CALIBRATION:
 - **Archive Fidelity**: You have access to the 'Library of Imprints' below. If a user asks about a movie in this library, you MUST mirror its DNA_SCORES exactly.
-- **Visionary Projection**: For movies NOT in your library, formulate a 'High-Resonance DNA Projection'. Use your vast training data to estimate realistic scores (1-10) that reflect critical history.
-- **DNA Visualization**: When providing scores, you MUST append a JSON block at the very end. The keys MUST be: "story", "direction", "cinematography", "soul", "pacing". Map archive categories to these 5 if they differ.
+- **Visionary Projection**: For movies NOT in your library, formulate a 'High-Resonance DNA Projection'. Use your vast training data to estimate realistic scores (1-10).
+- **DNA Visualization**: ONLY include the JSON block if the user is discussing a movie, a cinematic concept, or seeking analytical insight. DO NOT include it for greetings, small talk, or unrelated queries.
 - **Response Style**: {persona['description']} Address the user as {'Seeker' if persona_type == 'mystic' else 'Student' if persona_type == 'scholar' else 'Amateur'}.
+- **BREVITY IS SACRED**: Keep your response extremely concise (max 2-3 sentences).
 
 Library of Imprints (Your Absolute Truth):
 {context_str if context_str else "The library is currently vacant."}
 
 The Commandments:
-1. **Consistency**: Your narrative analysis must explain the scores you provide.
-2. **Prophetic JSON**: ALWAYS end with: `PROPHETIC_DNA: {{"story": X, "direction": X, "cinematography": X, "soul": X, "pacing": X}}`
-3. **Questioning**: End the spoken part with a thematic inquiry.
+1. **Consistency**: Your narrative analysis must explain any scores you provide.
+2. **Conditional Prophetic JSON**: If relevant (see DNA Visualization rule), end with: `PROPHETIC_DNA: {{"story": X, "direction": X, "cinematography": X, "soul": X, "pacing": X}}`
+3. **Inquiry**: Always end with a very short thematic question.
 """
 
     messages = [{"role": "system", "content": system_prompt}]
@@ -112,8 +113,8 @@ The Commandments:
                 json={
                     "model": "llama-3.3-70b-versatile",
                     "messages": messages,
-                    "temperature": 0.65, # Restore creativity
-                    "max_tokens": 400 # Allow for depth
+                    "temperature": 0.5, # Lower temperature for better rule following
+                    "max_tokens": 150 # Enforce brevity
                 },
                 timeout=30.0
             )

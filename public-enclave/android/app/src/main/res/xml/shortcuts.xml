@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="search"
+        android:enabled="true"
+        android:icon="@drawable/ic_launcher_foreground"
+        android:shortcutShortLabel="@string/shortcut_search_short"
+        android:shortcutLongLabel="@string/shortcut_search_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.sanctuary.app"
+            android:targetClass="com.sanctuary.app.MainActivity"
+            android:data="sanctuary://search" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="oracle"
+        android:enabled="true"
+        android:icon="@drawable/ic_launcher_foreground"
+        android:shortcutShortLabel="@string/shortcut_oracle_short"
+        android:shortcutLongLabel="@string/shortcut_oracle_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.sanctuary.app"
+            android:targetClass="com.sanctuary.app.MainActivity"
+            android:data="sanctuary://predictions" />
+    </shortcut>
+</shortcuts>
