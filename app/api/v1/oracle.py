@@ -80,19 +80,19 @@ async def oracle_query(
     system_prompt = f"""{persona['prompt']}
     
 DIVINE INTELLIGENCE CALIBRATION:
-- **Archive Fidelity**: You have access to the 'Library of Imprints' below. If a user asks about a movie in this library, you MUST mirror its DNA_SCORES exactly.
-- **Visionary Projection**: For movies NOT in your library, formulate a 'High-Resonance DNA Projection'. Use your vast training data to estimate realistic scores (1-10).
-- **DNA Visualization**: ONLY include the JSON block if the user is discussing a movie, a cinematic concept, or seeking analytical insight. DO NOT include it for greetings, small talk, or unrelated queries.
+- **Archive Fidelity**: You have access to the 'Library of Imprints' below. If a user asks about a movie in this library, you MUST mirror its DNA_SCORES exactly but ONLY in the structured JSON block.
+- **DNA Visualization**: ONLY include the JSON block if the user is discussing a movie, a cinematic concept, or seeking analytical insight.
+- **NO LISTING**: DO NOT list specific scores (e.g., "story: 8, pacing: 7") within your spoken text. Keep the text poetic and descriptive. Move ALL numerical data to the JSON block.
 - **Response Style**: {persona['description']} Address the user as {'Seeker' if persona_type == 'mystic' else 'Student' if persona_type == 'scholar' else 'Amateur'}.
-- **BREVITY IS SACRED**: Keep your response extremely concise (max 2-3 sentences).
+- **BREVITY IS SACRED**: Keep your spoken response extremely concise (max 2 sentences).
+
+The Commandments:
+1. **Consistency**: Your narrative analysis must explain the "vibe" that justifies the scores in your JSON.
+2. **The Prophetic Block**: ALWAYS end your response with this EXACT format if relevant: `PROPHETIC_DNA: {{"story": X, "direction": X, "cinematography": X, "soul": X, "pacing": X}}`
+3. **Questioning**: End the spoken part with a tiny thematic inquiry.
 
 Library of Imprints (Your Absolute Truth):
 {context_str if context_str else "The library is currently vacant."}
-
-The Commandments:
-1. **Consistency**: Your narrative analysis must explain any scores you provide.
-2. **Conditional Prophetic JSON**: If relevant (see DNA Visualization rule), end with: `PROPHETIC_DNA: {{"story": X, "direction": X, "cinematography": X, "soul": X, "pacing": X}}`
-3. **Inquiry**: Always end with a very short thematic question.
 """
 
     messages = [{"role": "system", "content": system_prompt}]
@@ -113,8 +113,8 @@ The Commandments:
                 json={
                     "model": "llama-3.3-70b-versatile",
                     "messages": messages,
-                    "temperature": 0.5, # Lower temperature for better rule following
-                    "max_tokens": 150 # Enforce brevity
+                    "temperature": 0.5,
+                    "max_tokens": 250 # Increased slightly to prevent cutoff if model is wordy
                 },
                 timeout=30.0
             )
