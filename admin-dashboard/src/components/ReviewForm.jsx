@@ -666,10 +666,10 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                                 <AnimatePresence>
                                     {showLangSuggestions && (
                                         <motion.div
-                                            initial={{ opacity: 0, y: 10 }}
+                                            initial={{ opacity: 0, y: -10 }}
                                             animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: 10 }}
-                                            className="absolute bottom-full mb-4 left-0 w-full glass-obsidian border border-white/10 rounded-2xl overflow-hidden z-50 max-h-64 overflow-y-auto"
+                                            exit={{ opacity: 0, y: -10 }}
+                                            className="absolute top-full mt-4 left-0 w-full bg-[#111] border border-white/10 rounded-2xl overflow-hidden z-[70] max-h-64 overflow-y-auto shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
                                         >
                                             {filteredLanguages.length > 0 ? (
                                                 filteredLanguages.map(l => (
