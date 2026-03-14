@@ -136,6 +136,39 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
     const [newTag, setNewTag] = useState('')
     const [activeGroup, setActiveGroup] = useState(0)
     const [activeAspectIdx, setActiveAspectIdx] = useState(0)
+    const [langSearch, setLangSearch] = useState('')
+    const [showLangSuggestions, setShowLangSuggestions] = useState(false)
+
+    const ALL_LANGUAGES = useMemo(() => [
+        { code: 'en', name: 'English' },
+        { code: 'te', name: 'Telugu' },
+        { code: 'hi', name: 'Hindi' },
+        { code: 'ta', name: 'Tamil' },
+        { code: 'ml', name: 'Malayalam' },
+        { code: 'kn', name: 'Kannada' },
+        { code: 'es', name: 'Spanish' },
+        { code: 'ko', name: 'Korean' },
+        { code: 'ja', name: 'Japanese' },
+        { code: 'fr', name: 'French' },
+        { code: 'it', name: 'Italian' },
+        { code: 'de', name: 'German' },
+        { code: 'ru', name: 'Russian' },
+        { code: 'pt', name: 'Portuguese' },
+        { code: 'zh', name: 'Chinese' },
+        { code: 'ar', name: 'Arabic' }
+    ], []);
+
+    const filteredLanguages = useMemo(() => {
+        if (!langSearch) return ALL_LANGUAGES;
+        return ALL_LANGUAGES.filter(l => 
+            l.name.toLowerCase().includes(langSearch.toLowerCase()) || 
+            l.code.toLowerCase().includes(langSearch.toLowerCase())
+        );
+    }, [langSearch, ALL_LANGUAGES]);
+
+    const currentLanguageName = useMemo(() => {
+        return ALL_LANGUAGES.find(l => l.code === formData.language)?.name || formData.language || 'Auto Detect';
+    }, [formData.language, ALL_LANGUAGES]);
 
     // Reset aspect index when group changes
     React.useEffect(() => {
@@ -603,29 +636,68 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                         />
 
                         <div className="flex flex-wrap items-center gap-4">
-                            <div className="flex items-center gap-3 px-6 py-3 bg-white/5 border border-white/10 rounded-2xl group focus-within:border-amber-500/30 transition-all">
-                                <Globe size={16} className="text-amber-500/50 group-focus-within:text-amber-500" />
-                                <select
-                                    value={formData.language}
-                                    onChange={e => setFormData({ ...formData, language: e.target.value })}
-                                    className="bg-transparent text-xs font-black uppercase tracking-widest text-white/60 outline-none cursor-pointer"
-                                >
-                                    <option value="" className="bg-[#111]">Auto Detect Language</option>
-                                    <optgroup label="Primary" className="bg-[#111]">
-                                        <option value="en" className="bg-[#111]">English</option>
-                                        <option value="te" className="bg-[#111]">Telugu</option>
-                                        <option value="hi" className="bg-[#111]">Hindi</option>
-                                        <option value="ta" className="bg-[#111]">Tamil</option>
-                                    </optgroup>
-                                    <optgroup label="International" className="bg-[#111]">
-                                        <option value="it" className="bg-[#111]">Italian</option>
-                                        <option value="fr" className="bg-[#111]">French</option>
-                                        <option value="ko" className="bg-[#111]">Korean</option>
-                                        <option value="ja" className="bg-[#111]">Japanese</option>
-                                        <option value="es" className="bg-[#111]">Spanish</option>
-                                        <option value="de" className="bg-[#111]">German</option>
-                                    </optgroup>
-                                </select>
+                            <div className="relative group">
+                                <div className="flex items-center gap-3 px-6 py-3 bg-white/5 border border-white/10 rounded-2xl focus-within:border-amber-500/30 transition-all min-w-[240px]">
+                                    <Globe size={16} className="text-amber-500/50 group-focus-within:text-amber-500" />
+                                    <input
+                                        type="text"
+                                        value={langSearch}
+                                        onChange={e => {
+                                            setLangSearch(e.target.value);
+                                            setShowLangSuggestions(true);
+                                        }}
+                                        onFocus={() => setShowLangSuggestions(true)}
+                                        placeholder={currentLanguageName}
+                                        className="bg-transparent text-xs font-black uppercase tracking-widest text-white/60 outline-none w-full placeholder:text-white/20"
+                                    />
+                                    {formData.language && (
+                                        <button 
+                                            onClick={() => {
+                                                setFormData({ ...formData, language: '' });
+                                                setLangSearch('');
+                                            }}
+                                            className="text-white/20 hover:text-white"
+                                        >
+                                            <X size={12} />
+                                        </button>
+                                    )}
+                                </div>
+
+                                <AnimatePresence>
+                                    {showLangSuggestions && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: 10 }}
+                                            className="absolute bottom-full mb-4 left-0 w-full glass-obsidian border border-white/10 rounded-2xl overflow-hidden z-50 max-h-64 overflow-y-auto"
+                                        >
+                                            {filteredLanguages.length > 0 ? (
+                                                filteredLanguages.map(l => (
+                                                    <button
+                                                        key={l.code}
+                                                        onClick={() => {
+                                                            setFormData({ ...formData, language: l.code });
+                                                            setLangSearch('');
+                                                            setShowLangSuggestions(false);
+                                                        }}
+                                                        className="w-full text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest hover:bg-amber-500 hover:text-black transition-all border-b border-white/5 last:border-0"
+                                                    >
+                                                        {l.name}
+                                                    </button>
+                                                ))
+                                            ) : (
+                                                <div className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-white/20">No matching realms</div>
+                                            )}
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                                
+                                {showLangSuggestions && (
+                                    <div 
+                                        className="fixed inset-0 z-40" 
+                                        onClick={() => setShowLangSuggestions(false)} 
+                                    />
+                                )}
                             </div>
                         </div>
                     </div>
