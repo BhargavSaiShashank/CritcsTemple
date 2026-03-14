@@ -14,10 +14,15 @@ const BackgroundAtmosphere = ({ imageUrl }) => {
         img.onload = () => {
             try {
                 const colorThief = new ColorThief();
-                const palette = colorThief.getPalette(img, 3);
+                const palette = colorThief.getPalette(img, 5); // Get more colors for better blending
                 if (palette && palette.length > 0) {
                     const hexColors = palette.map(rgb => `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`);
                     setColors(hexColors);
+                    
+                    // Inject dominant color into root for wider UI tinting
+                    const dominant = palette[0];
+                    document.documentElement.style.setProperty('--accent-movie', `rgb(${dominant[0]}, ${dominant[1]}, ${dominant[2]})`);
+                    document.documentElement.style.setProperty('--accent-movie-muted', `rgba(${dominant[0]}, ${dominant[1]}, ${dominant[2]}, 0.3)`);
                 }
             } catch (err) {
                 console.error("Color extraction failed:", err);
@@ -29,18 +34,21 @@ const BackgroundAtmosphere = ({ imageUrl }) => {
         <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
             {/* Primary Glow */}
             <div
-                className="absolute -top-[10%] -left-[10%] w-[60%] h-[60%] rounded-full blur-[120px] opacity-20 transition-all duration-[3000ms] ease-in-out"
+                className="absolute -top-[20%] -left-[20%] w-[80%] h-[80%] rounded-full blur-[160px] opacity-[0.15] transition-all duration-[4000ms] ease-in-out"
                 style={{ backgroundColor: colors[0] }}
             />
 
             {/* Secondary Glow */}
             <div
-                className="absolute -bottom-[10%] -right-[10%] w-[50%] h-[50%] rounded-full blur-[120px] opacity-10 transition-all duration-[3000ms] ease-in-out"
+                className="absolute -bottom-[20%] -right-[20%] w-[70%] h-[70%] rounded-full blur-[160px] opacity-[0.08] transition-all duration-[4000ms] ease-in-out"
                 style={{ backgroundColor: colors[1] || colors[0] }}
             />
 
             {/* Ambient Dark Overlay */}
-            <div className="absolute inset-0 bg-[#0c0c0c]/40 backdrop-blur-[2px]" />
+            <div className="absolute inset-0 bg-[#0c0c0c]/60 backdrop-blur-[4px]" />
+            
+            {/* Dynamic Noise texture if needed for premium feel */}
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
         </div>
     );
 };

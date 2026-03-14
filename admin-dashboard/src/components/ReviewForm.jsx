@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronRight, Star, Quote, AlignLeft, Layout, Zap, Heart, Music, Camera, Plus, Loader2, Sparkles, Download, Eye } from 'lucide-react'
 import { createReview, updateReview, getProxyImageUrl } from '../services/api'
 import SanctuaryCard from './SanctuaryCard';
+import PublicPreview from './PublicPreview';
 import html2canvas from 'html2canvas';
 
 const aspectGroups = [
@@ -132,6 +133,73 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
 
     const [newTag, setNewTag] = useState('')
     const [activeGroup, setActiveGroup] = useState(0)
+    const [activeAspectIdx, setActiveAspectIdx] = useState(0)
+
+    // Reset aspect index when group changes
+    React.useEffect(() => {
+        setActiveAspectIdx(0);
+    }, [activeGroup]);
+
+    // Keyboard Shortcuts (Kinetic Scoring)
+    React.useEffect(() => {
+        const handleKeyDown = (e) => {
+            // Numbers 1-9 for scoring the active aspect
+            if (e.key >= '1' && e.key <= '9' && !(['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName))) {
+                const activeAspects = aspectGroups[activeGroup].aspects;
+                const aspectKey = activeAspects[activeAspectIdx];
+                if (aspectKey) {
+                    handleAspectChange(aspectKey, 'score', parseFloat(e.key));
+                }
+            }
+
+            // '0' for a perfect 10
+            if (e.key === '0' && !(['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName))) {
+                const activeAspects = aspectGroups[activeGroup].aspects;
+                const aspectKey = activeAspects[activeAspectIdx];
+                if (aspectKey) {
+                    handleAspectChange(aspectKey, 'score', 10);
+                }
+            }
+
+            // Up/Down Arrows to adjust score precisely
+            if (!(['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName))) {
+                const activeAspects = aspectGroups[activeGroup].aspects;
+                const aspectKey = activeAspects[activeAspectIdx];
+                const currentScore = parseFloat(formData.aspects[aspectKey]?.score || 0);
+
+                if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    handleAspectChange(aspectKey, 'score', Math.min(10, currentScore + 0.1).toFixed(1));
+                } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    handleAspectChange(aspectKey, 'score', Math.max(0, currentScore - 0.1).toFixed(1));
+                }
+            }
+
+            // Tab / Shift+Tab to cycle aspects in group
+            if (e.key === 'Tab' && !(['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName))) {
+                e.preventDefault();
+                const count = aspectGroups[activeGroup].aspects.length;
+                if (e.shiftKey) {
+                    setActiveAspectIdx(prev => (prev - 1 + count) % count);
+                } else {
+                    setActiveAspectIdx(prev => (prev + 1) % count);
+                }
+            }
+
+            // Shift + Arrows to cycle groups
+            if (e.shiftKey) {
+                if (e.key === 'ArrowRight') {
+                    setActiveGroup(prev => (prev + 1) % aspectGroups.length);
+                } else if (e.key === 'ArrowLeft') {
+                    setActiveGroup(prev => (prev - 1 + aspectGroups.length) % aspectGroups.length);
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [activeGroup, activeAspectIdx, formData.aspects]);
 
     const handleExportCard = async () => {
         if (!cardRef.current) return;
@@ -374,18 +442,18 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
     }
 
     return (
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 md:gap-20 pb-24 font-premium px-4 md:px-0">
+        <div className="grid grid-cols-1 md:grid-cols-12 xl:grid-cols-16 gap-8 md:gap-12 pb-24 font-premium">
             {/* Aspect Controller */}
-            <div className="xl:col-span-4 space-y-10">
+            <div className="md:col-span-4 xl:col-span-3 space-y-10">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="relative glass-obsidian rounded-[42px] p-12 text-center group overflow-hidden"
+                    className="relative glass-obsidian rounded-[42px] py-12 px-6 text-center group overflow-hidden"
                 >
                     <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
                     <Sparkles className="mx-auto mb-4 md:mb-6 text-amber-500/40 animate-pulse" size={32} />
                     <p className="text-[10px] font-black uppercase tracking-[0.6em] text-white/20 mb-4">Temple Accuracy</p>
-                    <div className="text-7xl md:text-9xl font-black text-white tracking-tighter mb-4 italic drop-shadow-[0_0_50px_rgba(245,158,11,0.2)]">
+                    <div className="text-6xl md:text-8xl font-black text-white tracking-tighter mb-4 italic drop-shadow-[0_0_50px_rgba(245,158,11,0.2)]">
                         {averageScore}
                     </div>
                     <div className="h-1 w-24 bg-gradient-to-r from-transparent via-amber-500/50 to-transparent mx-auto mb-4" />
@@ -415,7 +483,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             </div>
 
             {/* Detail Input */}
-            <div className="xl:col-span-8 space-y-12">
+            <div className="md:col-span-8 xl:col-span-9 space-y-12">
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={activeGroup}
@@ -428,10 +496,24 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                         <div className="absolute top-0 right-0 p-8 md:p-12 text-white/[0.02] font-black text-7xl md:text-9xl pointer-events-none select-none italic">
                             {activeGroup + 1}
                         </div>
-                        {aspectGroups[activeGroup].aspects.map(aspect => (
-                            <div key={aspect} className="space-y-6 group/item">
+                        {aspectGroups[activeGroup].aspects.map((aspect, idx) => (
+                            <div 
+                                key={aspect} 
+                                className={`space-y-6 group/item p-4 rounded-3xl transition-all duration-500 ${
+                                    activeAspectIdx === idx ? 'bg-amber-500/5 ring-1 ring-amber-500/20 shadow-[0_0_30px_rgba(245,158,11,0.05)]' : ''
+                                }`}
+                            >
                                 <div className="flex justify-between items-end px-1">
-                                    <label className="text-[9px] font-black uppercase tracking-[0.4em] text-amber-500/40 group-hover/item:text-amber-500 transition-colors">{aspect.replace(/_/g, ' ')}</label>
+                                    <div className="flex items-center gap-3">
+                                        <label className={`text-[9px] font-black uppercase tracking-[0.4em] transition-colors ${
+                                            activeAspectIdx === idx ? 'text-amber-500' : 'text-amber-500/40 group-hover/item:text-amber-500'
+                                        }`}>
+                                            {aspect.replace(/_/g, ' ')}
+                                        </label>
+                                        {activeAspectIdx === idx && (
+                                            <motion.div layoutId="focus-dot" className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_10px_#f59e0b]" />
+                                        )}
+                                    </div>
                                     <span className="text-3xl md:text-4xl font-black text-white italic tracking-tighter">{formData.aspects[aspect].score}</span>
                                 </div>
                                 <input
@@ -725,6 +807,44 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                         }}
                         cardRef={cardRef}
                     />
+                </div>
+            </div>
+
+            {/* Live Sanctuary Card Overlay (Desktop Only) */}
+            <div className="hidden xl:block xl:col-span-4 sticky top-10 h-fit">
+                <div className="glass-obsidian rounded-[42px] p-6 border-amber-500/10 relative group overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-b from-amber-500/[0.02] to-transparent pointer-events-none" />
+                    <div className="flex items-center justify-between mb-6 px-2">
+                        <div className="flex items-center gap-2">
+                            <Eye size={14} className="text-amber-500" />
+                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">Temporal Preview</span>
+                        </div>
+                        <div className="h-1 w-12 bg-white/5 rounded-full" />
+                    </div>
+                    
+                    <div className="mt-2">
+                         <PublicPreview
+                            movie={{
+                                title: movie.title,
+                                poster_url: formData.movie_poster_url || movie.poster_url,
+                                release_year: formData.movie_year || movie.release_year,
+                                director: movie.director || 'Visionary',
+                                runtime: movie.runtime,
+                                genres: movie.genres || [movie.genre]
+                            }}
+                            review={{
+                                ...formData,
+                                overall_rating: averageScore,
+                            }}
+                        />
+                    </div>
+                    
+                    <div className="pt-8 border-t border-white/5 relative z-10">
+                        <p className="text-[8px] font-bold text-white/20 uppercase tracking-[0.2em] text-center leading-relaxed">
+                            Behold the final imprint as it will manifest in the archives. 
+                            <span className="block text-amber-500/40 mt-1">Updates in real-time.</span>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
