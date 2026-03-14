@@ -10,6 +10,8 @@ export default defineConfig({
     tailwindcss(),
     Sitemap({
       hostname: 'https://critiquetemplesanctuary.vercel.app',
+      generateRobotsTxt: false, // Using manual robots.txt in public/
+      outDir: 'dist',
       dynamicRoutes: [
         '/hall-of-fame'
       ]
