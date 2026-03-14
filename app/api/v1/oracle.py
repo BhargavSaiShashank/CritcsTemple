@@ -3,6 +3,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.db.mongodb import get_database
 from app.services.review_service import review_service
 from app.core.config import get_settings
+from app.services.oracle_analytics_service import oracle_analytics
 import httpx
 from typing import List, Dict, Any
 
@@ -129,6 +130,18 @@ Library of Imprints (Your Absolute Truth):
         except Exception as e:
             print(f"Oracle Error: {e}")
             raise HTTPException(status_code=500, detail="The Oracle is currently deep in meditation.")
+
+@router.get("/legacy")
+async def oracle_legacy(
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Get aggregated analytics for the Architect's Profile."""
+    try:
+        stats = await oracle_analytics.get_legacy_stats(db)
+        return stats
+    except Exception as e:
+        print(f"Analytics Error: {e}")
+        raise HTTPException(status_code=500, detail="The Oracle is struggling to calculate your legacy.")
 
 @router.post("/duel")
 async def oracle_duel(

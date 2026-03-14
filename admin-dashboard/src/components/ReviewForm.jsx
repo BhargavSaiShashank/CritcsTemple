@@ -395,7 +395,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             slug,
             status,
             content_type: formData.content_type || movie.content_type || 'movie',
-            movie_id: parseInt(movie.id) || 0,
+            movie_id: movie.id || 0,
             movie_title: formData.movie_title || movie.title,
             movie_poster_url: formData.movie_poster_url || movie.poster_url,
             watch_links: formData.watch_links,

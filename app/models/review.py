@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, validator, ConfigDict
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Any
 from datetime import datetime
 from enum import Enum
 
@@ -49,7 +49,7 @@ class Reactions(BaseModel):
     havent_seen: int = 0
 
 class ReviewBase(BaseModel):
-    movie_id: int # TMDB ID for easy mapping
+    movie_id: Any  # Can be TMDB ID (int) or IMDB ID (str)
     content_type: str = "movie" # movie, tv
     movie_title: Optional[str] = None
     movie_poster_url: Optional[str] = None

@@ -5,7 +5,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import ReviewForm from '../components/ReviewForm'
 import {
     Search, Plus, LogOut, TrendingUp, Sparkles, Image as ImageIcon,
-    Clock, Calendar, DownloadCloud, Loader2, Play, BookOpen, Star, Clapperboard, ChevronRight
+    Clock, Calendar, DownloadCloud, Loader2, Play, BookOpen, Star, Clapperboard, ChevronRight, LayoutGrid
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
@@ -178,7 +178,7 @@ const Dashboard = () => {
     return (
         <div className="min-h-screen bg-[#020202] text-[#f0f0f0] font-premium selection:bg-amber-500/30">
             {/* Dynamic Ambient Background */}
-            <BackgroundAtmosphere imageUrl={movie?.poster} />
+            <BackgroundAtmosphere imageUrl={movie?.poster || movie?.poster_url} />
 
             {/* Global Atmospheric Effects */}
             <div className="fixed inset-0 spotlight pointer-events-none" />
@@ -295,6 +295,14 @@ const Dashboard = () => {
                         title="Cinematic Intelligence"
                     >
                         <TrendingUp size={16} className="text-gray-400 group-hover:text-amber-500 transition-colors md:w-[18px] md:h-[18px]" />
+                    </Link>
+
+                    <Link
+                        to="/sanctorum"
+                        className="p-2 md:p-3 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl md:rounded-2xl transition-all group"
+                        title="The Sanctorum Archives"
+                    >
+                        <LayoutGrid size={16} className="text-gray-400 group-hover:text-amber-500 transition-colors md:w-[18px] md:h-[18px]" />
                     </Link>
 
                     <button

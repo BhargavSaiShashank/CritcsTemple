@@ -7,6 +7,7 @@ import { getLatestReviews } from '../services/api';
 import ReviewGrid from '../components/ReviewGrid';
 import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
 import { getVerdictFromScore } from '../utils/verdict';
+import { useColorHarmonizer } from '../hooks/useColorHarmonizer';
 
 const FALLBACK = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=1200';
 const VERDICT_COLOR = {
@@ -214,6 +215,10 @@ export default function Home() {
     }, [loading, loadingMore, hasMore, fetchReviews, reviews.length]);
 
     const hero = featuredReviews[currentIndex];
+    
+    // Soul-Sync Hero Atmosphere
+    useColorHarmonizer(hero?.movie_poster_url);
+
     const derivedVerdict = getVerdictFromScore(hero?.overall_rating || 0);
     const heroColor = VERDICT_COLOR[derivedVerdict] || '#FFFFFF';
 

@@ -43,10 +43,14 @@ body,
   /* Safe area defaults */
   --safe-top: max(env(safe-area-inset-top, 0px), 0px);
 
-  /* Dynamic Accent Defaults */
-  --accent-primary: var(--amber);
-  --accent-secondary: #60a5fa;
-  --accent-glow: rgba(245, 166, 35, 0.06);
+  /* Dynamic Accent Baseline */
+  --theme-primary: #f5a623;
+  --theme-secondary: #60a5fa;
+  --theme-glow: rgba(245, 166, 35, 0.06);
+
+  --accent-primary: var(--theme-primary);
+  --accent-secondary: var(--theme-secondary);
+  --accent-glow: var(--theme-glow);
   --accent-dark: #1e40af;
 }
 

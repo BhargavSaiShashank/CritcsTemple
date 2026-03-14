@@ -14,6 +14,7 @@ import SearchOverlay from './components/SearchOverlay'
 import { CapacitorUpdater } from '@capgo/capacitor-updater'
 import { API_URL } from './services/api'
 import { FirebaseMessagingService } from './services/FirebaseMessaging.service'
+import { AtmosphereProvider } from './context/AtmosphereContext'
 
 const PrimalPulse = () => {
   const readySent = React.useRef(false);
@@ -122,24 +123,26 @@ const App = () => {
 
   return (
     <HelmetProvider>
-      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <NativeListener onSearchOpen={() => setIsSearchOpen(true)} />
-        <PrimalPulse />
-        <div className="min-h-screen bg-[#0c0c0c] text-white">
-          <Navbar onSearchOpen={() => setIsSearchOpen(true)} />
-          <main>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/review/:slug" element={<ReviewDetail />} />
-              <Route path="/hall-of-fame" element={<HallOfFame />} />
-              <Route path="/compare" element={<Compare />} />
-              <Route path="/predictions" element={<Predictions />} />
-            </Routes>
-          </main>
-          <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
-          <CeremonyOracle />
-        </div>
-      </Router>
+      <AtmosphereProvider>
+        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <NativeListener onSearchOpen={() => setIsSearchOpen(true)} />
+          <PrimalPulse />
+          <div className="min-h-screen bg-[#0c0c0c] text-white">
+            <Navbar onSearchOpen={() => setIsSearchOpen(true)} />
+            <main>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/review/:slug" element={<ReviewDetail />} />
+                <Route path="/hall-of-fame" element={<HallOfFame />} />
+                <Route path="/compare" element={<Compare />} />
+                <Route path="/predictions" element={<Predictions />} />
+              </Routes>
+            </main>
+            <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+            <CeremonyOracle />
+          </div>
+        </Router>
+      </AtmosphereProvider>
     </HelmetProvider>
   )
 }
