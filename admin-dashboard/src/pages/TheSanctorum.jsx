@@ -203,18 +203,19 @@ const TheSanctorum = () => {
                 <BentoCard title="Critical Anchors (Correlation to Overall)" icon={TrendingUp} className="md:col-span-7">
                     <div className="h-64 mt-6">
                         <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={corrData} layout="vertical">
+                            <BarChart data={corrData} layout="vertical" margin={{ right: 60 }}>
                                 <XAxis type="number" hide domain={[0, 1]} />
                                 <YAxis dataKey="aspect" type="category" axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11, fontWeight: 700 }} width={100} />
                                 <Tooltip
                                     cursor={{ fill: 'rgba(255,255,255,0.03)' }}
                                     contentStyle={{ background: '#111', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
+                                    formatter={(v) => [`${(v * 100).toFixed(1)}%`, 'Weight']}
                                 />
                                 <Bar dataKey="correlation" radius={[0, 20, 20, 0]}>
                                     {corrData.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={entry.correlation > 0.8 ? '#f5a623' : '#60a5fa'} opacity={0.8} />
                                     ))}
-                                    <LabelList dataKey="correlation" position="right" formatter={(v) => v.toFixed(2)} fill="white" fontSize={10} fontWeight="bold" />
+                                    <LabelList dataKey="correlation" position="right" formatter={(v) => `${Math.round(v * 100)}%`} fill="white" fontSize={10} fontWeight="bold" />
                                 </Bar>
                             </BarChart>
                         </ResponsiveContainer>
