@@ -84,9 +84,17 @@ class OracleAnalyticsService:
                 lang = id_to_lang.get(mid)
                 
             if not lang or lang == "en":
-                # Try tags if ID lookup failed or returned default 'en' (which might be wrong for an ID: 0)
+                # Try tags or content if ID lookup failed or returned default 'en'
                 tags = [t.lower() for t in r.get("tags", [])]
-                found_lang = next((l for l in self.lang_map.keys() if l in tags or self.lang_map[l].lower() in tags), None)
+                text_to_scan = (r.get("content", "") + " " + r.get("summary", "") + " " + r.get("movie_title", "")).lower()
+                
+                found_lang = None
+                # Check mapping
+                for code, full_name in self.lang_map.items():
+                    if code in tags or full_name.lower() in tags or full_name.lower() in text_to_scan:
+                        found_lang = code
+                        break
+                
                 if found_lang:
                     lang = found_lang
             
@@ -119,6 +127,12 @@ class OracleAnalyticsService:
                     try: val = float(rating_data)
                     except: val = 0
                 row[aspect_name.lower()] = val
+            
+            # 3b. Synthetic 'Soul' Score (Average of Emotional Impact and Rewatch Value)
+            # This matches the 'Soul' group in ReviewForm.jsx
+            ei = row.get('emotional_impact', 0)
+            rv = row.get('rewatch_value', 0)
+            row['soul'] = (ei + rv) / 2 if (ei or rv) else 0
                     
             df_list.append(row)
             

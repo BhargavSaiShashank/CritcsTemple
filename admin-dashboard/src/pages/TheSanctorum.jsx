@@ -71,8 +71,9 @@ const TheSanctorum = () => {
     const langData = stats.language_dna.map(l => ({
         name: l.language,
         value: l.count,
-        avg: l.avg_score
-    }));
+        avg: l.avg_score,
+        displayLabel: `${l.language} (${l.count})`
+    })).sort((a,b) => b.value - a.value);
 
     const temporalData = Object.entries(stats.temporal_imprints).map(([month, count]) => ({
         month,
@@ -132,7 +133,7 @@ const TheSanctorum = () => {
                     <div className="grid grid-cols-2 gap-4 mt-4">
                         {langData.map((l, i) => (
                             <div key={l.name} className="flex flex-col">
-                                <span className="text-[10px] font-bold text-white/20 uppercase">{l.name}</span>
+                                <span className="text-[10px] font-bold text-white/20 uppercase">{l.name} <span className="opacity-40 italic">x{l.value}</span></span>
                                 <span className="text-lg font-black" style={{ color: COLORS[i % COLORS.length] }}>{l.avg.toFixed(2)}</span>
                             </div>
                         ))}
@@ -145,13 +146,30 @@ const TheSanctorum = () => {
                         <ResponsiveContainer width="100%" height="100%">
                             <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
                                 <PolarGrid stroke="rgba(255,255,255,0.1)" />
-                                <PolarAngleAxis dataKey="subject" tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 10, fontWeight: 700 }} />
+                                <PolarAngleAxis 
+                                    dataKey="subject" 
+                                    tick={({ payload, x, y, textAnchor, stroke, radius }) => {
+                                        const data = radarData.find(d => d.subject === payload.value);
+                                        return (
+                                            <text x={x} y={y} textAnchor={textAnchor} fontSize={10} fontWeight={700} fill="rgba(255,255,255,0.4)">
+                                                <tspan x={x} dy="0">{payload.value}</tspan>
+                                                <tspan x={x} dy="12" fill="#f5a623" fontSize={11}>{data ? data.A.toFixed(1) : ''}</tspan>
+                                            </text>
+                                        );
+                                    }}
+                                />
                                 <Radar
                                     name="Averages"
                                     dataKey="A"
                                     stroke="#f5a623"
                                     fill="#f5a623"
                                     fillOpacity={0.4}
+                                    dot={{ r: 4, fill: '#f5a623' }}
+                                />
+                                <Tooltip
+                                    contentStyle={{ background: '#111', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
+                                    itemStyle={{ color: '#fff' }}
+                                    formatter={(value) => [value.toFixed(2), "Score"]}
                                 />
                             </RadarChart>
                         </ResponsiveContainer>
@@ -196,6 +214,7 @@ const TheSanctorum = () => {
                                     {corrData.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={entry.correlation > 0.8 ? '#f5a623' : '#60a5fa'} opacity={0.8} />
                                     ))}
+                                    <LabelList dataKey="correlation" position="right" formatter={(v) => v.toFixed(2)} fill="white" fontSize={10} fontWeight="bold" />
                                 </Bar>
                             </BarChart>
                         </ResponsiveContainer>
