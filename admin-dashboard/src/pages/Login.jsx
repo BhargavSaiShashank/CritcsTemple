@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { auth, googleProvider } from '../services/firebase'
-import { signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged } from 'firebase/auth'
+import { signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, GoogleAuthProvider, signInWithCredential } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
+import { Capacitor } from '@capacitor/core'
+import { FirebaseAuthentication } from '@capacitor-firebase/authentication'
 import { LogIn, Sparkles, ShieldCheck, Loader2, Clapperboard } from 'lucide-react'
 import { motion } from 'framer-motion'
 
@@ -64,6 +66,21 @@ const Login = () => {
         setLoading(true)
         setError('')
         try {
+            if (Capacitor.isNativePlatform()) {
+                try {
+                    const nativeResult = await FirebaseAuthentication.signInWithGoogle()
+                    if (nativeResult?.credential?.idToken) {
+                        const credential = GoogleAuthProvider.credential(nativeResult.credential.idToken)
+                        await signInWithCredential(auth, credential)
+                        navigate('/dashboard')
+                        return
+                    }
+                } catch (nativeErr) {
+                    console.error("NATIVE AUTH ERROR:", nativeErr)
+                    throw nativeErr
+                }
+            }
+            
             await signInWithPopup(auth, googleProvider)
             navigate('/dashboard')
         } catch (err) {
