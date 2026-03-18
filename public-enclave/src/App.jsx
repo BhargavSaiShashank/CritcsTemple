@@ -12,7 +12,7 @@ import Predictions from './pages/Predictions'
 import Oscars from './pages/Oscars'
 import CeremonyOracle from './components/CeremonyOracle'
 import SearchOverlay from './components/SearchOverlay'
-import { CapacitorUpdater } from '@capgo/capacitor-updater'
+
 import { API_URL } from './services/api'
 import { FirebaseMessagingService } from './services/FirebaseMessaging.service'
 import { AtmosphereProvider } from './context/AtmosphereContext'
@@ -25,11 +25,7 @@ const PrimalPulse = () => {
     console.log('[Primal Pulse] Waking up the Oracle...');
     fetch(`${API_URL}/health`).catch(() => { });
 
-    // Capgo OTA Update Check - Guarded to prevent duplicate native calls
-    if (Capacitor.isNativePlatform() && !readySent.current) {
-      readySent.current = true;
-      CapacitorUpdater.notifyAppReady();
-    }
+
   }, []);
   return null;
 };
