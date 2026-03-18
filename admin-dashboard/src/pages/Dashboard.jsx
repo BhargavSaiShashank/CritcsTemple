@@ -184,18 +184,18 @@ const Dashboard = () => {
             <div className="fixed inset-0 spotlight pointer-events-none" />
             <div className="fixed top-[-10%] left-[-10%] w-[50%] h-[50%] bg-amber-500/5 blur-[120px] rounded-full pointer-events-none animate-pulse" />
 
-            <header className="relative z-50 flex justify-between items-center px-4 md:px-12 py-6 md:py-8 border-b border-white/5 backdrop-blur-xl">
-                <div className="flex items-center gap-3 md:gap-6">
-                    <div className="w-9 h-9 md:w-12 md:h-12 bg-gradient-to-br from-amber-500 to-amber-700 rounded-xl md:rounded-2xl flex items-center justify-center shadow-2xl shadow-amber-500/20 flex-shrink-0">
-                        <Clapperboard className="text-black w-4 h-4 md:w-6 md:h-6" />
+            <header className="relative z-50 flex flex-col md:flex-row justify-between items-center gap-5 md:gap-0 px-4 md:px-12 py-6 md:py-8 border-b border-white/5 backdrop-blur-xl">
+                <div className="flex items-center gap-3 md:gap-6 w-full md:w-auto justify-center md:justify-start">
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-amber-500 to-amber-700 rounded-xl md:rounded-2xl flex items-center justify-center shadow-2xl shadow-amber-500/20 flex-shrink-0">
+                        <Clapperboard className="text-black w-5 h-5 md:w-6 md:h-6" />
                     </div>
                     <div className="min-w-0">
-                        <h1 className="text-lg md:text-2xl font-black italic tracking-tighter truncate">THE TEMPLE</h1>
-                        <p className="text-[6px] md:text-[8px] font-black uppercase tracking-[0.4em] text-amber-500/50">Admin Sanctorum</p>
+                        <h1 className="text-xl md:text-2xl font-black italic tracking-tighter truncate">THE TEMPLE</h1>
+                        <p className="text-[7px] md:text-[8px] font-black uppercase tracking-[0.4em] text-amber-500/50">Admin Sanctorum</p>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2 md:gap-4">
+                <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4 w-full md:w-auto">
                     <Link
                         to="/hall-of-fame"
                         className="p-3 bg-white/5 hover:bg-white/10 border border-white/5 rounded-2xl transition-all group"
@@ -238,7 +238,7 @@ const Dashboard = () => {
                                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                     animate={{ opacity: 1, y: 0, scale: 1 }}
                                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                    className="absolute right-0 top-full mt-4 w-72 md:w-96 bg-[#0a0a0a]/90 backdrop-blur-3xl border border-white/10 rounded-3xl p-4 shadow-2xl z-50 overflow-hidden"
+                                    className="absolute -left-20 md:left-auto md:right-0 top-full mt-4 w-72 md:w-96 bg-[#0a0a0a]/90 backdrop-blur-3xl border border-white/10 rounded-3xl p-4 shadow-2xl z-50 overflow-hidden"
                                 >
                                     <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/40 mb-4 px-2">Local Drafts Unfinished</h3>
                                     <div className="max-h-[300px] overflow-y-auto pr-2 space-y-2">
