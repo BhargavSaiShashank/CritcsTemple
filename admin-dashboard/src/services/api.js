@@ -1,7 +1,10 @@
 import axios from 'axios';
 import { auth } from './firebase';
+import { Capacitor } from '@capacitor/core';
 
-const baseURL = import.meta.env.VITE_API_URL || '/api/v1';
+const baseURL = Capacitor.isNativePlatform()
+    ? 'https://temple-backend-zgu3.onrender.com/api/v1'
+    : import.meta.env.VITE_API_URL || '/api/v1';
 console.log(`[API_CONFIG] Base URL: ${baseURL}`);
 
 const api = axios.create({

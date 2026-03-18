@@ -261,6 +261,7 @@ export default function Navbar({ onSearchOpen }) {
                         <MobileNavLink to="/" active={isActive('/')} icon={<Archive size={16} />}>Archive</MobileNavLink>
                         <MobileNavLink to="/compare" active={isActive('/compare')} icon={<Film size={16} />}>Compare</MobileNavLink>
                         <MobileNavLink to="/hall-of-fame" active={isActive('/hall-of-fame')} icon={<Award size={16} />}>Hall of Fame</MobileNavLink>
+                        <MobileNavLink to="/oscars" active={isActive('/oscars')} icon={<Award size={16} style={{ color: '#FFD700' }} />}>Oscars</MobileNavLink>
                         <MobileNavLink to="/predictions" active={isActive('/predictions')} icon={<Target size={16} />}>Prophecies</MobileNavLink>
 
                         <div style={{ margin: '8px 0', height: '1px', background: 'rgba(255, 255, 255, 0.05)' }} />
