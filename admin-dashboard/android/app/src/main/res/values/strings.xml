@@ -4,4 +4,5 @@
     <string name="title_activity_main">Temple Admin</string>
     <string name="package_name">com.sanctuary.admin</string>
     <string name="custom_url_scheme">com.sanctuary.admin</string>
+    <string name="google_client_id">932473722147-33q9acgdq83hdf495ag8pulu0r0sgh05.apps.googleusercontent.com</string>
 </resources>
