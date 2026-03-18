@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "932473722147-rebge4ovq17hcfajdi23qlpvnml60b4q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sanctuary.admin",
+            "certificate_hash": "fd5780f4af54e13b9d6bfafa8dcfd255512c3892"
+          }
+        },
+        {
           "client_id": "932473722147-33q9acgdq83hdf495ag8pulu0r0sgh05.apps.googleusercontent.com",
           "client_type": 3
         }
