@@ -1,21 +1,23 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import ColorThief from 'colorthief';
 
 const AtmosphereContext = createContext();
 
 export const useAtmosphere = () => useContext(AtmosphereContext);
 
-export const AtmosphereProvider = ({ children }) => {
-  const [currentPoster, setCurrentPoster] = useState(null);
-  const [colors, setColors] = useState({
-    primary: '#60a5fa', // Default blue
-    secondary: '#3b82f6',
-    glow: 'rgba(96, 165, 250, 0.3)'
-  });
+const defaultColors = {
+  primary: '#60a5fa', // Default blue
+  secondary: '#3b82f6',
+  glow: 'rgba(96, 165, 250, 0.3)'
+};
 
-  const updateAtmosphere = async (posterUrl) => {
-    if (!posterUrl || posterUrl === currentPoster) return;
-    setCurrentPoster(posterUrl);
+export const AtmosphereProvider = ({ children }) => {
+  const currentPosterRef = useRef(null);
+  const [colors, setColors] = useState(defaultColors);
+
+  const updateAtmosphere = useCallback(async (posterUrl) => {
+    if (!posterUrl || posterUrl === currentPosterRef.current) return;
+    currentPosterRef.current = posterUrl;
 
     const img = new Image();
     img.crossOrigin = 'Anonymous';
@@ -31,8 +33,23 @@ export const AtmosphereProvider = ({ children }) => {
           return hex.length === 1 ? '0' + hex : hex;
         }).join('');
 
-        const dominant = palette[0];
-        const vibrant = palette[1] || palette[0];
+        // Helper to ensure color is bright enough for dark background
+        const ensureLegible = (rgb, minL = 130) => {
+          const [r, g, b] = rgb;
+          const luminance = (0.299 * r + 0.587 * g + 0.114 * b);
+          if (luminance < minL) {
+            const factor = minL / (luminance || 1);
+            return [
+              Math.min(255, Math.round(r * factor + 30)), // Boost both scale and floor
+              Math.min(255, Math.round(g * factor + 30)),
+              Math.min(255, Math.round(b * factor + 30))
+            ];
+          }
+          return rgb;
+        };
+
+        const dominant = ensureLegible(palette[0], 140);
+        const vibrant = ensureLegible(palette[1] || palette[0], 160);
         
         const primaryHex = rgbToHex(...dominant);
         const secondaryHex = rgbToHex(...vibrant);
@@ -50,11 +67,22 @@ export const AtmosphereProvider = ({ children }) => {
         console.error('[Atmosphere] Extraction Error:', e);
       }
     };
-  };
+  }, []);
+
+  const resetAtmosphere = useCallback(() => {
+    currentPosterRef.current = null;
+
+    setColors(defaultColors);
+    document.documentElement.style.removeProperty('--theme-primary');
+    document.documentElement.style.removeProperty('--theme-secondary');
+    document.documentElement.style.removeProperty('--theme-glow');
+    console.log('[Atmosphere] Reset to default');
+  }, []);
 
   return (
-    <AtmosphereContext.Provider value={{ colors, updateAtmosphere }}>
+    <AtmosphereContext.Provider value={{ colors, updateAtmosphere, resetAtmosphere }}>
       {children}
     </AtmosphereContext.Provider>
   );
+
 };

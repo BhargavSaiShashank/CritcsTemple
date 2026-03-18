@@ -143,7 +143,14 @@ export default function ReviewDetail() {
 
 
     // Dynamic Color Harmonization
-    useColorHarmonizer(review?.movie_poster_url ? proxyImage(review.movie_poster_url) : null);
+    const { resetAtmosphere } = useColorHarmonizer(review?.movie_poster_url ? proxyImage(review.movie_poster_url) : null);
+
+    // Reset atmosphere when leaving the detail page
+    useEffect(() => {
+        return () => {
+            resetAtmosphere();
+        };
+    }, [resetAtmosphere]);
 
     // Robust YouTube ID extraction
     const getEmbedUrl = (url) => {
@@ -455,7 +462,13 @@ export default function ReviewDetail() {
                     >
                         {/* Poster */}
                         <div style={{ borderRadius: '18px', overflow: 'hidden', boxShadow: '0 32px 80px rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                            <img src={src} alt={review.movie_title} onError={() => setSrc(FALLBACK)} style={{ width: '100%', display: 'block' }} />
+                            <motion.img
+                                layoutId={`poster-${review.slug}`}
+                                src={src}
+                                alt={review.movie_title}
+                                onError={() => setSrc(FALLBACK)}
+                                style={{ width: '100%', display: 'block' }}
+                            />
                         </div>
 
                         {/* Score + verdict card */}

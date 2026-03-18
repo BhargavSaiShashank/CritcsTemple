@@ -3,11 +3,16 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Zap, Camera, Music, Heart, QuoteIcon, Star, TrendingUp, ChevronRight, Search, Film, ChevronLeft } from 'lucide-react';
-import { getLatestReviews } from '../services/api';
+import { getLatestReviews, proxyImage } from '../services/api';
 import ReviewGrid from '../components/ReviewGrid';
 import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
 import { getVerdictFromScore } from '../utils/verdict';
 import { useColorHarmonizer } from '../hooks/useColorHarmonizer';
+import DiscoveryCarousel from '../components/DiscoveryCarousel';
+import { Capacitor } from '@capacitor/core';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { initializeSmartSearch, performSmartSearch } from '../services/SmartSearch';
+import offlineData from "../../public/assets/offline_data.json";
 
 const FALLBACK = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=1200';
 const VERDICT_COLOR = {
@@ -19,12 +24,15 @@ const VERDICT_COLOR = {
 };
 
 export default function Home() {
-    const [featuredReviews, setFeaturedReviews] = useState([]);
+    const hasOffline = offlineData && offlineData.length > 0;
+    const sortedOffline = hasOffline ? [...offlineData].sort((a,b) => new Date(b.created_at) - new Date(a.created_at)) : [];
+
+    const [featuredReviews, setFeaturedReviews] = useState(hasOffline ? offlineData.filter(r => r.overall_rating >= 8.5) : []);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isAutoPlaying, setIsAutoPlaying] = useState(true);
     const [error, setError] = useState(null);
-    const [reviews, setReviews] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [reviews, setReviews] = useState(sortedOffline);
+    const [loading, setLoading] = useState(!hasOffline);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const [search, setSearch] = useState('');
     const containerRef = useRef(null);
@@ -51,6 +59,13 @@ export default function Home() {
     const [verdictFilter, setVerdictFilter] = useState('All');
     const [contentTypeFilter, setContentTypeFilter] = useState('All');
     const [sortOption, setSortOption] = useState('date-desc');
+
+    const handleFilterChange = (setter, value) => {
+        setter(value);
+        if (Capacitor.isNativePlatform()) {
+            Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
+        }
+    };
 
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [pullDistance, setPullDistance] = useState(0);
@@ -217,13 +232,22 @@ export default function Home() {
     const hero = featuredReviews[currentIndex];
     
     // Soul-Sync Hero Atmosphere
-    useColorHarmonizer(hero?.movie_poster_url);
+    const { resetAtmosphere } = useColorHarmonizer(hero?.movie_poster_url ? proxyImage(hero.movie_poster_url) : null);
+
+    // Reset atmosphere when leaving the home page
+    useEffect(() => {
+        return () => {
+            resetAtmosphere();
+        };
+    }, [resetAtmosphere]);
 
     const derivedVerdict = getVerdictFromScore(hero?.overall_rating || 0);
     const heroColor = VERDICT_COLOR[derivedVerdict] || '#FFFFFF';
 
-    // The backend now natively filters via MongoDB `$regex` so we pass reviews directly
-    const filtered = reviews;
+    // The backend natively filters, but we augment it with Fuse.js for heavy local typo tolerance 
+    // and instant offline querying of the baseline payload
+    const smartSearchIndex = React.useMemo(() => initializeSmartSearch(reviews), [reviews]);
+    const filtered = search ? performSmartSearch(smartSearchIndex, search) : reviews;
 
     return (
         <div
@@ -498,6 +522,9 @@ export default function Home() {
                 </div>
             </section>
 
+            {/* ── DISCOVERY CAROUSEL ── */}
+            <DiscoveryCarousel reviews={featuredReviews} loading={featuredReviews.length === 0} />
+
             {/* ── ARCHIVE GRID ── */}
             <section className="max-w-container" style={{ paddingTop: '64px', paddingBottom: '100px' }}>
                 <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '32px', flexWrap: 'wrap', gap: '24px' }}>
@@ -527,7 +554,7 @@ export default function Home() {
 
                         <select
                             value={verdictFilter}
-                            onChange={e => setVerdictFilter(e.target.value)}
+                            onChange={e => handleFilterChange(setVerdictFilter, e.target.value)}
                             style={{ padding: '9px 14px', borderRadius: '10px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', fontSize: '12px', color: '#fff', outline: 'none', fontFamily: 'Outfit, sans-serif', cursor: 'pointer' }}
                         >
                             <option value="All" style={{ background: '#111', color: '#fff' }}>All Verdicts</option>
@@ -545,7 +572,7 @@ export default function Home() {
 
                         <select
                             value={contentTypeFilter}
-                            onChange={e => setContentTypeFilter(e.target.value)}
+                            onChange={e => handleFilterChange(setContentTypeFilter, e.target.value)}
                             style={{ padding: '9px 14px', borderRadius: '10px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', fontSize: '12px', color: '#fff', outline: 'none', fontFamily: 'Outfit, sans-serif', cursor: 'pointer' }}
                         >
                             <option value="All" style={{ background: '#111', color: '#fff' }}>All Content</option>
@@ -555,7 +582,7 @@ export default function Home() {
 
                         <select
                             value={sortOption}
-                            onChange={e => setSortOption(e.target.value)}
+                            onChange={e => handleFilterChange(setSortOption, e.target.value)}
                             style={{ padding: '9px 14px', borderRadius: '10px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', fontSize: '12px', color: '#fff', outline: 'none', fontFamily: 'Outfit, sans-serif', cursor: 'pointer' }}
                         >
                             <option value="date-desc" style={{ background: '#111', color: '#fff' }}>Newest First</option>
@@ -569,7 +596,13 @@ export default function Home() {
 
                 {/* Infinite Scroll Trigger */}
                 <div ref={lastElementRef} style={{ height: '40px', marginTop: '40px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    {loadingMore && <div style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(245,166,35,0.6)', letterSpacing: '0.2em', textTransform: 'uppercase', animation: 'pulse 1.5s infinite' }}>Unearthing Deeper Archives...</div>}
+                    {loadingMore && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <div style={{ width: '24px', height: '24px', border: '2px solid rgba(245,166,35,0.2)', borderTopColor: '#f5a623', borderRadius: '50%', animation: 'spin 1s linear infinite' }}>
+                            </div>
+                            <div style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(245,166,35,0.6)', letterSpacing: '0.2em', textTransform: 'uppercase', animation: 'pulse 1.5s infinite' }}>Unearthing Deeper Archives...</div>
+                        </div>
+                    )}
                 </div>
             </section>
         </div >

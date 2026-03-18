@@ -50,16 +50,15 @@
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="default" />
+            android:value="default"
+        />
 
         <!-- The Oracle's Eye Widget -->
         <receiver android:name=".OracleWidgetProvider" android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_info_oracle" />
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info_oracle" />
         </receiver>
     </application>
 

@@ -103,20 +103,30 @@ export default function Navbar({ onSearchOpen }) {
                     gap: '10px',
                     textDecoration: 'none',
                     color: '#f2f2f2',
-                    zIndex: 1001
+                    zIndex: 1001,
+                    minWidth: 0 // allow bounding flex shrink
                 }}>
-                    <div style={{
-                        width: '32px',
-                        height: '32px',
-                        borderRadius: '10px',
-                        background: 'linear-gradient(135deg, #f5a623 0%, #f57c00 100%)',
-                        display: 'flex',
-                        alignItems: 'center',
+                    <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
                         justifyContent: 'center',
-                        boxShadow: '0 4px 12px rgba(245, 166, 35, 0.3)',
-                        padding: '6px'
+                        background: '#000',
+                        borderRadius: '12px',
+                        padding: '6px 8px',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)',
+                        overflow: 'hidden',
+                        flexShrink: 0 // Prevent squishing on mobile
                     }}>
-                        <Film size={18} color="#000" strokeWidth={2.5} />
+                        <img 
+                            src="/assets/logo.png" 
+                            alt="Logo" 
+                            style={{ 
+                                height: 'clamp(28px, 6vw, 42px)', // scale height responsively
+                                width: 'auto', 
+                                objectFit: 'contain'
+                            }} 
+                        />
                     </div>
                     <span style={{
                         display: 'block',
@@ -125,7 +135,9 @@ export default function Navbar({ onSearchOpen }) {
                         letterSpacing: '0.15em',
                         color: '#fff',
                         textTransform: 'uppercase',
-                        whiteSpace: 'nowrap'
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
                     }}>
                         CRITIC'S TEMPLE
                     </span>
@@ -142,6 +154,8 @@ export default function Navbar({ onSearchOpen }) {
                     <NavLink to="/compare" active={isActive('/compare')} icon={<Film size={12} />}>Compare</NavLink>
                     <HUDSeparator />
                     <NavLink to="/hall-of-fame" active={isActive('/hall-of-fame')} icon={<Award size={12} />}>Hall of Fame</NavLink>
+                    <HUDSeparator />
+                    <NavLink to="/oscars" active={isActive('/oscars')} icon={<Award size={12} style={{ color: '#FFD700' }} />}>Oscars</NavLink>
                     <HUDSeparator />
                     <NavLink to="/predictions" active={isActive('/predictions')} icon={<Target size={12} />}>Prophecies</NavLink>
 

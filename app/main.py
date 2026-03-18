@@ -97,3 +97,5 @@ async def health_check():
 @app.api_route("/", methods=["GET", "HEAD"])
 async def root():
     return {"message": "Welcome to The Critic's Temple API"}
+    
+# Hot-reload trigger 2

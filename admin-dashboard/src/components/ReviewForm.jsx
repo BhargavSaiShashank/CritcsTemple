@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronRight, Star, Quote, AlignLeft, Layout, Zap, Heart, Music, Camera, Plus, Loader2, Sparkles, Download, Eye, MoreVertical, X, Globe } from 'lucide-react'
+import { ChevronRight, Star, Quote, AlignLeft, Layout, Zap, Heart, Music, Camera, Plus, Loader2, Sparkles, Download, Eye, MoreVertical, X, Globe, Award } from 'lucide-react'
 import { createReview, updateReview, getProxyImageUrl } from '../services/api'
 import SanctuaryCard from './SanctuaryCard';
 import PublicPreview from './PublicPreview';
@@ -887,22 +887,46 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                             </AnimatePresence>
                         </div>
 
-                        <label className="flex items-center gap-8 cursor-pointer group w-fit">
-                            <div className={`w-10 h-10 rounded-2xl border flex items-center justify-center transition-all duration-700 ${formData.is_featured ? 'bg-amber-500 border-amber-500 rotate-12 scale-110 shadow-[0_0_30px_rgba(245,158,11,0.4)]' : 'bg-white/5 border-white/10 group-hover:border-amber-500/30'
-                                }`}>
-                                {formData.is_featured && <Star size={18} className="text-black fill-black" />}
-                            </div>
-                            <input
-                                type="checkbox"
-                                className="hidden"
-                                checked={formData.is_featured}
-                                onChange={e => setFormData({ ...formData, is_featured: e.target.checked })}
-                            />
-                            <div className="space-y-1">
-                                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 group-hover:text-amber-500 transition-colors">Featured Sanctuary Post</p>
-                                <p className="text-[8px] font-bold text-white/10 uppercase tracking-widest">Mark this critique for the main archives</p>
-                            </div>
-                        </label>
+                        <div className="flex flex-col sm:flex-row gap-10">
+                            <label className="flex items-center gap-6 cursor-pointer group w-fit">
+                                <div className={`w-10 h-10 rounded-2xl border flex items-center justify-center transition-all duration-700 ${formData.is_featured ? 'bg-amber-500 border-amber-500 rotate-12 scale-110 shadow-[0_0_30px_rgba(245,158,11,0.4)]' : 'bg-white/5 border-white/10 group-hover:border-amber-500/30'
+                                    }`}>
+                                    {formData.is_featured && <Star size={18} className="text-black fill-black" />}
+                                </div>
+                                <input
+                                    type="checkbox"
+                                    className="hidden"
+                                    checked={formData.is_featured}
+                                    onChange={e => setFormData({ ...formData, is_featured: e.target.checked })}
+                                />
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 group-hover:text-amber-500 transition-colors">Featured Sanctuary Post</p>
+                                    <p className="text-[8px] font-bold text-white/10 uppercase tracking-widest">Mark this critique for the main archives</p>
+                                </div>
+                            </label>
+
+                            <label className="flex items-center gap-6 cursor-pointer group w-fit">
+                                <div className={`w-10 h-10 rounded-2xl border flex items-center justify-center transition-all duration-700 ${formData.tags.includes('oscar') ? 'bg-[#FFD700] border-[#FFD700] -rotate-12 scale-110 shadow-[0_0_30px_rgba(255,215,0,0.4)]' : 'bg-white/5 border-white/10 group-hover:border-[#FFD700]/30'
+                                    }`}>
+                                    {formData.tags.includes('oscar') && <Award size={18} className="text-black" strokeWidth={2.5} />}
+                                </div>
+                                <input
+                                    type="checkbox"
+                                    className="hidden"
+                                    checked={formData.tags.includes('oscar')}
+                                    onChange={e => {
+                                        const tags = e.target.checked 
+                                            ? Array.from(new Set([...formData.tags, 'oscar']))
+                                            : formData.tags.filter(t => t !== 'oscar');
+                                        setFormData({ ...formData, tags });
+                                    }}
+                                />
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 group-hover:text-[#FFD700] transition-colors">Oscar Contender</p>
+                                    <p className="text-[8px] font-bold text-white/10 uppercase tracking-widest">Pin exclusively to the Golden Contenders Page</p>
+                                </div>
+                            </label>
+                        </div>
                     </div>
 
                     <div className="flex flex-col md:flex-row gap-8 pt-10">

@@ -84,7 +84,8 @@ const ReviewCard = React.memo(({ review, index }) => {
                 >
                     {/* Poster */}
                     <div style={{ position: 'relative', aspectRatio: '2 / 3', overflow: 'hidden', background: '#181818', flexShrink: 0 }}>
-                        <img
+                        <motion.img
+                            layoutId={`poster-${review.slug}`}
                             src={src}
                             alt={review.movie_title}
                             onError={() => setSrc(FALLBACK)}
@@ -99,6 +100,21 @@ const ReviewCard = React.memo(({ review, index }) => {
                             position: 'absolute', inset: 0,
                             background: 'linear-gradient(to top, rgba(17,17,17,1) 0%, rgba(17,17,17,0.3) 50%, transparent 100%)',
                         }} />
+                        {/* Oscar Rank badge */}
+                        {review.oscar_rank && (
+                            <div style={{
+                                position: 'absolute', top: '12px', left: '12px',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                padding: '4px 10px', borderRadius: '8px',
+                                background: 'linear-gradient(135deg, rgba(255,215,0,0.9), rgba(184,134,11,0.9))',
+                                border: '1px solid rgba(255,255,255,0.3)',
+                                fontSize: '13px', fontWeight: 900, color: '#000',
+                                backdropFilter: 'blur(5px)',
+                                boxShadow: '0 4px 15px rgba(255,215,0,0.3)'
+                            }}>
+                                #{review.oscar_rank}
+                            </div>
+                        )}
                         {/* Score badge */}
                         <div style={{
                             position: 'absolute', top: '12px', right: '12px',
@@ -185,7 +201,9 @@ export default function ReviewGrid({ reviews, loading }) {
     }
     if (!reviews?.length) {
         return (
-            <div style={{ textAlign: 'center', padding: '80px 20px', color: 'rgba(255,255,255,0.2)', fontSize: '13px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 20px', color: 'rgba(255,255,255,0.2)', fontSize: '13px' }}>
+                <div style={{ width: '40px', height: '40px', border: '3px solid rgba(255,255,255,0.1)', borderTopColor: 'rgba(255,255,255,0.5)', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: '20px' }}>
+                </div>
                 No reviews yet
             </div>
         );

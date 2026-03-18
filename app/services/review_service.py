@@ -68,7 +68,13 @@ class ReviewService:
             
         query = {"$and": filters} if len(filters) > 1 else filters[0]
             
-        sort_field = "overall_rating" if sort_by == "score" else "published_at"
+        if sort_by == "score":
+            sort_field = "overall_rating"
+        elif sort_by == "oscar_rank":
+            sort_field = "oscar_rank"
+        else:
+            sort_field = "published_at"
+            
         sort_direction = ASCENDING if (order or "desc").lower() == "asc" else DESCENDING
         
         cursor = db.reviews.find(query).sort(sort_field, sort_direction).skip(offset).limit(limit)

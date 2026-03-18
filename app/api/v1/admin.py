@@ -248,6 +248,40 @@ async def get_dna_analytics(
 ):
     return await analytics_service.get_dna_analytics(db)
 
+@router.put("/oscar-rankings")
+async def update_oscar_rankings(
+    rankings: List[Dict[str, Any]] = Body(...), # [{'id': '...', 'rank': 1}]
+    db = Depends(get_database),
+    admin = Depends(get_current_admin)
+):
+    import pymongo
+    requests = []
+    
+    # Reset all oscar_ranks to null first and strip the oscar tag to confidently map the new state
+    await db.reviews.update_many(
+        {"tags": "oscar"}, 
+        {"$set": {"oscar_rank": None}, "$pull": {"tags": "oscar"}}
+    )
+    
+    for item in rankings:
+        try:
+            obj_id = ObjectId(item["id"])
+        except InvalidId:
+            obj_id = item["id"]
+        
+        # We push "oscar" tag to ensure it appears in the specific lists, and set the rank
+        requests.append(
+            pymongo.UpdateOne(
+                {"_id": obj_id}, 
+                {"$set": {"oscar_rank": item["rank"]}, "$addToSet": {"tags": "oscar"}}
+            )
+        )
+    
+    if requests:
+        await db.reviews.bulk_write(requests)
+        
+    return {"status": "success", "message": "Oscar hierarchy updated"}
+
 
 
 @router.post("/upload")
@@ -338,9 +372,9 @@ from fastapi.responses import StreamingResponse
 @router.get("/proxy-image")
 async def proxy_image(url: str = Query(...)):
     """Proxies an image to bypass CORS and network blocks."""
-    # Safety check - only allow TMDb images
-    if not url.startswith("https://image.tmdb.org/t/p/"):
-        raise HTTPException(status_code=400, detail="Invalid image source")
+    # Safety check lifted to accommodate global third-party hosting platforms
+    # if not url.startswith("https://image.tmdb.org/t/p/"):
+    #     raise HTTPException(status_code=400, detail="Invalid image source")
 
     async with httpx.AsyncClient(verify=False) as client:
         try:

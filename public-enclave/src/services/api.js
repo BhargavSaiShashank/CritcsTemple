@@ -62,7 +62,7 @@ api.interceptors.response.use(
     }
 );
 
-export const getLatestReviews = (limit = 12, offset = 0, search = '', verdict = '', content_type = '', sortBy = 'date', order = 'desc') => {
+export const getLatestReviews = (limit = 12, offset = 0, search = '', verdict = '', content_type = '', sortBy = 'date', order = 'desc', tag = '') => {
     const params = {
         limit,
         offset,
@@ -72,6 +72,7 @@ export const getLatestReviews = (limit = 12, offset = 0, search = '', verdict = 
     if (search) params.search = search;
     if (verdict && verdict !== 'All') params.verdict = verdict;
     if (content_type && content_type !== 'All') params.content_type = content_type;
+    if (tag) params.tag = tag;
 
     return api.get('/reviews', { params });
 };

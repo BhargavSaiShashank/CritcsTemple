@@ -6,6 +6,7 @@ import EditReview from './pages/EditReview'
 import HallOfFame from './pages/HallOfFame'
 import UpcomingMovies from './pages/UpcomingMovies'
 import TheSanctorum from './pages/TheSanctorum'
+import OscarRankings from './pages/OscarRankings'
 import PrivateRoute from './components/PrivateRoute'
 import { auth } from './services/firebase'
 
@@ -60,6 +61,14 @@ const App = () => {
                         element={
                             <PrivateRoute>
                                 <TheSanctorum />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/oscar-rankings"
+                        element={
+                            <PrivateRoute>
+                                <OscarRankings />
                             </PrivateRoute>
                         }
                     />

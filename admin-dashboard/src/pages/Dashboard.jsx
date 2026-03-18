@@ -5,7 +5,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import ReviewForm from '../components/ReviewForm'
 import {
     Search, Plus, LogOut, TrendingUp, Sparkles, Image as ImageIcon,
-    Clock, Calendar, DownloadCloud, Loader2, Play, BookOpen, Star, Clapperboard, ChevronRight, LayoutGrid
+    Clock, Calendar, DownloadCloud, Loader2, Play, BookOpen, Star, Clapperboard, ChevronRight, LayoutGrid, Award
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
@@ -202,6 +202,14 @@ const Dashboard = () => {
                         title="Hall of Fame Details"
                     >
                         <Star size={18} className="text-amber-500/50 group-hover:text-amber-500 transition-colors" />
+                    </Link>
+
+                    <Link
+                        to="/oscar-rankings"
+                        className="p-3 bg-white/5 hover:border-[#FFD700]/30 border border-white/5 rounded-2xl transition-all group"
+                        title="Oscar Rankings Control"
+                    >
+                        <Award size={18} className="text-[#FFD700]/50 group-hover:text-[#FFD700] transition-colors" />
                     </Link>
 
                     <Link
