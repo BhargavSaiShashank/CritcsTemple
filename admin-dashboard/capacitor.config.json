@@ -3,6 +3,11 @@
   "appName": "Temple Admin",
   "webDir": "dist",
   "plugins": {
+    "StatusBar": {
+      "overlaysWebView": false,
+      "style": "DARK",
+      "backgroundColor": "#020202"
+    },
     "FirebaseAuthentication": {
       "providers": ["google.com"],
       "skipNativeAuth": false
