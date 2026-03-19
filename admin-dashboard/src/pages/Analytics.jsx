@@ -91,6 +91,24 @@ const Analytics = () => {
         );
     }
 
+    if (!stats) {
+        return (
+            <div className="min-h-screen bg-[#020202] flex flex-col items-center justify-center p-12 text-center">
+                <div className="w-24 h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-10">
+                    <LayoutDashboard size={40} className="text-white/10" />
+                </div>
+                <h1 className="text-2xl font-black italic uppercase tracking-tighter mb-4">No Analytical Fragments Detected</h1>
+                <p className="text-[10px] uppercase font-black tracking-[0.4em] text-white/20 mb-12 max-w-sm leading-relaxed">
+                    The archives are currently devoid of recorded intelligence. <br/>
+                    Begin imprinting reviews to generate cinematic DNA.
+                </p>
+                <Link to="/dashboard" className="px-10 py-4 bg-amber-500 text-black text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-amber-400 transition-all">
+                    Return to Mission Control
+                </Link>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-[#020202] text-white selection:bg-amber-500/30 font-premium overflow-x-hidden">
             {/* Atmosphere */}

@@ -93,6 +93,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                 language: initialData.language || '',
                 trailer_url: initialData.trailer_url || '',
                 movie_year: initialData.movie_year || '',
+                oscar_rank: initialData.oscar_rank || 0,
                 scheduled_date: initialData.scheduled_date ? initialData.scheduled_date.slice(0, 16) : '',
                 content_type: initialData.content_type || 'movie',
                 aspects: { ...defaultAspects, ...(initialData.aspects || {}) }
@@ -117,6 +118,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             language: '',
             trailer_url: movie?.trailer_url || '',
             movie_year: movie?.release_year || '',
+            oscar_rank: 0,
             scheduled_date: '',
             content_type: movie?.content_type || 'movie',
             aspects: defaultAspects
@@ -1092,6 +1094,25 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                                     <p className="text-[8px] font-bold text-white/10 uppercase tracking-widest">Pin exclusively to the Golden Contenders Page</p>
                                 </div>
                             </label>
+
+                            {formData.tags.includes('oscar') && (
+                                <motion.div 
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    className="flex items-center gap-4 bg-white/5 border border-[#FFD700]/20 px-6 py-2 rounded-2xl"
+                                >
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-[#FFD700]">Rank #</label>
+                                    <input 
+                                        type="number"
+                                        min="1"
+                                        max="100"
+                                        value={formData.oscar_rank || ''}
+                                        onChange={e => setFormData({ ...formData, oscar_rank: parseInt(e.target.value) || 0 })}
+                                        className="bg-transparent text-white font-black text-sm outline-none w-12 text-center"
+                                        placeholder="0"
+                                    />
+                                </motion.div>
+                            )}
                         </div>
                     </div>
 
