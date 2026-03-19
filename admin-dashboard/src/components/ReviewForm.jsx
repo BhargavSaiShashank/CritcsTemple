@@ -506,7 +506,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
     return (
         <div className="relative">
             {/* Global Actions Floating Buttons */}
-            <div className="fixed top-6 right-6 md:top-10 md:right-10 z-[60] flex items-center gap-3">
+            <div className="fixed top-12 md:top-10 right-6 md:right-10 z-[100] flex items-center gap-3">
                 <button
                     onClick={() => setShowPreview(true)}
                     className="w-12 h-12 rounded-2xl glass-obsidian border border-amber-500/20 flex items-center justify-center text-amber-500 shadow-2xl shadow-amber-500/10 active:scale-95 transition-all"
