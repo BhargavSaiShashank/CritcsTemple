@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getReview } from '../services/api';
 import ReviewForm from '../components/ReviewForm';
-import { Loader2, ArrowLeft } from 'lucide-react';
+import { Loader2, ArrowLeft, MoreVertical, Archive, List } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
 
 const EditReview = () => {
@@ -10,6 +11,7 @@ const EditReview = () => {
     const navigate = useNavigate();
     const [review, setReview] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [showMenu, setShowMenu] = useState(false);
 
     useEffect(() => {
         const fetchReview = async () => {
@@ -61,10 +63,11 @@ const EditReview = () => {
                     <span className="text-[10px] uppercase font-black tracking-widest">Back to Intelligence</span>
                 </Link>
 
-                <div className="mb-12">
+                <div className="flex justify-between items-start mb-12">
                     <h1 className="text-4xl md:text-5xl font-black italic tracking-tighter">
                         REFORGING <span className="text-amber-500">CRITIQUE</span>
                     </h1>
+
                 </div>
 
                 <ReviewForm

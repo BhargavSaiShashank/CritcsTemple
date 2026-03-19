@@ -5,7 +5,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import ReviewForm from '../components/ReviewForm'
 import {
     Search, Plus, LogOut, TrendingUp, Sparkles, Image as ImageIcon,
-    Clock, Calendar, DownloadCloud, Loader2, Play, BookOpen, Star, Clapperboard, ChevronRight, LayoutGrid, Award
+    Clock, Calendar, DownloadCloud, Loader2, Play, BookOpen, Star, Clapperboard, ChevronRight, LayoutGrid, Award, MoreVertical, Archive, List
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
@@ -24,6 +24,7 @@ const Dashboard = () => {
     const [exporting, setExporting] = useState(false);
     const [showDrafts, setShowDrafts] = useState(false);
     const [localDrafts, setLocalDrafts] = useState([]);
+    const [showPosterMenu, setShowPosterMenu] = useState(false);
 
     const loadDrafts = () => {
         const drafts = [];
@@ -476,11 +477,24 @@ const Dashboard = () => {
                                         >
                                             <ChevronRight size={24} className="rotate-180" />
                                         </button>
+
+
+                                        {/* TMDB Badge OVER the poster (Matching Screenshot) */}
+                                        {movie.ratings?.find(r => r.Source === "The Movie Database" || r.Source === "TMDB" || r.Source === "Internet Movie Database") && (
+                                            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 bg-black/40 backdrop-blur-3xl border border-white/10 rounded-2xl text-center min-w-[120px]">
+                                                <p className="text-[8px] font-black uppercase text-white/30 tracking-[0.4em] mb-1">
+                                                    {movie.ratings.find(r => r.Source === "The Movie Database" || r.Source === "TMDB" || r.Source === "Internet Movie Database").Source === "Internet Movie Database" ? "IMDB" : "TMDB"}
+                                                </p>
+                                                <p className="text-2xl font-black text-amber-500 tracking-tighter">
+                                                    {movie.ratings.find(r => r.Source === "The Movie Database" || r.Source === "TMDB" || r.Source === "Internet Movie Database").Value.split('/')[0]}
+                                                </p>
+                                            </div>
+                                        )}
                                     </motion.div>
 
-                                    {/* Critic Metas */}
+                                    {/* Other Critic Metas */}
                                     <div className="flex flex-wrap justify-center gap-4">
-                                        {movie.ratings?.map(r => (
+                                        {movie.ratings?.filter(r => !["The Movie Database", "TMDB", "Internet Movie Database"].includes(r.Source)).map(r => (
                                             <div key={r.Source} className="glass-obsidian w-full max-w-[160px] p-4 sm:p-6 rounded-2xl sm:rounded-3xl text-center space-y-1 group hover:border-amber-500/20 transition-all flex flex-col justify-center">
                                                 <p className="text-[7px] sm:text-[8px] font-black uppercase text-white/30 tracking-[0.2em] sm:tracking-[0.4em] mb-1">{r.Source}</p>
                                                 <p className="text-xl sm:text-2xl font-black text-amber-500 tracking-tighter">{r.Value}</p>

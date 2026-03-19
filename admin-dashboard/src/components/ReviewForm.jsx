@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronRight, Star, Quote, AlignLeft, Layout, Zap, Heart, Music, Camera, Plus, Loader2, Sparkles, Download, Eye, MoreVertical, X, Globe, Award } from 'lucide-react'
+import { ChevronRight, Star, Quote, AlignLeft, Layout, Zap, Heart, Music, Camera, Plus, Loader2, Sparkles, Download, Eye, MoreVertical, X, Globe, Award, Archive, List } from 'lucide-react'
 import { createReview, updateReview, getProxyImageUrl } from '../services/api'
 import SanctuaryCard from './SanctuaryCard';
 import PublicPreview from './PublicPreview';
@@ -42,6 +42,32 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
     const [submitting, setSubmitting] = useState(false);
     const [exportLoading, setExportLoading] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
+    const [showRatingScale, setShowRatingScale] = useState(false);
+    const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1280);
+
+    const VERDICT_SCALE = [
+        { range: '9.6 – 10.0', verdict: 'LEGENDARY', description: 'Cultural shift. Genre redefining. Long-term impact. Few films live here.', color: '#FFFFFF' },
+        { range: '9.2 – 9.5', verdict: 'MASTERPIECE', description: 'Near-flawless execution. Technical and emotional dominance.', color: '#FFD700' },
+        { range: '8.8 – 9.1', verdict: 'ESSENTIAL', description: 'High craft, strong identity, must-watch within its genre.', color: '#FF00FF' },
+        { range: '8.4 – 8.7', verdict: 'ELITE', description: 'Exceptional execution with minor flaws. Strong authorial control.', color: '#9D00FF' },
+        { range: '8.0 – 8.3', verdict: 'GREAT', description: 'Very well made. Strong craft. Not transcendent.', color: '#00FF00' },
+        { range: '7.5 – 7.9', verdict: 'GOOD', description: 'Solid. Worth watching. Has noticeable flaws.', color: '#ADFF2F' },
+        { range: '7.0 – 7.4', verdict: 'DECENT', description: 'Watchable. Functional. Lacks depth or consistency.', color: '#00CCFF' },
+        { range: '6.0 – 6.9', verdict: 'AVERAGE', description: 'Technically fine. Emotionally forgettable.', color: '#8E9AAF' },
+        { range: '5.0 – 5.9', verdict: 'MEDIOCRE', description: 'Inconsistent. Weak in key areas.', color: '#FFFF00' },
+        { range: '4.0 – 4.9', verdict: 'POOR', description: 'Multiple structural or execution failures.', color: '#FF8C00' },
+        { range: '3.0 – 3.9', verdict: 'BAD', description: 'Broken storytelling or technical incompetence.', color: '#FF4500' },
+        { range: '2.0 – 2.9', verdict: 'TERRIBLE', description: 'Painfully flawed.', color: '#FF0000' },
+        { range: '1.0 – 1.9', verdict: 'DISASTER', description: 'Collapse of craft.', color: '#B22222' },
+        { range: '0.0 – 0.9', verdict: 'ABOMINATION', description: 'Fundamentally unwatchable.', color: '#4B0000' }
+    ];
+
+    React.useEffect(() => {
+        const handleResize = () => setIsDesktop(window.innerWidth >= 1280);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     const draftKey = useMemo(() => {
         if (id && id !== 'new') return `review_draft_edit_${id}`;
         if (movie && (movie.imdb_id || movie.id)) return `review_draft_movie_${movie.imdb_id || movie.id}`;
@@ -479,15 +505,96 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
 
     return (
         <div className="relative">
-            {/* Mobile Preview Trigger */}
-            <div className="xl:hidden fixed top-6 right-6 z-[60]">
+            {/* Global Actions Floating Buttons */}
+            <div className="fixed top-6 right-6 md:top-10 md:right-10 z-[60] flex items-center gap-3">
                 <button
                     onClick={() => setShowPreview(true)}
                     className="w-12 h-12 rounded-2xl glass-obsidian border border-amber-500/20 flex items-center justify-center text-amber-500 shadow-2xl shadow-amber-500/10 active:scale-95 transition-all"
+                    title="View Preview"
                 >
-                    <MoreVertical size={20} />
+                    <Eye size={20} />
+                </button>
+                <button
+                    onClick={() => setShowRatingScale(true)}
+                    className="w-12 h-12 rounded-2xl glass-obsidian border border-white/10 flex items-center justify-center text-white/40 shadow-2xl active:scale-95 transition-all"
+                    title="Rating Scale"
+                >
+                    <List size={20} />
                 </button>
             </div>
+
+            {/* Rating Scale Overlay */}
+            <AnimatePresence>
+                {showRatingScale && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[110] bg-[#020202]/95 backdrop-blur-3xl overflow-y-auto px-6 py-12 md:py-20 flex justify-center items-start"
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className="w-full max-w-md bg-[#0a0a0a] border border-white/10 rounded-[40px] p-10 md:p-14 shadow-[0_40px_100px_rgba(0,0,0,0.8)] relative"
+                        >
+                            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-amber-500/20 to-transparent" />
+                            
+                            <header className="mb-10 text-center">
+                                <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mb-2">Temple Protocol</h2>
+                                <h1 className="text-2xl font-black italic tracking-tighter text-white uppercase">THE VERDICT SCALE</h1>
+                            </header>
+
+                            <div className="space-y-4">
+                                {VERDICT_SCALE.map((tier, idx) => (
+                                    <motion.div
+                                        key={idx}
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: idx * 0.02 }}
+                                        className="group flex items-start gap-4 py-3 px-4 rounded-2xl hover:bg-white/[0.03] transition-all relative"
+                                    >
+                                        <div 
+                                            className="w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0 shadow-[0_0_10px_currentColor]" 
+                                            style={{ backgroundColor: tier.color, color: tier.color }} 
+                                        />
+                                        <div className="flex-1 flex flex-col gap-1">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-sm font-black text-white group-hover:text-amber-500 transition-colors uppercase italic tracking-tight">
+                                                    {tier.verdict}
+                                                </span>
+                                                <span className="text-[10px] font-black text-white/20 group-hover:text-amber-500/60 transition-colors tracking-widest uppercase">
+                                                    {tier.range}
+                                                </span>
+                                            </div>
+                                            <p className="text-[10px] text-white/30 font-medium italic group-hover:text-white/60 transition-colors leading-relaxed max-w-[240px]">
+                                                {tier.description}
+                                            </p>
+                                        </div>
+
+                                        {/* Background Interaction Effect */}
+                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.01] to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl pointer-events-none" />
+                                    </motion.div>
+                                ))}
+                            </div>
+
+                            <button
+                                onClick={() => setShowRatingScale(false)}
+                                className="mt-12 w-full py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] text-white/40 hover:bg-amber-500 hover:text-black hover:border-amber-500 transition-all"
+                            >
+                                CLOSE ARCHIVE
+                            </button>
+
+                            <button
+                                onClick={() => setShowRatingScale(false)}
+                                className="absolute top-6 right-6 text-white/10 hover:text-white transition-colors"
+                            >
+                                <X size={18} />
+                            </button>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Mobile Preview Overlay */}
             <AnimatePresence>
@@ -993,42 +1100,44 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             </div>
 
             {/* Live Sanctuary Card Overlay (Desktop Only) */}
-            <div className="hidden xl:block xl:col-span-4 sticky top-10 h-fit">
-                <div className="glass-obsidian rounded-[42px] p-6 border-amber-500/10 relative group overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-b from-amber-500/[0.02] to-transparent pointer-events-none" />
-                    <div className="flex items-center justify-between mb-6 px-2">
-                        <div className="flex items-center gap-2">
-                            <Eye size={14} className="text-amber-500" />
-                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">Temporal Preview</span>
+            {isDesktop && (
+                <div className="hidden xl:block xl:col-span-4 sticky top-10 h-fit">
+                    <div className="glass-obsidian rounded-[42px] p-6 border-amber-500/10 relative group overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-b from-amber-500/[0.02] to-transparent pointer-events-none" />
+                        <div className="flex items-center justify-between mb-6 px-2">
+                            <div className="flex items-center gap-2">
+                                <Eye size={14} className="text-amber-500" />
+                                <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">Temporal Preview</span>
+                            </div>
+                            <div className="h-1 w-12 bg-white/5 rounded-full" />
                         </div>
-                        <div className="h-1 w-12 bg-white/5 rounded-full" />
-                    </div>
-                    
-                    <div className="mt-2">
-                         <PublicPreview
-                            movie={{
-                                title: movie.title,
-                                poster_url: formData.movie_poster_url || movie.poster_url,
-                                release_year: formData.movie_year || movie.release_year,
-                                director: movie.director || 'Visionary',
-                                runtime: movie.runtime,
-                                genres: movie.genres || [movie.genre]
-                            }}
-                            review={{
-                                ...formData,
-                                overall_rating: averageScore,
-                            }}
-                        />
-                    </div>
-                    
-                    <div className="pt-8 border-t border-white/5 relative z-10">
-                        <p className="text-[8px] font-bold text-white/20 uppercase tracking-[0.2em] text-center leading-relaxed">
-                            Behold the final imprint as it will manifest in the archives. 
-                            <span className="block text-amber-500/40 mt-1">Updates in real-time.</span>
-                        </p>
+                        
+                        <div className="mt-2">
+                            <PublicPreview
+                                movie={{
+                                    title: movie.title,
+                                    poster_url: formData.movie_poster_url || movie.poster_url,
+                                    release_year: formData.movie_year || movie.release_year,
+                                    director: movie.director || 'Visionary',
+                                    runtime: movie.runtime,
+                                    genres: movie.genres || [movie.genre]
+                                }}
+                                review={{
+                                    ...formData,
+                                    overall_rating: averageScore,
+                                }}
+                            />
+                        </div>
+                        
+                        <div className="pt-8 border-t border-white/5 relative z-10">
+                            <p className="text-[8px] font-bold text-white/20 uppercase tracking-[0.2em] text-center leading-relaxed">
+                                Behold the final imprint as it will manifest in the archives. 
+                                <span className="block text-amber-500/40 mt-1">Updates in real-time.</span>
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
         </div>
     </div>
 )
