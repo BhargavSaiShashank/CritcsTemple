@@ -175,37 +175,43 @@ export default function Oscars() {
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] opacity-10 mix-blend-overlay" />
             </div>
 
-            <main className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-12 pt-32 pb-40">
+            <main className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-12 pt-40 pb-40">
                 {/* Ritual Ambient Header */}
-                <header className="flex flex-col items-center text-center mb-60 transition-all duration-1000">
+                <header className="flex flex-col items-center text-center mb-32">
                     <motion.div 
-                        initial={{ opacity: 0, y: -50 }}
+                        initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="relative"
+                        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                        className="w-full"
                     >
-                        <div className="flex items-center gap-6 text-amber-500 text-[11px] font-black uppercase tracking-[0.8em] mb-12 opacity-80">
-                            <div className="w-16 h-px bg-gradient-to-r from-transparent to-amber-500/30" />
+                        {/* Label — centered */}
+                        <div className="flex items-center justify-center gap-6 text-amber-500 text-[10px] font-black uppercase tracking-[0.8em] mb-8 opacity-70">
+                            <div className="w-12 h-px bg-gradient-to-r from-transparent to-amber-500/40" />
                             Sacred Selection
-                            <div className="w-16 h-px bg-gradient-to-l from-transparent to-amber-500/30" />
+                            <div className="w-12 h-px bg-gradient-to-l from-transparent to-amber-500/40" />
                         </div>
 
-                        <h1 className="text-[12vw] md:text-[14rem] font-black italic tracking-tighter leading-none text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-amber-500/10 mix-blend-difference drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-                            THE OSCAR <span className="block text-amber-500 italic-extreme drop-shadow-[0_10px_40px_rgba(245,158,11,0.3)]">RITUAL</span>
+                        {/* Title — properly scaled */}
+                        <h1 className="text-6xl sm:text-8xl md:text-[9rem] lg:text-[11rem] font-black italic tracking-tighter leading-[0.9] bg-gradient-to-b from-white via-white to-white/60 bg-clip-text text-transparent">
+                            THE OSCAR
+                        </h1>
+                        <h1 className="text-6xl sm:text-8xl md:text-[9rem] lg:text-[11rem] font-black italic tracking-tighter leading-[0.9] text-amber-500 drop-shadow-[0_0_40px_rgba(245,158,11,0.25)]">
+                            RITUAL
                         </h1>
 
-                        <div className="mt-16 space-y-6">
-                            <p className="text-[11px] md:text-sm font-bold uppercase tracking-[0.6em] text-white/40 max-w-2xl mx-auto leading-relaxed italic">
-                                A curated archive of cinematic divine selection. <br/>
+                        <div className="mt-12 space-y-6">
+                            <p className="text-[11px] md:text-xs font-bold uppercase tracking-[0.5em] text-white/30 max-w-lg mx-auto leading-relaxed italic">
+                                A curated archive of cinematic divine selection.<br/>
                                 The contenders moving through the infinite aisle of recognition.
                             </p>
-                            <div className="flex justify-center pt-12">
+                            <div className="flex justify-center pt-10">
                                 <motion.div 
-                                    animate={{ y: [0, 15, 0], opacity: [0.2, 0.6, 0.2] }}
+                                    animate={{ y: [0, 12, 0], opacity: [0.2, 0.5, 0.2] }}
                                     transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                                     className="flex flex-col items-center gap-3"
                                 >
-                                    <div className="w-px h-24 bg-gradient-to-b from-amber-500/60 to-transparent" />
-                                    <span className="text-[8px] font-black uppercase tracking-[0.4em] text-amber-500/40">Scroll to Witness</span>
+                                    <div className="w-px h-16 bg-gradient-to-b from-amber-500/50 to-transparent" />
+                                    <span className="text-[8px] font-black uppercase tracking-[0.4em] text-amber-500/30">Scroll to Witness</span>
                                 </motion.div>
                             </div>
                         </div>
