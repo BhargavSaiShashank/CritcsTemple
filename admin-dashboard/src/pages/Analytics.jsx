@@ -50,7 +50,7 @@ const Analytics = () => {
         // 1. Verdict Distribution
         const distribution = VERDICT_SCALE.map(tier => ({
             name: tier.verdict,
-            count: reviews.filter(r => getVerdictForScore(r.rating_temple).verdict === tier.verdict).length,
+            count: reviews.filter(r => getVerdictForScore(r.overall_rating || r.rating_temple || 0).verdict === tier.verdict).length,
             color: tier.color,
             range: tier.range
         })).reverse(); // Professional low-to-high flow
@@ -58,9 +58,10 @@ const Analytics = () => {
         // 2. Genre DNA
         const genreMap = {};
         reviews.forEach(r => {
-            r.genres.forEach(g => {
+            const genresArr = r.tags || r.genres || [];
+            genresArr.forEach(g => {
                 if (!genreMap[g]) genreMap[g] = { sum: 0, count: 0 };
-                genreMap[g].sum += r.rating_temple;
+                genreMap[g].sum += (r.overall_rating || r.rating_temple || 0);
                 genreMap[g].count += 1;
             });
         });
@@ -74,7 +75,7 @@ const Analytics = () => {
             .slice(0, 8); // Top 8 genres
 
         // 3. Overall Averages
-        const avgScore = (reviews.reduce((acc, r) => acc + r.rating_temple, 0) / reviews.length).toFixed(1);
+        const avgScore = (reviews.reduce((acc, r) => acc + (r.overall_rating || r.rating_temple || 0), 0) / reviews.length).toFixed(1);
         const topVerdict = [...distribution].sort((a,b) => b.count - a.count)[0].name;
 
         return { distribution, genreDNA, avgScore, topVerdict, total: reviews.length };

@@ -16,9 +16,10 @@ export const VERDICT_SCALE = [
 ];
 
 export const getVerdictForScore = (score) => {
+    const num = parseFloat(score) || 0;
+    // Since VERDICT_SCALE is ordered high-to-low, find the first tier that fits.
     return VERDICT_SCALE.find(tier => {
-        const [min, max] = tier.range.split(' – ').map(v => v === 'Below 1.0' ? 0 : parseFloat(v));
-        if (tier.range === '0.0 – 0.9' || tier.range === 'Below 1.0') return score < 1.0;
-        return score >= min && score <= max;
+        const threshold = parseFloat(tier.range.split(' – ')[0]);
+        return num >= threshold;
     }) || VERDICT_SCALE[VERDICT_SCALE.length - 1];
 };
