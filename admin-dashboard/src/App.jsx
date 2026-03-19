@@ -7,6 +7,7 @@ import HallOfFame from './pages/HallOfFame'
 import UpcomingMovies from './pages/UpcomingMovies'
 import TheSanctorum from './pages/TheSanctorum'
 import OscarRankings from './pages/OscarRankings'
+import Analytics from './pages/Analytics'
 import PrivateRoute from './components/PrivateRoute'
 import { auth } from './services/firebase'
 
@@ -69,6 +70,14 @@ const App = () => {
                         element={
                             <PrivateRoute>
                                 <OscarRankings />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/analytics"
+                        element={
+                            <PrivateRoute>
+                                <Analytics />
                             </PrivateRoute>
                         }
                     />

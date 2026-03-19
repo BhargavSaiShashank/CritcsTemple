@@ -5,7 +5,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import ReviewForm from '../components/ReviewForm'
 import {
     Search, Plus, LogOut, TrendingUp, Sparkles, Image as ImageIcon,
-    Clock, Calendar, DownloadCloud, Loader2, Play, BookOpen, Star, Clapperboard, ChevronRight, LayoutGrid, Award, MoreVertical, Archive, List
+    Clock, Calendar, DownloadCloud, Loader2, Play, BookOpen, Star, Clapperboard, ChevronRight, LayoutGrid, Award, MoreVertical, Archive, List, Activity
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
@@ -211,6 +211,14 @@ const Dashboard = () => {
                         title="Oscar Rankings Control"
                     >
                         <Award size={18} className="text-[#FFD700]/50 group-hover:text-[#FFD700] transition-colors" />
+                    </Link>
+
+                    <Link
+                        to="/analytics"
+                        className="p-3 bg-white/5 hover:bg-amber-500/10 border border-white/5 hover:border-amber-500/30 rounded-2xl transition-all group"
+                        title="Criterion Analytics"
+                    >
+                        <Activity size={18} className="text-amber-500/50 group-hover:text-amber-500 transition-colors" />
                     </Link>
 
                     <Link

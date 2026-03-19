@@ -6,6 +6,7 @@ import { createReview, updateReview, getProxyImageUrl } from '../services/api'
 import SanctuaryCard from './SanctuaryCard';
 import PublicPreview from './PublicPreview';
 import html2canvas from 'html2canvas';
+import { VERDICT_SCALE } from '../constants/verdictScale';
 
 const aspectGroups = [
     {
@@ -45,22 +46,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
     const [showRatingScale, setShowRatingScale] = useState(false);
     const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1280);
 
-    const VERDICT_SCALE = [
-        { range: '9.6 – 10.0', verdict: 'LEGENDARY', description: 'Cultural shift. Genre redefining. Long-term impact. Few films live here.', color: '#FFFFFF' },
-        { range: '9.2 – 9.5', verdict: 'MASTERPIECE', description: 'Near-flawless execution. Technical and emotional dominance.', color: '#FFD700' },
-        { range: '8.8 – 9.1', verdict: 'ESSENTIAL', description: 'High craft, strong identity, must-watch within its genre.', color: '#FF00FF' },
-        { range: '8.4 – 8.7', verdict: 'ELITE', description: 'Exceptional execution with minor flaws. Strong authorial control.', color: '#9D00FF' },
-        { range: '8.0 – 8.3', verdict: 'GREAT', description: 'Very well made. Strong craft. Not transcendent.', color: '#00FF00' },
-        { range: '7.5 – 7.9', verdict: 'GOOD', description: 'Solid. Worth watching. Has noticeable flaws.', color: '#ADFF2F' },
-        { range: '7.0 – 7.4', verdict: 'DECENT', description: 'Watchable. Functional. Lacks depth or consistency.', color: '#00CCFF' },
-        { range: '6.0 – 6.9', verdict: 'AVERAGE', description: 'Technically fine. Emotionally forgettable.', color: '#8E9AAF' },
-        { range: '5.0 – 5.9', verdict: 'MEDIOCRE', description: 'Inconsistent. Weak in key areas.', color: '#FFFF00' },
-        { range: '4.0 – 4.9', verdict: 'POOR', description: 'Multiple structural or execution failures.', color: '#FF8C00' },
-        { range: '3.0 – 3.9', verdict: 'BAD', description: 'Broken storytelling or technical incompetence.', color: '#FF4500' },
-        { range: '2.0 – 2.9', verdict: 'TERRIBLE', description: 'Painfully flawed.', color: '#FF0000' },
-        { range: '1.0 – 1.9', verdict: 'DISASTER', description: 'Collapse of craft.', color: '#B22222' },
-        { range: '0.0 – 0.9', verdict: 'ABOMINATION', description: 'Fundamentally unwatchable.', color: '#4B0000' }
-    ];
+
 
     React.useEffect(() => {
         const handleResize = () => setIsDesktop(window.innerWidth >= 1280);
@@ -418,6 +404,71 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
         return finalScore.toFixed(2);
     }, [formData.aspects])
 
+    const [aiLoading, setAiLoading] = useState(false);
+
+    const handleAIDraft = async () => {
+        if (!movie && !formData.movie_title) {
+            alert("No movie intelligence detected to reforge.");
+            return;
+        }
+
+        setAiLoading(true);
+        // Simulate "Divine Processing" delay
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        try {
+            const baseRating = movie?.ratings?.find(r => r.Source === "The Movie Database" || r.Source === "TMDB" || r.Source === "Internet Movie Database" || r.Source === "Metacritic")?.Value;
+            let numericScore = 7.0; // Default baseline
+
+            if (baseRating) {
+                if (baseRating.includes('/')) numericScore = (parseFloat(baseRating.split('/')[0]) / (baseRating.includes('/100') ? 10 : 1));
+                else if (baseRating.includes('%')) numericScore = parseFloat(baseRating) / 10;
+                else numericScore = parseFloat(baseRating);
+            }
+
+            // Procedural Aspect Scattering (Divine Inspiration)
+            const draftAspects = {};
+            aspectGroups.forEach(group => {
+                group.aspects.forEach(aspect => {
+                    const variance = (Math.random() - 0.5); // -0.5 to +0.5
+                    const score = Math.min(10, Math.max(1, (numericScore + variance))).toFixed(1);
+                    draftAspects[aspect] = { score: parseFloat(score), comment: '' };
+                });
+            });
+
+            // Spiritual Summary Drafting
+            const year = movie?.release_year || movie?.Year || formData.movie_year || 'Unknown Era';
+            const director = movie?.director || movie?.crew?.find(c => c.job === 'Director')?.name || 'a legendary filmmaker';
+            const tiers = ['LEGENDARY', 'MASTERPIECE', 'ESSENTIAL', 'ELITE', 'GREAT', 'GOOD', 'DECENT', 'AVERAGE'];
+            const predictedVerdict = tiers[Math.min(tiers.length - 1, Math.floor((10 - numericScore) / 1.25))] || 'DECENT';
+            
+            const spiritualSummary = `A ${predictedVerdict} manifestation of ${movie?.genres?.[0] || 'cinema'}. This is ${director}'s vision reaching heights of ${movie?.genres?.[1] || 'dramatic'} resonance during the ${year} cycle. A necessary decryption for the collective consciousness.`;
+
+            // Tag Generation
+            const movieTags = [...new Set([
+                ...(movie?.genres || []),
+                predictedVerdict.toLowerCase(),
+                'divine_intelligence',
+                numericScore > 8 ? 'must_watch' : 'critique_ritual'
+            ])].slice(0, 6);
+
+            setFormData(prev => ({
+                ...prev,
+                aspects: draftAspects,
+                summary: spiritualSummary,
+                tags: movieTags,
+                content: prev.content || `The cinematic fabric of ${formData.movie_title || movie?.title} is woven with threads of ${movie?.genres?.join(', ') || 'pure artistry'}. In the year ${year}, ${director} unleashed a work that demands profound analysis...`,
+                cast_performances: prev.cast_performances || `The ensemble manifests performances that ground the ethereal scope of ${director}'s vision.`,
+                director_trademarks: prev.director_trademarks || `${director} utilizes distinct visual language to bridge the gap between audience and art.`,
+            }));
+
+        } catch (error) {
+            console.error("Divine drafting failed:", error);
+        } finally {
+            setAiLoading(false);
+        }
+    };
+
     const handleAspectChange = (aspect, field, value) => {
         setFormData(prev => ({
             ...prev,
@@ -507,6 +558,14 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
         <div className="relative">
             {/* Global Actions Floating Buttons */}
             <div className="fixed top-12 md:top-10 right-6 md:right-10 z-[100] flex items-center gap-3">
+                <button
+                    onClick={handleAIDraft}
+                    disabled={aiLoading}
+                    className={`w-12 h-12 rounded-2xl glass-obsidian border border-amber-500/20 flex items-center justify-center text-amber-500 shadow-2xl shadow-amber-500/10 active:scale-95 transition-all ${aiLoading ? 'animate-pulse opacity-50' : ''}`}
+                    title="Generate Intelligence Draft"
+                >
+                    {aiLoading ? <Loader2 size={20} className="animate-spin" /> : <Sparkles size={20} />}
+                </button>
                 <button
                     onClick={() => setShowPreview(true)}
                     className="w-12 h-12 rounded-2xl glass-obsidian border border-amber-500/20 flex items-center justify-center text-amber-500 shadow-2xl shadow-amber-500/10 active:scale-95 transition-all"
