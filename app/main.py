@@ -19,6 +19,7 @@ app.add_middleware(
         "http://127.0.0.1:5173",
         "http://127.0.0.1:3000",
         "http://localhost",
+        "https://localhost",
         "capacitor://localhost",
         "https://critiquetemple.vercel.app",
         "https://temple-admin-dashboard.vercel.app",

@@ -13,15 +13,44 @@ const api = axios.create({
 
 // Inject Firebase ID Token into every request
 api.interceptors.request.use(async (config) => {
-    const user = auth.currentUser;
-    if (user) {
-        const token = await user.getIdToken();
-        config.headers.Authorization = `Bearer ${token}`;
+    if (auth && auth.currentUser) {
+        try {
+            const token = await auth.currentUser.getIdToken();
+            config.headers.Authorization = `Bearer ${token}`;
+        } catch (error) {
+            console.error("[API Auth] Failed to attach token", error);
+        }
+    }
+    if (Capacitor.isNativePlatform()) {
+        console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`);
     }
     return config;
 }, (error) => {
     return Promise.reject(error);
 });
+
+api.interceptors.response.use(
+    response => {
+        if (Capacitor.isNativePlatform()) {
+            console.log(`[API Response] Success: ${response.status} for ${response.config.url}`);
+        }
+        return response;
+    },
+    error => {
+        if (Capacitor.isNativePlatform()) {
+            console.error('[API Error] Full Object:', JSON.stringify(error, null, 2));
+            if (error.response) {
+                console.error(`[API Error] Status: ${error.response.status}`);
+                console.error(`[API Error] Data:`, error.response.data);
+            } else if (error.request) {
+                console.error(`[API Error] No response received. Request details:`, error.request);
+            } else {
+                console.error(`[API Error] Message: ${error.message}`);
+            }
+        }
+        return Promise.reject(error);
+    }
+);
 
 export const fetchMovieFromOMDb = (searchTerm) => api.post('/admin/movies/fetch', { search_term: searchTerm });
 export const searchMovies = (title) => api.get(`/admin/movies/search?title=${title}`);

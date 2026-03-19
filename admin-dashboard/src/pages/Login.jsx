@@ -68,7 +68,10 @@ const Login = () => {
         try {
             if (Capacitor.isNativePlatform()) {
                 try {
-                    const nativeResult = await FirebaseAuthentication.signInWithGoogle();
+                    // EXPLICIT CLIENT ID: Required for Credential Manager on some Android versions/environments
+                    const clientId = "932473722147-33q9acgdq83hdf495ag8pulu0r0sgh05.apps.googleusercontent.com";
+                    let nativeResult = await FirebaseAuthentication.signInWithGoogle({ clientId });
+                    
                     if (nativeResult?.credential?.idToken) {
                         const credential = GoogleAuthProvider.credential(nativeResult.credential.idToken)
                         await signInWithCredential(auth, credential)
