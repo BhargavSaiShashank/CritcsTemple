@@ -175,83 +175,42 @@ export default function Oscars() {
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] opacity-10 mix-blend-overlay" />
             </div>
 
-            <main className="relative z-10 w-full px-6 lg:px-12 pt-36 pb-40" style={{ maxWidth: '1400px', margin: '0 auto' }}>
-                {/* Ritual Header */}
-                <header style={{ textAlign: 'center' }} className="mb-24">
+            <main className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-12 pt-60 pb-40">
+                {/* Ritual Ambient Header */}
+                <header className="flex flex-col items-center text-center mb-60 transition-all duration-1000">
                     <motion.div 
-                        initial={{ opacity: 0, y: 30 }}
+                        initial={{ opacity: 0, y: -50 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                        className="relative"
                     >
-                        {/* Label */}
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', marginBottom: '24px' }}>
-                            <div style={{ width: '48px', height: '1px', background: 'rgba(245,158,11,0.3)' }} />
-                            <span style={{ color: 'rgba(245,158,11,0.7)', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.4em' }}>
-                                Sacred Selection
-                            </span>
-                            <div style={{ width: '48px', height: '1px', background: 'rgba(245,158,11,0.3)' }} />
+                        <div className="flex items-center gap-6 text-amber-500 text-[11px] font-black uppercase tracking-[0.8em] mb-12 opacity-80">
+                            <div className="w-16 h-px bg-gradient-to-r from-transparent to-amber-500/30" />
+                            Sacred Selection
+                            <div className="w-16 h-px bg-gradient-to-l from-transparent to-amber-500/30" />
                         </div>
 
-                        {/* Title */}
-                        <div style={{ lineHeight: '0.9', marginBottom: '16px' }}>
-                            <div style={{
-                                fontSize: 'clamp(3rem, 10vw, 8rem)',
-                                fontWeight: 900,
-                                fontStyle: 'italic',
-                                letterSpacing: '-0.04em',
-                                color: '#ffffff',
-                                textTransform: 'uppercase'
-                            }}>
-                                THE OSCAR
+                        <h1 className="text-[12vw] md:text-[14rem] font-black italic tracking-tighter leading-none text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-amber-500/10 drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+                            THE OSCAR <span className="block text-amber-500 italic-extreme drop-shadow-[0_10px_40px_rgba(245,158,11,0.3)]">RITUAL</span>
+                        </h1>
+
+                        <div className="mt-16 space-y-6">
+                            <p className="text-[11px] md:text-sm font-bold uppercase tracking-[0.6em] text-white/40 max-w-2xl mx-auto leading-relaxed italic">
+                                A curated archive of cinematic divine selection. <br/>
+                                The contenders moving through the infinite aisle of recognition.
+                            </p>
+                            <div className="flex justify-center pt-12">
+                                <motion.div 
+                                    animate={{ y: [0, 15, 0], opacity: [0.2, 0.6, 0.2] }}
+                                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                                    className="flex flex-col items-center gap-3"
+                                >
+                                    <div className="w-px h-24 bg-gradient-to-b from-amber-500/60 to-transparent" />
+                                    <span className="text-[8px] font-black uppercase tracking-[0.4em] text-amber-500/40">Scroll to Witness</span>
+                                </motion.div>
                             </div>
-                            <div style={{
-                                fontSize: 'clamp(3rem, 10vw, 8rem)',
-                                fontWeight: 900,
-                                fontStyle: 'italic',
-                                letterSpacing: '-0.04em',
-                                color: '#f59e0b',
-                                textTransform: 'uppercase',
-                                textShadow: '0 0 60px rgba(245,158,11,0.3)'
-                            }}>
-                                RITUAL
-                            </div>
-                        </div>
-
-                        {/* Divider */}
-                        <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
-                            <div style={{ width: '60px', height: '1px', background: 'rgba(245,158,11,0.4)' }} />
-                        </div>
-
-                        {/* Subtitle */}
-                        <p style={{
-                            fontSize: '11px',
-                            fontWeight: 700,
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.3em',
-                            color: 'rgba(255,255,255,0.3)',
-                            fontStyle: 'italic',
-                            lineHeight: '2',
-                            maxWidth: '480px',
-                            margin: '0 auto'
-                        }}>
-                            A curated archive of cinematic divine selection.<br/>
-                            The contenders moving through the infinite aisle of recognition.
-                        </p>
-
-                        {/* Scroll Indicator */}
-                        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '40px' }}>
-                            <motion.div 
-                                animate={{ y: [0, 10, 0], opacity: [0.2, 0.5, 0.2] }}
-                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}
-                            >
-                                <div style={{ width: '1px', height: '60px', background: 'linear-gradient(to bottom, rgba(245,158,11,0.5), transparent)' }} />
-                                <span style={{ fontSize: '8px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.4em', color: 'rgba(245,158,11,0.3)' }}>Scroll to Witness</span>
-                            </motion.div>
                         </div>
                     </motion.div>
                 </header>
-
 
                 {/* Staggered Ranking List */}
                 <div className="space-y-0">
