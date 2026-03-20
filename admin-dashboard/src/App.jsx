@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Capacitor } from '@capacitor/core'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Intelligence from './pages/Intelligence'
@@ -12,6 +14,12 @@ import PrivateRoute from './components/PrivateRoute'
 import { auth } from './services/firebase'
 
 const App = () => {
+    useEffect(() => {
+        if (Capacitor.isNativePlatform()) {
+            document.body.classList.add('is-native')
+        }
+    }, [])
+
     return (
         <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <div className="min-h-screen bg-[#0c0c0c] text-white">

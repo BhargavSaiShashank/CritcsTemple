@@ -8,10 +8,11 @@ import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { Filesystem, Directory } from '@capacitor/filesystem';
-import { getReviewBySlug, clapReview, unclapReview, reactReview, getRelatedReviews, proxyImage } from '../services/api';
+import { getReviewBySlug, clapReview, unclapReview, reactReview, getRelatedReviews, proxyImage, getRatingTimeline } from '../services/api';
 import ReviewExportCard from '../components/ReviewExportCard';
 import SanctuaryTicket from '../components/SanctuaryTicket';
 import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
+import RatingTimelineGraph from '../components/RatingTimelineGraph';
 
 import { useColorHarmonizer } from '../hooks/useColorHarmonizer';
 import { getVerdictFromScore } from '../utils/verdict';
@@ -140,6 +141,7 @@ export default function ReviewDetail() {
     const ticketRef = useRef(null);
     const [exportingTicket, setExportingTicket] = useState(false);
     const [isTrailerOpen, setIsTrailerOpen] = useState(false);
+    const [ratingTimeline, setRatingTimeline] = useState(null);
 
 
     // Dynamic Color Harmonization
@@ -262,6 +264,14 @@ export default function ReviewDetail() {
 
         window.scrollTo(0, 0);
     }, [slug]);
+
+    useEffect(() => {
+        if (review?.movie_id || review?.imdb_id) {
+            getRatingTimeline(review.movie_id || review.imdb_id)
+                .then(res => setRatingTimeline(res.data))
+                .catch(() => setRatingTimeline(null));
+        }
+    }, [review]);
 
     const handleReaction = async (type) => {
         const key = `react_${review?.slug}`;
@@ -656,6 +666,18 @@ export default function ReviewDetail() {
                                 <div style={{ fontSize: 'clamp(14px, 3.5vw, 15px)', fontWeight: 300, color: 'rgba(255,255,255,0.52)', lineHeight: 1.9, whiteSpace: 'pre-wrap', letterSpacing: '0.01em' }}>
                                     {review.content}
                                 </div>
+                            </motion.div>
+                        )}
+
+                        {/* Rating Evolution */}
+                        {ratingTimeline && (
+                            <motion.div
+                                initial={{ y: 20, opacity: 0 }}
+                                whileInView={{ y: 0, opacity: 1 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.8 }}
+                            >
+                                <RatingTimelineGraph data={ratingTimeline} />
                             </motion.div>
                         )}
 

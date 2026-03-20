@@ -4,7 +4,7 @@ import traceback
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
 from app.db.mongodb import connect_to_mongo, close_mongo_connection, get_database
-from app.api.v1 import public, admin, oracle, predictions
+from app.api.v1 import public, admin, oracle, predictions, dynamic_rating, bias
 
 app = FastAPI(title="The Critic's Temple")
 
@@ -89,6 +89,8 @@ app.include_router(public.router, prefix="/api/v1", tags=["Public"])
 app.include_router(admin.router, prefix="/api/v1/admin", tags=["Admin"])
 app.include_router(oracle.router, prefix="/api/v1/oracle", tags=["Oracle"])
 app.include_router(predictions.router, prefix="/api/v1/predictions", tags=["Predictions"])
+app.include_router(dynamic_rating.router, prefix="/api/v1/ratings", tags=["Dynamic Ratings"])
+app.include_router(bias.router, prefix="/api/v1/bias", tags=["Bias Detector"])
 
 @app.api_route("/health", methods=["GET", "HEAD"])
 @app.api_route("/api/v1/health", methods=["GET", "HEAD"])
@@ -99,4 +101,4 @@ async def health_check():
 async def root():
     return {"message": "Welcome to The Critic's Temple API"}
     
-# Hot-reload trigger 2
+# Hot-reload trigger 3

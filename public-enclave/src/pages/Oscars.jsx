@@ -1,20 +1,62 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { motion } from 'framer-motion';
-import { Award, Film } from 'lucide-react';
-import { getLatestReviews } from '../services/api';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Award, Film, ChevronDown, Calendar } from 'lucide-react';
+import { getLatestReviews, getSettings } from '../services/api';
 import ReviewGrid from '../components/ReviewGrid';
 
 export default function Oscars() {
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedYear, setSelectedYear] = useState(2026);
+    const [isYearDropdownOpen, setIsYearDropdownOpen] = useState(false);
+    const [availableYears, setAvailableYears] = useState([2024, 2025, 2026]);
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const { data } = await getSettings();
+                if (data && data.active_oscar_year) {
+                    setSelectedYear(data.active_oscar_year);
+                }
+            } catch (err) {
+                console.error("Failed to fetch settings", err);
+            }
+        };
+
+        const fetchYears = async () => {
+            try {
+                const { data } = await getOscarYears();
+                if (data && Array.isArray(data)) {
+                    // Ensure the active year is also in the list even if it's new
+                    setAvailableYears(prev => {
+                        const combined = [...new Set([...data, selectedYear])];
+                        return combined.sort((a, b) => b - a);
+                    });
+                }
+            } catch (err) {
+                console.error("Failed to fetch Oscar years", err);
+            }
+        };
+
+        fetchSettings();
+        fetchYears();
+    }, []);
+
+    // Update available years if selectedYear changes and isn't in the list
+    useEffect(() => {
+        if (!availableYears.includes(selectedYear)) {
+            setAvailableYears(prev => [...new Set([...prev, selectedYear])].sort((a, b) => b - a));
+        }
+    }, [selectedYear]);
 
     useEffect(() => {
         const fetchOscars = async () => {
+            setLoading(true);
             try {
-                // Fetch up to 50 latest reviews ascending securely mapped to the hierarchical rank
-                const { data } = await getLatestReviews(50, 0, '', 'All', 'All', 'oscar_rank', 'asc', 'oscar');
+                // Fetch up to 50 latest reviews ascending securely mapped to the hierarchical rank, including year filter
+                const { data } = await getLatestReviews(50, 0, '', 'All', 'All', 'oscar_rank', 'asc', 'oscar', selectedYear);
                 setReviews(data || []);
             } catch (err) {
                 console.error("Failed to fetch oscar contenders", err);
@@ -24,7 +66,7 @@ export default function Oscars() {
             }
         };
         fetchOscars();
-    }, []);
+    }, [selectedYear]);
 
     return (
         <div style={{ background: '#080808', minHeight: '100vh', position: 'relative' }}>
@@ -86,7 +128,7 @@ export default function Oscars() {
                         textShadow: '0 10px 30px rgba(255,215,0,0.15)'
                     }}
                 >
-                    Oscar Contenders
+                    Oscar Contenders {selectedYear}
                 </motion.h1>
 
                 <motion.p
@@ -98,11 +140,91 @@ export default function Oscars() {
                         color: 'rgba(255,255,255,0.5)',
                         maxWidth: '600px',
                         margin: '0 auto',
-                        lineHeight: 1.6
+                        lineHeight: 1.6,
+                        marginBottom: '40px'
                     }}
                 >
                     A curated archive of cinematic excellence. The films pushing the boundaries of the medium, contending for the highest accolades.
                 </motion.p>
+
+                {/* Fixed Exploration Dropdown on Top Left */}
+                <div style={{
+                    position: 'absolute',
+                    top: 'calc(100px + var(--safe-top))',
+                    left: '40px',
+                    zIndex: 100
+                }}>
+                    <div style={{ position: 'relative' }}>
+                        <button
+                            onClick={() => setIsYearDropdownOpen(!isYearDropdownOpen)}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '10px',
+                                padding: '10px 18px',
+                                background: 'rgba(255,255,255,0.03)',
+                                border: '1px solid rgba(255,255,255,0.08)',
+                                borderRadius: '12px',
+                                color: '#FFD700',
+                                fontSize: '13px',
+                                fontWeight: 800,
+                                cursor: 'pointer',
+                                backdropFilter: 'blur(10px)',
+                                transition: 'all 0.3s'
+                            }}
+                        >
+                            <Calendar size={14} />
+                            Explore {selectedYear}
+                            <ChevronDown size={14} style={{ transform: isYearDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.3s' }} />
+                        </button>
+
+                        <AnimatePresence>
+                            {isYearDropdownOpen && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 10 }}
+                                    style={{
+                                        position: 'absolute',
+                                        top: '120%',
+                                        left: 0,
+                                        width: '160px',
+                                        background: '#0a0a0a',
+                                        border: '1px solid rgba(255,255,255,0.1)',
+                                        borderRadius: '16px',
+                                        overflow: 'hidden',
+                                        boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
+                                        zIndex: 101
+                                    }}
+                                >
+                                    {availableYears.map(year => (
+                                        <button
+                                            key={year}
+                                            onClick={() => {
+                                                setSelectedYear(year);
+                                                setIsYearDropdownOpen(false);
+                                            }}
+                                            style={{
+                                                width: '100%',
+                                                textAlign: 'left',
+                                                padding: '12px 20px',
+                                                background: selectedYear === year ? 'rgba(255,215,0,0.1)' : 'transparent',
+                                                color: selectedYear === year ? '#FFD700' : 'rgba(255,255,255,0.5)',
+                                                border: 'none',
+                                                fontSize: '13px',
+                                                fontWeight: 700,
+                                                cursor: 'pointer',
+                                                transition: 'all 0.2s'
+                                            }}
+                                        >
+                                            Oscars {year}
+                                        </button>
+                                    ))}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                </div>
             </section>
 
             <section className="max-w-container" style={{ position: 'relative', zIndex: 1, paddingBottom: '120px' }}>

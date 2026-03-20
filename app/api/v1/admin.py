@@ -10,6 +10,7 @@ from app.models.movie import MovieCreate, MovieInDB
 from app.models.show import ShowCreate
 from app.models.category import CategoryCreate, CategoryUpdate, CategoryInDB
 from app.models.prediction import UpcomingMovieCreate, UpcomingMovieInDB
+from app.models.settings import GlobalSettings
 from app.services.tmdb import tmdb_service
 from app.services.movie_service import movie_service
 from app.services.show_service import show_service
@@ -365,6 +366,23 @@ async def delete_upcoming_movie(
     admin = Depends(get_current_admin)
 ):
     return await prediction_service.delete_upcoming_movie(db, movie_id)
+
+@router.get("/settings", response_model=GlobalSettings)
+async def get_settings(db = Depends(get_database), admin = Depends(get_current_admin)):
+    settings = await db.settings.find_one({"_id": "global"})
+    if not settings:
+        return GlobalSettings()
+    return settings
+
+@router.put("/settings", response_model=GlobalSettings)
+async def update_settings(settings: GlobalSettings, db = Depends(get_database), admin = Depends(get_current_admin)):
+    settings_dict = settings.model_dump()
+    await db.settings.update_one(
+        {"_id": "global"},
+        {"$set": settings_dict},
+        upsert=True
+    )
+    return settings
 
 import httpx
 from fastapi.responses import StreamingResponse

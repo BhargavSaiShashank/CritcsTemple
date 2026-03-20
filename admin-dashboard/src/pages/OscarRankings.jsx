@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Award, Search, ArrowUp, ArrowDown, X, Save, Loader2, Plus } from 'lucide-react';
-import { getReviews, getProxyImageUrl, updateOscarRankings } from '../services/api';
+import { getReviews, getProxyImageUrl, updateOscarRankings, getSettings, updateSettings } from '../services/api';
 
 export default function OscarRankings() {
     const [allReviews, setAllReviews] = useState([]);
@@ -9,10 +9,37 @@ export default function OscarRankings() {
     const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [activeYear, setActiveYear] = useState(2026);
+    const [savingSettings, setSavingSettings] = useState(false);
 
     useEffect(() => {
         fetchData();
+        fetchSettings();
     }, []);
+
+    const fetchSettings = async () => {
+        try {
+            const { data } = await getSettings();
+            if (data && data.active_oscar_year) {
+                setActiveYear(data.active_oscar_year);
+            }
+        } catch (err) {
+            console.error("Failed to fetch settings", err);
+        }
+    };
+
+    const saveSettings = async (year) => {
+        setSavingSettings(true);
+        try {
+            await updateSettings({ active_oscar_year: year });
+            setActiveYear(year);
+        } catch (err) {
+            console.error("Failed to update settings", err);
+            alert("Failed to update active year");
+        } finally {
+            setSavingSettings(false);
+        }
+    };
 
     const fetchData = async () => {
         try {
@@ -105,10 +132,29 @@ export default function OscarRankings() {
             </header>
 
             <main className="relative z-10 max-w-container mx-auto py-8 md:py-12 lg:py-20 px-4 md:px-12">
-                <div className="flex flex-col gap-6 mb-12">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
                     <div className="flex items-center gap-4">
                         <Award className="text-[#FFD700]" size={48} strokeWidth={2} />
                         <h1 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-[#FFD700] to-yellow-600">Golden Hierarchy</h1>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-[#FFD700]/50">ACTIVE DEPLOYMENT YEAR</label>
+                        <div className="flex items-center gap-3 p-2 bg-white/5 border border-white/5 rounded-2xl">
+                            <input 
+                                type="number"
+                                value={activeYear}
+                                onChange={(e) => setActiveYear(parseInt(e.target.value) || 2026)}
+                                className="w-24 bg-transparent border-none text-white font-black text-center focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            />
+                            <button
+                                onClick={() => saveSettings(activeYear)}
+                                disabled={savingSettings}
+                                className="px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-[#FFD700] text-black shadow-[0_0_20px_rgba(255,215,0,0.2)] hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
+                            >
+                                {savingSettings ? "Saving..." : "Deploy"}
+                            </button>
+                        </div>
                     </div>
                 </div>
 

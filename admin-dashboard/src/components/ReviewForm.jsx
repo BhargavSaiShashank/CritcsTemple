@@ -2,11 +2,13 @@ import React, { useState, useMemo, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronRight, Star, Quote, AlignLeft, Layout, Zap, Heart, Music, Camera, Plus, Loader2, Sparkles, Download, Eye, MoreVertical, X, Globe, Award, Archive, List } from 'lucide-react'
-import { createReview, updateReview, getProxyImageUrl } from '../services/api'
+import { createReview, updateReview, getProxyImageUrl, getRatingTimeline, updateDynamicRating, resetRatingTimeline } from '../services/api'
 import SanctuaryCard from './SanctuaryCard';
 import PublicPreview from './PublicPreview';
+import RatingTimelineGraph from './RatingTimelineGraph';
 import html2canvas from 'html2canvas';
 import { VERDICT_SCALE } from '../constants/verdictScale';
+import { History, RefreshCw } from 'lucide-react';
 
 const aspectGroups = [
     {
@@ -45,6 +47,8 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
     const [showPreview, setShowPreview] = useState(false);
     const [showRatingScale, setShowRatingScale] = useState(false);
     const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1280);
+    const [ratingTimeline, setRatingTimeline] = useState(null);
+    const [phaseLoading, setPhaseLoading] = useState(false);
 
 
 
@@ -146,6 +150,52 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             }
         }
     }, [draftKey]);
+    
+    // Fetch Rating Timeline
+    React.useEffect(() => {
+        const fetchTimeline = async () => {
+            if (movie?.imdb_id || movie?.id) {
+                try {
+                    const response = await getRatingTimeline(movie.imdb_id || movie.id);
+                    setRatingTimeline(response.data);
+                } catch (e) {
+                    console.log("No timeline yet");
+                }
+            }
+        };
+        fetchTimeline();
+    }, [movie]);
+
+    const handlePhaseUpdate = async (phase) => {
+        setPhaseLoading(true);
+        try {
+            const payload = {
+                movie_id: movie.imdb_id || movie.id,
+                phase_name: phase,
+                score: parseFloat(averageScore),
+                metadata: { mood: 'Normal', context: 'Standard Review' }
+            };
+            const response = await updateDynamicRating(payload);
+            setRatingTimeline(response.data);
+        } catch (e) {
+            console.error("Phase update failed", e);
+        } finally {
+            setPhaseLoading(false);
+        }
+    };
+
+    const handleResetTimeline = async () => {
+        if (!window.confirm("Are you sure you want to reset the entire rating evolution for this movie?")) return;
+        setPhaseLoading(true);
+        try {
+            await resetRatingTimeline(movie.imdb_id || movie.id);
+            setRatingTimeline(null);
+        } catch (e) {
+            console.error("Reset failed", e);
+        } finally {
+            setPhaseLoading(false);
+        }
+    };
 
     const [newTag, setNewTag] = useState('')
     const [activeGroup, setActiveGroup] = useState(0)
@@ -739,6 +789,55 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                         </button>
                     ))}
                 </nav>
+
+                {/* Rating Evolution Tracker */}
+                <div className="glass-obsidian rounded-[42px] p-8 border-white/5 space-y-6">
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 flex items-center gap-2">
+                            <History size={14} className="text-indigo-400" />
+                            Evolution Registry
+                        </h3>
+                        {ratingTimeline && (
+                            <button
+                                type="button"
+                                onClick={handleResetTimeline}
+                                disabled={phaseLoading}
+                                className="text-[10px] font-bold text-red-400/50 hover:text-red-400 uppercase tracking-tighter transition-colors"
+                            >
+                                Reset
+                            </button>
+                        )}
+                    </div>
+                    
+                    {ratingTimeline && <RatingTimelineGraph data={ratingTimeline} />}
+                    
+                    <div className="grid grid-cols-1 gap-2">
+                        {['initial', 'reflection', 'rewatch'].map(phase => (
+                            <button
+                                key={phase}
+                                onClick={() => handlePhaseUpdate(phase)}
+                                disabled={phaseLoading}
+                                className="group flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-indigo-500/30 transition-all"
+                            >
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 group-hover:text-gray-300">
+                                    Stamp {phase}
+                                </span>
+                                {ratingTimeline?.phases?.[phase] ? (
+                                    <span className="text-xs font-black text-indigo-400 italic">
+                                        {ratingTimeline.phases[phase].score.toFixed(1)}
+                                    </span>
+                                ) : (
+                                    <div className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400 group-hover:bg-indigo-500 group-hover:text-black transition-all">
+                                        {phaseLoading ? <RefreshCw size={12} className="animate-spin" /> : <Plus size={12} />}
+                                    </div>
+                                )}
+                            </button>
+                        ))}
+                    </div>
+                    <p className="text-[8px] font-medium text-gray-600 italic text-center leading-relaxed">
+                        Register the current score ({averageScore}) to the temporal registry to track your perception drift.
+                    </p>
+                </div>
 
             </div>
 

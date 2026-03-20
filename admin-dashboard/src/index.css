@@ -13,6 +13,9 @@
   --text-dim: #71717a;
   --page-padding: clamp(1rem, 5vw, 3rem);
   --max-width: 1400px;
+  
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 body {
@@ -22,6 +25,12 @@ body {
   margin: 0;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+}
+
+body.is-native {
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+  min-height: 100vh;
 }
 
 .font-premium {

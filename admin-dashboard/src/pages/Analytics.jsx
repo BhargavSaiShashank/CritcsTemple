@@ -11,6 +11,7 @@ import {
 import { Link } from 'react-router-dom';
 import { getReviews } from '../services/api';
 import { VERDICT_SCALE, getVerdictForScore } from '../constants/verdictScale';
+import BiasDashboard from '../components/BiasDashboard';
 
 const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -272,6 +273,11 @@ const Analytics = () => {
                             </motion.div>
                         ))}
                     </div>
+                </div>
+
+                {/* Bias Analytics Section */}
+                <div className="mt-20">
+                    <BiasDashboard />
                 </div>
             </div>
         </div>

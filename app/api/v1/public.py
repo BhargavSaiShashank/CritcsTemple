@@ -16,12 +16,13 @@ async def get_latest_reviews(
     verdict: Optional[str] = None,
     search: Optional[str] = None,
     content_type: Optional[str] = None, # "movie" or "tv"
+    year: Optional[int] = None,
     sort_by: Optional[str] = "date",
     order: Optional[str] = "desc",
     db = Depends(get_database)
 ):
     return await review_service.get_latest_reviews(
-        db, limit, offset, tag, verdict, search, content_type, sort_by, order
+        db, limit, offset, tag, verdict, search, content_type, sort_by, order, year
     )
 
 @router.get("/reviews/{slug}")
@@ -88,4 +89,15 @@ async def proxy_image(url: str):
                 async for chunk in response.aiter_bytes():
                     yield chunk
     return StreamingResponse(stream_image(), media_type="image/jpeg")
+
+@router.get("/settings")
+async def get_public_settings(db = Depends(get_database)):
+    settings = await db.settings.find_one({"_id": "global"})
+    if not settings:
+        return {"active_oscar_year": 2026}
+    return settings
+
+@router.get("/oscar-years")
+async def get_oscar_years(db = Depends(get_database)):
+    return await review_service.get_oscar_years(db)
 

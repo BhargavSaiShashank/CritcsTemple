@@ -62,7 +62,7 @@ api.interceptors.response.use(
     }
 );
 
-export const getLatestReviews = (limit = 12, offset = 0, search = '', verdict = '', content_type = '', sortBy = 'date', order = 'desc', tag = '') => {
+export const getLatestReviews = (limit = 12, offset = 0, search = '', verdict = '', content_type = '', sortBy = 'date', order = 'desc', tag = '', year = null) => {
     const params = {
         limit,
         offset,
@@ -73,6 +73,7 @@ export const getLatestReviews = (limit = 12, offset = 0, search = '', verdict = 
     if (verdict && verdict !== 'All') params.verdict = verdict;
     if (content_type && content_type !== 'All') params.content_type = content_type;
     if (tag) params.tag = tag;
+    if (year) params.year = year;
 
     return api.get('/reviews', { params });
 };
@@ -97,5 +98,9 @@ export const getMyProfile = () => api.get('/predictions/me');
 export const getUpcomingPublicMovies = () => api.get('/predictions/upcoming');
 export const makePrediction = (upcoming_movie_id, predicted_verdict) => api.post('/predictions/', { upcoming_movie_id, predicted_verdict });
 export const getMyPredictions = () => api.get('/predictions/my-predictions');
+
+export const getSettings = () => api.get('/settings');
+export const getOscarYears = () => api.get('/oscar-years');
+export const getRatingTimeline = (movieId) => api.get(`/ratings/${movieId}/timeline`);
 
 export default api;

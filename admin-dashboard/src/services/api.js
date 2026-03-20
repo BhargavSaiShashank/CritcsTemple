@@ -82,11 +82,24 @@ export const getUpcomingMovies = () => api.get('/admin/upcoming-movies');
 export const deleteUpcomingMovie = (id) => api.delete(`/admin/upcoming-movies/${id}`);
 export const resolveUpcomingMovie = (id, actual_verdict) => api.patch(`/admin/upcoming-movies/${id}/resolve`, { actual_verdict });
 
+// Global Settings
+export const getSettings = () => api.get('/admin/settings');
+export const updateSettings = (data) => api.put('/admin/settings', data);
+
 // Image Proxy
 export const getProxyImageUrl = (url) => {
     if (!url) return '';
     const baseUrl = import.meta.env.VITE_API_URL || '/api/v1';
     return `${baseUrl}/admin/proxy-image?url=${encodeURIComponent(url)}`;
 };
+
+// Dynamic Ratings
+export const updateDynamicRating = (data) => api.post('/ratings', data);
+export const getRatingTimeline = (movieId) => api.get(`/ratings/${movieId}/timeline`);
+export const resetRatingTimeline = (movieId) => api.delete(`/ratings/${movieId}`);
+
+// Bias Detector
+export const getBiasMetrics = (userId = 'default_user') => api.get('/bias', { params: { user_id: userId } });
+export const recomputeBias = (userId = 'default_user') => api.post('/bias/recompute', null, { params: { user_id: userId } });
 
 export default api;

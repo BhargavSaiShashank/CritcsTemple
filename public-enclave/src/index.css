@@ -42,6 +42,7 @@ body,
 
   /* Safe area defaults */
   --safe-top: max(env(safe-area-inset-top, 0px), 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
 
   /* Dynamic Accent Baseline */
   --theme-primary: #f5a623;
@@ -57,6 +58,9 @@ body,
 body.is-native {
   /* Enforce a minimum of 48px top clearance for native devices (specifically Android hole-punches) */
   --safe-top: max(env(safe-area-inset-top, 0px), 48px);
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+  min-height: 100vh;
 }
 
 .max-w-container {

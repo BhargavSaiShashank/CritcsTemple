@@ -43,7 +43,8 @@ class ReviewService:
         search: Optional[str] = None,
         content_type: Optional[str] = None,
         sort_by: Optional[str] = "date",
-        order: Optional[str] = "desc"
+        order: Optional[str] = "desc",
+        year: Optional[int] = None
     ) -> List[Dict[str, Any]]:
         publication_query = self._get_publication_query()
         filters = [publication_query]
@@ -56,6 +57,9 @@ class ReviewService:
             
         if content_type:
             filters.append({"content_type": content_type})
+
+        if year:
+            filters.append({"movie_year": year})
             
         if search and search.strip():
             filters.append({
@@ -80,6 +84,11 @@ class ReviewService:
         cursor = db.reviews.find(query).sort(sort_field, sort_direction).skip(offset).limit(limit)
         reviews = await cursor.to_list(length=limit)
         return [self.serialize_doc(r) for r in reviews]
+
+    async def get_oscar_years(self, db) -> List[int]:
+        """Returns a sorted list of unique years that have oscar reviews."""
+        years = await db.reviews.distinct("movie_year", {"tags": "oscar"})
+        return sorted([y for y in years if y is not None], reverse=True)
 
     async def get_review_by_slug(self, db: AsyncIOMotorDatabase, slug: str) -> Dict[str, Any]:
         query = self._get_publication_query()
