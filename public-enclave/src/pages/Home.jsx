@@ -12,7 +12,7 @@ import DiscoveryCarousel from '../components/DiscoveryCarousel';
 import { Capacitor } from '@capacitor/core';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { initializeSmartSearch, performSmartSearch } from '../services/SmartSearch';
-import offlineData from "../../public/assets/offline_data.json";
+import offlineData from "../assets/offline_data.json";
 
 const FALLBACK = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=1200';
 const VERDICT_COLOR = {
