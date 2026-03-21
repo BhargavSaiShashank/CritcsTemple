@@ -12,8 +12,6 @@ import DiscoveryCarousel from '../components/DiscoveryCarousel';
 import { Capacitor } from '@capacitor/core';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { initializeSmartSearch, performSmartSearch } from '../services/SmartSearch';
-import offlineData from "../assets/offline_data.json";
-
 const FALLBACK = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=1200';
 const VERDICT_COLOR = {
     Legendary: '#FFFFFF', Masterpiece: '#FFD700', Essential: '#FF00EA',
@@ -24,15 +22,12 @@ const VERDICT_COLOR = {
 };
 
 export default function Home() {
-    const hasOffline = offlineData && offlineData.length > 0;
-    const sortedOffline = hasOffline ? [...offlineData].sort((a,b) => new Date(b.created_at) - new Date(a.created_at)) : [];
-
-    const [featuredReviews, setFeaturedReviews] = useState(hasOffline ? offlineData.filter(r => r.overall_rating >= 8.5) : []);
+    const [featuredReviews, setFeaturedReviews] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isAutoPlaying, setIsAutoPlaying] = useState(true);
     const [error, setError] = useState(null);
-    const [reviews, setReviews] = useState(sortedOffline);
-    const [loading, setLoading] = useState(!hasOffline);
+    const [reviews, setReviews] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const [search, setSearch] = useState('');
     const containerRef = useRef(null);
