@@ -79,8 +79,21 @@ async def get_show_details(tmdb_id: str, db = Depends(get_database)):
     return review_service.serialize_doc(show)
 
 @router.get("/proxy-image")
-async def proxy_image(url: str):
-    """Proxy an external image to bypass CORS limits for html2canvas downloading."""
+async def proxy_image(url: str, quality: str = None):
+    """Proxy an external image to bypass CORS limits and apply quality downsampling for TMDB."""
+    if quality and "image.tmdb.org/t/p/" in url:
+        for size in ['/original/', '/w1280/', '/w780/', '/w500/', '/w300/', '/w154/', '/w92/']:
+            if size in url:
+                if quality == 'Micro':
+                    url = url.replace(size, '/w92/')
+                elif quality == 'Low':
+                    url = url.replace(size, '/w300/')
+                elif quality == 'Medium':
+                    url = url.replace(size, '/w500/')
+                elif quality == 'High':
+                    url = url.replace(size, '/original/')
+                break
+
     async def stream_image():
         async with httpx.AsyncClient() as client:
             async with client.stream("GET", url) as response:

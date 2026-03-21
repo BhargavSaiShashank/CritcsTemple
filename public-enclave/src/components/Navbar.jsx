@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Film, Award, Archive, Search, Target, Menu, X, LogIn, LogOut, User } from 'lucide-react';
+import { Film, Award, Archive, Search, Target, Menu, X, LogIn, LogOut, User, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { auth } from '../services/firebase';
 import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signInWithCredential, signOut } from 'firebase/auth';
@@ -167,10 +167,10 @@ export default function Navbar({ onSearchOpen }) {
                     }} />
 
                     <motion.div
-                        whileHover={{ scale: 1.1, color: '#f5a623' }}
+                        whileHover={{ scale: 1.1, color: 'var(--theme-primary)' }}
                         onClick={user ? handleLogout : handleLogin}
                         style={{
-                            color: user ? '#f5a623' : 'rgba(255, 255, 255, 0.5)',
+                            color: user ? 'var(--theme-primary)' : 'rgba(255, 255, 255, 0.5)',
                             cursor: 'pointer',
                             padding: '6px',
                             display: 'flex',
@@ -194,6 +194,15 @@ export default function Navbar({ onSearchOpen }) {
                             </>
                         )}
                     </motion.div>
+
+                    {Capacitor.isNativePlatform() && (
+                        <>
+                            <div style={{ width: '1px', height: '14px', background: 'rgba(255, 255, 255, 0.15)', margin: '0 8px' }} />
+                            <Link to="/settings" style={{ color: 'rgba(255, 255, 255, 0.6)', cursor: 'pointer', padding: '6px', display: 'flex', transition: 'color 0.3s ease' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.6)'}>
+                                <Settings size={16} />
+                            </Link>
+                        </>
+                    )}
                 </div>
 
                 {/* Mobile Toggle */}
@@ -202,7 +211,7 @@ export default function Navbar({ onSearchOpen }) {
                         whileTap={{ scale: 0.9 }}
                         onClick={user ? handleLogout : handleLogin}
                         style={{
-                            color: user ? '#f5a623' : 'rgba(255, 255, 255, 0.6)',
+                            color: user ? 'var(--theme-primary)' : 'rgba(255, 255, 255, 0.6)',
                             padding: '8px'
                         }}
                     >
@@ -225,7 +234,7 @@ export default function Navbar({ onSearchOpen }) {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            color: mobileMenuOpen ? '#f5a623' : '#fff',
+                            color: mobileMenuOpen ? 'var(--theme-primary)' : '#fff',
                             transition: 'all 0.3s ease'
                         }}
                     >
@@ -275,7 +284,7 @@ export default function Navbar({ onSearchOpen }) {
                                 fontSize: '13px',
                                 fontWeight: 800,
                                 textDecoration: 'none',
-                                color: user ? '#ff4d4d' : '#f5a623',
+                                color: user ? '#ff4d4d' : 'var(--theme-primary)',
                                 textTransform: 'uppercase',
                                 letterSpacing: '0.15em',
                                 padding: '14px 16px',
@@ -290,6 +299,13 @@ export default function Navbar({ onSearchOpen }) {
                             {user ? <LogOut size={18} /> : <LogIn size={18} />}
                             {user ? 'Terminate Session' : 'Authenticate'}
                         </button>
+
+                        {Capacitor.isNativePlatform() && (
+                            <>
+                                <div style={{ margin: '8px 0', height: '1px', background: 'rgba(255, 255, 255, 0.05)' }} />
+                                <MobileNavLink to="/settings" active={isActive('/settings')} icon={<Settings size={16} />}>Settings</MobileNavLink>
+                            </>
+                        )}
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -306,7 +322,7 @@ function NavLink({ to, children, active, icon }) {
             fontSize: '11px',
             fontWeight: 800,
             textDecoration: 'none',
-            color: active ? '#f5a623' : 'rgba(255, 255, 255, 0.4)',
+            color: active ? 'var(--theme-primary)' : 'rgba(255, 255, 255, 0.4)',
             transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
             position: 'relative',
             padding: '4px 8px',
@@ -354,7 +370,7 @@ function MobileNavLink({ to, children, active, icon }) {
             fontSize: '13px',
             fontWeight: 800,
             textDecoration: 'none',
-            color: active ? '#f5a623' : 'rgba(255, 255, 255, 0.6)',
+            color: active ? 'var(--theme-primary)' : 'rgba(255, 255, 255, 0.6)',
             textTransform: 'uppercase',
             letterSpacing: '0.15em',
             padding: '12px 16px',
@@ -363,7 +379,7 @@ function MobileNavLink({ to, children, active, icon }) {
             border: active ? '1px solid rgba(245, 166, 35, 0.2)' : '1px solid rgba(255, 255, 255, 0.05)',
             transition: 'all 0.3s ease'
         }}>
-            <span style={{ color: active ? '#f5a623' : 'rgba(255, 255, 255, 0.2)' }}>{icon}</span>
+            <span style={{ color: active ? 'var(--theme-primary)' : 'rgba(255, 255, 255, 0.2)' }}>{icon}</span>
             {children}
             {active && <ChevronIndicator />}
         </Link>

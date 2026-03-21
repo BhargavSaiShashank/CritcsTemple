@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import { Capacitor } from '@capacitor/core'
@@ -10,12 +10,15 @@ import HallOfFame from './pages/HallOfFame'
 import Compare from './pages/Compare'
 import Predictions from './pages/Predictions'
 import Oscars from './pages/Oscars'
+import Settings from './pages/Settings'
 import CeremonyOracle from './components/CeremonyOracle'
 import SearchOverlay from './components/SearchOverlay'
+import IntroVideo from './components/IntroVideo'
 
 import { API_URL } from './services/api'
 import { FirebaseMessagingService } from './services/FirebaseMessaging.service'
 import { AtmosphereProvider } from './context/AtmosphereContext'
+import { SettingsProvider } from './context/SettingsContext'
 
 const PrimalPulse = () => {
   const readySent = React.useRef(false);
@@ -33,6 +36,22 @@ const PrimalPulse = () => {
 const NativeListener = ({ onSearchOpen }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const hasCheckedTab = React.useRef(false);
+
+  useEffect(() => {
+    // Default Launch Tab logic
+    if (!hasCheckedTab.current && location.pathname === '/') {
+      let savedTab = localStorage.getItem('sanctorum_defaultTab');
+      if (savedTab) {
+        // Strip quotes if it was JSON.stringified
+        savedTab = savedTab.replace(/"/g, '');
+        if (savedTab !== '/') {
+          navigate(savedTab, { replace: true });
+        }
+      }
+      hasCheckedTab.current = true;
+    }
+  }, [location.pathname, navigate]);
 
   const handleRoute = (url) => {
     if (!url) return;
@@ -108,7 +127,11 @@ const NativeListener = ({ onSearchOpen }) => {
 };
 
 const App = () => {
-  const [isSearchOpen, setIsSearchOpen] = React.useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  
+  // The Intro Video should only lock the UI if it's currently running on native.
+  // We initialize the completion state to TRUE for web users to skip it entirely.
+  const [introFinished, setIntroFinished] = useState(!Capacitor.isNativePlatform())
 
   useEffect(() => {
     if (Capacitor.isNativePlatform()) {
@@ -120,11 +143,18 @@ const App = () => {
 
   return (
     <HelmetProvider>
-      <AtmosphereProvider>
-        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-          <NativeListener onSearchOpen={() => setIsSearchOpen(true)} />
-          <PrimalPulse />
-          <div className="min-h-screen bg-[#0c0c0c] text-white">
+      <SettingsProvider>
+        <AtmosphereProvider>
+          <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <NativeListener onSearchOpen={() => setIsSearchOpen(true)} />
+            <PrimalPulse />
+            
+            {/* Native Cinematic Intro */}
+            {Capacitor.isNativePlatform() && !introFinished && (
+                <IntroVideo onComplete={() => setIntroFinished(true)} />
+            )}
+
+            <div className="min-h-screen">
             <Navbar onSearchOpen={() => setIsSearchOpen(true)} />
             <main>
               <Routes>
@@ -134,6 +164,7 @@ const App = () => {
                 <Route path="/compare" element={<Compare />} />
                 <Route path="/predictions" element={<Predictions />} />
                 <Route path="/oscars" element={<Oscars />} />
+                <Route path="/settings" element={<Settings />} />
               </Routes>
             </main>
             <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
@@ -141,6 +172,7 @@ const App = () => {
           </div>
         </Router>
       </AtmosphereProvider>
+      </SettingsProvider>
     </HelmetProvider>
   )
 }

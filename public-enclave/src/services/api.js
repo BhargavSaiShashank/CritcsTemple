@@ -92,7 +92,18 @@ export const getMovieDetails = (imdbId) => api.get(`/movie/${imdbId}`);
 export const getTVDetails = (tmdbId) => api.get(`/tv/${tmdbId}`);
 export const getOracleDebate = (slug) => api.post('/oracle/debate', { slug });
 export const getOracleDuel = (movie1, movie2) => api.post('/oracle/duel', { movie1, movie2 });
-export const proxyImage = (url) => `${API_URL}/proxy-image?url=${encodeURIComponent(url)}`;
+export const proxyImage = (url, quality = null) => {
+    let finalQuality = quality;
+    if (!finalQuality) {
+        try {
+            // Read directly from native storage or localStorage for instantaneous image url generation
+            finalQuality = localStorage.getItem('sanctorum_posterQuality') || 'High';
+        } catch {
+            finalQuality = 'High';
+        }
+    }
+    return `${API_URL}/proxy-image?url=${encodeURIComponent(url)}&quality=${finalQuality}`;
+};
 
 export const getMyProfile = () => api.get('/predictions/me');
 export const getUpcomingPublicMovies = () => api.get('/predictions/upcoming');

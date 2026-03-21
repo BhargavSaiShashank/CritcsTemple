@@ -19,9 +19,19 @@ export const AtmosphereProvider = ({ children }) => {
     if (!posterUrl || posterUrl === currentPosterRef.current) return;
     currentPosterRef.current = posterUrl;
 
+    // MICRO-ROUTING OPTIMIZATION: 
+    // Prevent ColorThief from processing massive byte payloads on the main UI thread. 
+    // This violently drops the CPU overhead, preventing thousands of dropped frames on Android WebViews.
+    let extractUrl = posterUrl;
+    if (extractUrl.includes('/proxy-image')) {
+        extractUrl = extractUrl.replace(/quality=[a-zA-Z]+/, 'quality=Micro');
+    } else if (extractUrl.includes('image.tmdb.org')) {
+        extractUrl = extractUrl.replace(/\/(w\d+|original)\//, '/w92/');
+    }
+
     const img = new Image();
     img.crossOrigin = 'Anonymous';
-    img.src = posterUrl;
+    img.src = extractUrl;
 
     img.onload = () => {
       try {

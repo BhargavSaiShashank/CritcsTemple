@@ -55,6 +55,138 @@ body,
   --accent-dark: #1e40af;
 }
 
+/* --- THEME OVERRIDES --- */
+/* 1. Obsidian (Default) is handled by :root */
+.theme-obsidian {
+  --bg: #080808;
+  --surface: #101010;
+  --surface2: #181818;
+  --surface3: #222222;
+  --theme-primary: #f5a623;
+  --theme-glow: rgba(245, 166, 35, 0.06);
+}
+
+/* 1b. Default (Adaptive Poster Colors) */
+.theme-dynamic {
+  --bg: #050505;
+  --surface: #0f0f0f;
+  --surface2: #1a1a1a;
+  --surface3: #242424;
+  --text: #ffffff;
+  --text-2: rgba(255, 255, 255, 0.7);
+  --text-3: rgba(255, 255, 255, 0.5);
+  --border: rgba(255, 255, 255, 0.08);
+  --border2: rgba(255, 255, 255, 0.12);
+  /* Intentionally inheriting --theme-primary, --theme-secondary, --theme-glow from AtmosphereContext */
+  --amber: var(--theme-primary);
+  --amber-dim: rgba(255, 255, 255, 0.1);
+  --amber-glow: rgba(255, 255, 255, 0.05);
+}
+
+/* 2. Midnight Royal */
+.theme-midnight {
+  --bg: #050510;
+  --surface: #0a0a20;
+  --surface2: #121235;
+  --surface3: #1a1a4a;
+  --border: rgba(147, 112, 219, 0.15);
+  --border2: rgba(147, 112, 219, 0.08);
+  --theme-primary: #9370db;
+  --theme-secondary: #e6e6fa;
+  --theme-glow: rgba(147, 112, 219, 0.1);
+  --amber: #9370db; /* Retaining internal logic by mapping amber to purple */
+  --amber-dim: rgba(147, 112, 219, 0.12);
+  --amber-glow: rgba(147, 112, 219, 0.06);
+}
+
+/* 3. Crimson Theater */
+.theme-crimson {
+  --bg: #0f0000;
+  --surface: #1c0000;
+  --surface2: #2b0000;
+  --surface3: #3f0000;
+  --border: rgba(220, 20, 60, 0.15);
+  --border2: rgba(220, 20, 60, 0.08);
+  --theme-primary: #dc143c;
+  --theme-secondary: #ff6b81;
+  --theme-glow: rgba(220, 20, 60, 0.1);
+  --amber: #dc143c;
+  --amber-dim: rgba(220, 20, 60, 0.12);
+  --amber-glow: rgba(220, 20, 60, 0.06);
+}
+
+/* 4. Frost */
+.theme-frost {
+  --bg: #000b18;
+  --surface: #00152b;
+  --surface2: #002244;
+  --surface3: #003366;
+  --border: rgba(135, 206, 250, 0.15);
+  --border2: rgba(135, 206, 250, 0.08);
+  --theme-primary: #87cefa;
+  --theme-secondary: #e0ffff;
+  --theme-glow: rgba(135, 206, 250, 0.1);
+  --amber: #87cefa;
+  --amber-dim: rgba(135, 206, 250, 0.12);
+  --amber-glow: rgba(135, 206, 250, 0.06);
+}
+
+/* 5. Emerald */
+.theme-emerald {
+  --bg: #001108;
+  --surface: #001f10;
+  --surface2: #00331a;
+  --surface3: #004d26;
+  --border: rgba(46, 204, 113, 0.15);
+  --border2: rgba(46, 204, 113, 0.08);
+  --theme-primary: #2ecc71;
+  --theme-secondary: #a8f0c6;
+  --theme-glow: rgba(46, 204, 113, 0.1);
+  --amber: #2ecc71;
+  --amber-dim: rgba(46, 204, 113, 0.12);
+  --amber-glow: rgba(46, 204, 113, 0.06);
+}
+
+/* 6. Neon Arcade */
+.theme-neon {
+  --bg: #11001c;
+  --surface: #20003b;
+  --surface2: #340068;
+  --surface3: #5c00a3;
+  --border: rgba(255, 0, 255, 0.2);
+  --border2: rgba(255, 0, 255, 0.1);
+  --theme-primary: #ff00ff;
+  --theme-secondary: #00ffff;
+  --theme-glow: rgba(255, 0, 255, 0.15);
+  --amber: #ff00ff;
+  --amber-dim: rgba(255, 0, 255, 0.2);
+  --amber-glow: rgba(255, 0, 255, 0.1);
+}
+
+/* 7. Minimalist */
+.theme-minimal {
+  --bg: #121212;
+  --surface: #1e1e1e;
+  --surface2: #252525;
+  --surface3: #2e2e2e;
+  --border: rgba(255, 255, 255, 0.05);
+  --border2: rgba(255, 255, 255, 0.02);
+  --text: #ffffff;
+  --text-2: #a0a0a0;
+  --theme-primary: #e0e0e0;
+  --theme-secondary: #ffffff;
+  --theme-glow: rgba(255, 255, 255, 0.05);
+  --amber: #e0e0e0;
+  --amber-dim: rgba(255, 255, 255, 0.1);
+  --amber-glow: rgba(255, 255, 255, 0.03);
+  filter: grayscale(100%);
+}
+
+/* AMOLED PURE BLACK OVERRIDE */
+body.amoled-black {
+  --bg: #000000 !important;
+}
+
 body.is-native {
   /* Enforce a minimum of 48px top clearance for native devices (specifically Android hole-punches) */
   --safe-top: max(env(safe-area-inset-top, 0px), 48px);
