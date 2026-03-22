@@ -25,7 +25,7 @@ const SanctuaryTicket = React.forwardRef(({ review }, ref) => {
     const date = review.published_at ? new Date(review.published_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A';
 
     return (
-        <div style={{ position: 'fixed', top: 0, left: 0, zIndex: -1000, pointerEvents: 'none' }}>
+        <div style={{ position: 'fixed', top: '-10000px', left: '-10000px', zIndex: -1000, pointerEvents: 'none' }}>
             <div
                 ref={ref}
                 style={{

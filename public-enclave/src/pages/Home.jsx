@@ -32,6 +32,8 @@ export default function Home() {
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const [search, setSearch] = useState('');
     const containerRef = useRef(null);
+    const heroRef = useRef(null);
+
 
     const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
 
@@ -66,10 +68,9 @@ export default function Home() {
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [pullDistance, setPullDistance] = useState(0);
     const startY = useRef(0);
-    const startX = useRef(0);
     const isPulling = useRef(false);
-    const isHorizontalSwipe = useRef(false);
-    const hasDeterminedDirection = useRef(false);
+
+
 
     // Infinite Scroll State
     const [hasMore, setHasMore] = useState(true);
@@ -105,42 +106,25 @@ export default function Home() {
 
         const handleStart = (e) => {
             startY.current = e.touches[0].pageY;
-            startX.current = e.touches[0].pageX;
             isPulling.current = false;
-            isHorizontalSwipe.current = false;
-            hasDeterminedDirection.current = false;
         };
 
         const handleMove = (e) => {
             const currentY = e.touches[0].pageY;
-            const currentX = e.touches[0].pageX;
             const diffY = currentY - startY.current;
-            const diffX = currentX - startX.current;
 
-            if (!hasDeterminedDirection.current) {
-                if (Math.abs(diffX) > 10 || Math.abs(diffY) > 10) {
-                    hasDeterminedDirection.current = true;
-                    if (Math.abs(diffX) > Math.abs(diffY)) {
-                        isHorizontalSwipe.current = true;
-                    } else if (diffY > 0 && window.scrollY <= 5) {
-                        isPulling.current = true;
-                    }
-                }
+            if (diffY > 0 && window.scrollY <= 5 && !isPulling.current) {
+                isPulling.current = true;
             }
 
             if (isPulling.current) {
                 const distance = Math.min(diffY * 0.4, 80);
                 setPullDistance(distance);
                 if (distance > 10 && e.cancelable) e.preventDefault();
-            } else if (isHorizontalSwipe.current) {
-                if (e.cancelable) e.preventDefault();
             }
         };
 
-        const handleEnd = (e) => {
-            const currentX = e.changedTouches[0].pageX;
-            const diffX = currentX - startX.current;
-
+        const handleEnd = () => {
             if (isPulling.current) {
                 isPulling.current = false;
                 if (pullDistance > 60) {
@@ -155,8 +139,63 @@ export default function Home() {
                 } else {
                     setPullDistance(0);
                 }
-            } else if (isHorizontalSwipe.current) {
-                isHorizontalSwipe.current = false;
+            }
+        };
+
+        el.addEventListener('touchstart', handleStart, { passive: true });
+        el.addEventListener('touchmove', handleMove, { passive: false });
+        el.addEventListener('touchend', handleEnd, { passive: true });
+
+        return () => {
+            el.removeEventListener('touchstart', handleStart);
+            el.removeEventListener('touchmove', handleMove);
+            el.removeEventListener('touchend', handleEnd);
+        };
+    }, [pullDistance, fetchReviews]);
+
+    // Hero Swipe Logic
+    useEffect(() => {
+        const el = heroRef.current;
+        if (!el) return;
+
+        let hStartX = 0;
+        let hStartY = 0;
+        let hIsHorizontal = false;
+        let hHasDetermined = false;
+
+        const handleStart = (e) => {
+            hStartX = e.touches[0].pageX;
+            hStartY = e.touches[0].pageY;
+            hIsHorizontal = false;
+            hHasDetermined = false;
+        };
+
+        const handleMove = (e) => {
+            if (hHasDetermined && !hIsHorizontal) return;
+
+            const currentX = e.touches[0].pageX;
+            const currentY = e.touches[0].pageY;
+            const diffX = currentX - hStartX;
+            const diffY = currentY - hStartY;
+
+            if (!hHasDetermined) {
+                if (Math.abs(diffX) > 10 || Math.abs(diffY) > 10) {
+                    hHasDetermined = true;
+                    if (Math.abs(diffX) > Math.abs(diffY)) {
+                        hIsHorizontal = true;
+                    }
+                }
+            }
+
+            if (hIsHorizontal && e.cancelable) {
+                e.preventDefault();
+            }
+        };
+
+        const handleEnd = (e) => {
+            if (hIsHorizontal) {
+                const endX = e.changedTouches[0].pageX;
+                const diffX = endX - hStartX;
                 if (Math.abs(diffX) > 50) {
                     setIsAutoPlaying(false);
                     if (diffX > 0) {
@@ -177,7 +216,8 @@ export default function Home() {
             el.removeEventListener('touchmove', handleMove);
             el.removeEventListener('touchend', handleEnd);
         };
-    }, [pullDistance, fetchReviews, featuredReviews.length]);
+    }, [featuredReviews.length]);
+
 
     // Fetch Featured Reviews once on mount
     useEffect(() => {
@@ -297,6 +337,8 @@ export default function Home() {
 
             {/* ── HERO ── */}
             <section
+                ref={heroRef}
+
                 onMouseEnter={() => setIsAutoPlaying(false)}
                 onMouseLeave={() => setIsAutoPlaying(true)}
                 style={{

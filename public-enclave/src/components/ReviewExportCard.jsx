@@ -46,7 +46,7 @@ const ReviewExportCard = React.forwardRef(({ review }, ref) => {
     }).filter(g => g.avg !== null);
 
     return (
-        <div style={{ position: 'fixed', top: 0, left: 0, zIndex: -1000, pointerEvents: 'none' }}>
+        <div style={{ position: 'fixed', top: '-10000px', left: '-10000px', zIndex: -1000, pointerEvents: 'none' }}>
             <div
                 ref={ref}
                 style={{

@@ -2,14 +2,16 @@ import axios from 'axios';
 import { auth } from './firebase';
 import { Capacitor } from '@capacitor/core';
 
-const baseURL = Capacitor.isNativePlatform()
+export const API_BASE_URL = Capacitor.isNativePlatform()
     ? 'https://temple-backend-zgu3.onrender.com/api/v1'
     : import.meta.env.VITE_API_URL || '/api/v1';
-console.log(`[API_CONFIG] Base URL: ${baseURL}`);
+
+console.log(`[API_CONFIG] Base URL: ${API_BASE_URL}`);
 
 const api = axios.create({
-    baseURL: baseURL,
+    baseURL: API_BASE_URL,
 });
+
 
 // Inject Firebase ID Token into every request
 api.interceptors.request.use(async (config) => {
@@ -91,9 +93,9 @@ export const getProxyImageUrl = (url) => {
     if (!url || url === 'N/A') return '';
     // Prevent double-proxying
     if (url.includes('/admin/proxy-image?url=')) return url;
-    const baseUrl = import.meta.env.VITE_API_URL || '/api/v1';
-    return `${baseUrl}/admin/proxy-image?url=${encodeURIComponent(url)}`;
+    return `${API_BASE_URL}/admin/proxy-image?url=${encodeURIComponent(url)}`;
 };
+
 
 // Dynamic Ratings
 export const updateDynamicRating = (data) => api.post('/ratings', data);
