@@ -5,7 +5,7 @@ import {
     ChevronLeft, Plus, Loader2, Search, Calendar, Film,
     CheckCircle2, AlertCircle, TrendingUp, Trash2
 } from 'lucide-react';
-import { getUpcomingMovies, createUpcomingMovie, resolveUpcomingMovie, deleteUpcomingMovie } from '../services/api';
+import { getUpcomingMovies, createUpcomingMovie, resolveUpcomingMovie, deleteUpcomingMovie, getProxyImageUrl } from '../services/api';
 
 const UpcomingMovies = () => {
     const navigate = useNavigate();
@@ -196,7 +196,7 @@ const UpcomingMovies = () => {
                                 <div className="flex gap-4">
                                     <div className="w-20 h-28 bg-black/50 rounded-xl overflow-hidden border border-white/5 flex-shrink-0">
                                         {m.poster_url ? (
-                                            <img src={m.poster_url} className="w-full h-full object-cover" alt="" />
+                                            <img src={getProxyImageUrl(m.poster_url)} className="w-full h-full object-cover" alt="" />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center text-white/10">
                                                 <Film size={24} />

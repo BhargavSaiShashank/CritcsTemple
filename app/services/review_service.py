@@ -44,7 +44,8 @@ class ReviewService:
         content_type: Optional[str] = None,
         sort_by: Optional[str] = "date",
         order: Optional[str] = "desc",
-        year: Optional[int] = None
+        year: Optional[int] = None,
+        must_watch: Optional[bool] = None
     ) -> List[Dict[str, Any]]:
         publication_query = self._get_publication_query()
         filters = [publication_query]
@@ -60,6 +61,9 @@ class ReviewService:
 
         if year:
             filters.append({"movie_year": year})
+
+        if must_watch is not None:
+            filters.append({"is_must_watch": must_watch})
             
         if search and search.strip():
             filters.append({

@@ -107,8 +107,8 @@ const TheSanctorum = () => {
             <main className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 pb-20">
                 {/* 1. Global Presence (Language DNA) */}
                 <BentoCard title="Language DNA" icon={Globe} className="md:col-span-4">
-                    <div className="h-64 mt-4">
-                        <ResponsiveContainer width="100%" height="100%">
+                    <div className="h-64 mt-4 relative" style={{ minWidth: '1px', minHeight: '1px' }}>
+                        <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} debounce={50}>
                             <PieChart>
                                 <Pie
                                     data={langData}
@@ -142,8 +142,8 @@ const TheSanctorum = () => {
 
                 {/* 2. The Prime Radar */}
                 <BentoCard title="The Architectural Radar" icon={Zap} className="md:col-span-5">
-                    <div className="h-72">
-                        <ResponsiveContainer width="100%" height="100%">
+                    <div className="h-72 relative" style={{ minWidth: '1px', minHeight: '1px' }}>
+                        <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} debounce={50}>
                             <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
                                 <PolarGrid stroke="rgba(255,255,255,0.1)" />
                                 <PolarAngleAxis 
@@ -201,8 +201,8 @@ const TheSanctorum = () => {
 
                 {/* 4. Aspect Correlation (Long Card) */}
                 <BentoCard title="Critical Anchors (Correlation to Overall)" icon={TrendingUp} className="md:col-span-7">
-                    <div className="h-64 mt-6">
-                        <ResponsiveContainer width="100%" height="100%">
+                    <div className="h-64 mt-6 relative" style={{ minWidth: '1px', minHeight: '1px' }}>
+                        <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} debounce={50}>
                             <BarChart data={corrData} layout="vertical" margin={{ right: 60 }}>
                                 <XAxis type="number" hide domain={[0, 1]} />
                                 <YAxis dataKey="aspect" type="category" axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11, fontWeight: 700 }} width={100} />
@@ -225,8 +225,8 @@ const TheSanctorum = () => {
 
                 {/* 5. Temporal Imprints (Time Analysis) */}
                 <BentoCard title="Temporal Activity" icon={Clock} className="md:col-span-5">
-                    <div className="h-48 mt-8">
-                        <ResponsiveContainer width="100%" height="100%">
+                    <div className="h-48 mt-8 relative" style={{ minWidth: '1px', minHeight: '1px' }}>
+                        <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} debounce={50}>
                             <AreaChart data={temporalData}>
                                 <defs>
                                     <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">

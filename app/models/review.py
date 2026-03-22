@@ -71,6 +71,7 @@ class ReviewBase(BaseModel):
     aspects: AspectRatings = Field(default_factory=AspectRatings)
     tags: List[str] = []
     is_featured: bool = False
+    is_must_watch: bool = False
     author: Optional[str] = None
     watch_links: Optional[str] = None
     trailer_url: Optional[str] = None
@@ -101,6 +102,7 @@ class ReviewUpdate(BaseModel):
     aspects: Optional[AspectRatings] = None
     tags: Optional[List[str]] = None
     is_featured: Optional[bool] = None
+    is_must_watch: Optional[bool] = None
     author: Optional[str] = None
     movie_poster_url: Optional[str] = None
     watch_links: Optional[str] = None

@@ -82,8 +82,7 @@ const CarouselCard = ({ review, index }) => {
 export default function DiscoveryCarousel({ title, reviews, loading }) {
     const containerRef = useRef(null);
 
-    // Filter to show high rated content as "Must Watch"
-    const mustWatch = reviews?.filter(r => parseFloat(r.overall_rating) >= 8.5).slice(0, 10) || [];
+    const mustWatch = reviews || [];
 
     if (loading || mustWatch.length === 0) return null;
 

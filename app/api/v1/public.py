@@ -17,12 +17,13 @@ async def get_latest_reviews(
     search: Optional[str] = None,
     content_type: Optional[str] = None, # "movie" or "tv"
     year: Optional[int] = None,
+    must_watch: Optional[bool] = None,
     sort_by: Optional[str] = "date",
     order: Optional[str] = "desc",
     db = Depends(get_database)
 ):
     return await review_service.get_latest_reviews(
-        db, limit, offset, tag, verdict, search, content_type, sort_by, order, year
+        db, limit, offset, tag, verdict, search, content_type, sort_by, order, year, must_watch
     )
 
 @router.get("/reviews/{slug}")

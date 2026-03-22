@@ -88,7 +88,9 @@ export const updateSettings = (data) => api.put('/admin/settings', data);
 
 // Image Proxy
 export const getProxyImageUrl = (url) => {
-    if (!url) return '';
+    if (!url || url === 'N/A') return '';
+    // Prevent double-proxying
+    if (url.includes('/admin/proxy-image?url=')) return url;
     const baseUrl = import.meta.env.VITE_API_URL || '/api/v1';
     return `${baseUrl}/admin/proxy-image?url=${encodeURIComponent(url)}`;
 };

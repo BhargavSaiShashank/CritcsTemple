@@ -166,8 +166,8 @@ const Analytics = () => {
                             </div>
                         </div>
 
-                        <div className="h-[400px] w-full">
-                            <ResponsiveContainer width="100%" height="100%">
+                        <div className="h-[400px] w-full relative" style={{ minWidth: '1px', minHeight: '1px' }}>
+                            <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} debounce={50}>
                                 <BarChart data={stats?.distribution} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
                                     <XAxis 
@@ -227,8 +227,8 @@ const Analytics = () => {
                                 <p className="text-[10px] text-white/20 font-bold uppercase tracking-widest italic">Average score by collective categories</p>
                             </div>
                             
-                            <div className="flex-1 min-h-[300px]">
-                                <ResponsiveContainer width="100%" height="100%">
+                            <div className="flex-1 min-h-[300px] relative" style={{ minWidth: '1px', minHeight: '1px' }}>
+                                <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} debounce={50}>
                                     <RadarChart cx="50%" cy="50%" outerRadius="70%" data={stats?.genreDNA}>
                                         <PolarGrid stroke="#ffffff10" />
                                         <PolarAngleAxis 

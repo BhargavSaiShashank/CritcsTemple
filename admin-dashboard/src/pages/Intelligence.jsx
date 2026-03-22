@@ -7,7 +7,7 @@ import {
     TrendingUp, History, LayoutDashboard, Loader2, Star, ChevronRight, Filter, Search, Sparkles
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { getReviews, getDNAAnalytics, getEngagementAnalytics, deleteReview } from '../services/api';
+import { getReviews, getDNAAnalytics, getEngagementAnalytics, deleteReview, getProxyImageUrl } from '../services/api';
 import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
 import ReviewDetailsModal from '../components/ReviewDetailsModal';
 
@@ -124,13 +124,8 @@ const Intelligence = () => {
                         </div>
                     </div>
 
-                    <div className="h-[300px] md:h-[450px] w-full mt-4 transform group-hover:scale-105 transition-transform duration-1000 relative" style={{ minHeight: '400px' }}>
-                        {loading ? (
-                            <div className="h-full flex items-center justify-center">
-                                <Loader2 className="animate-spin text-amber-500" size={40} />
-                            </div>
-                        ) : (
-                            <ResponsiveContainer width="100%" height="100%">
+                    <div className="h-[300px] md:h-[450px] w-full mt-4 transform group-hover:scale-105 transition-transform duration-1000 relative" style={{ minHeight: '400px', minWidth: '1px' }}>
+                        <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} debounce={50}>
                                 <RadarChart cx="50%" cy="50%" outerRadius="75%" data={dnaData}>
                                     <PolarGrid stroke="#ffffff10" />
                                     <PolarAngleAxis
@@ -173,7 +168,6 @@ const Intelligence = () => {
                                     />
                                 </RadarChart>
                             </ResponsiveContainer>
-                        )}
                     </div>
                 </motion.div>
 
@@ -198,7 +192,7 @@ const Intelligence = () => {
                             {engagementData.trending.map((item, i) => (
                                 <div key={item.slug} className="flex items-center gap-4 group cursor-default">
                                     <div className="w-8 h-10 rounded-lg bg-white/5 overflow-hidden">
-                                        <img src={item.poster || "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&q=80&w=800"} className="w-full h-full object-cover grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all" />
+                                        <img src={getProxyImageUrl(item.poster) || "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&q=80&w=800"} className="w-full h-full object-cover grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all" />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="text-[10px] font-bold text-white/70 truncate uppercase">{item.title}</p>
@@ -290,8 +284,8 @@ const Intelligence = () => {
                                 <div className="w-24 aspect-[2/3] rounded-2xl overflow-hidden bg-white/5 shadow-xl transition-transform duration-700 group-hover:scale-110">
                                     <img
                                         src={failedPosters.has(review.movie_poster_url) || !review.movie_poster_url
-                                            ? "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&q=80&w=800"
-                                            : review.movie_poster_url}
+                                                ? "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&q=80&w=800"
+                                            : getProxyImageUrl(review.movie_poster_url)}
                                         className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-700"
                                         alt={review.movie_title}
                                         onError={(e) => handlePosterError(e, review.movie_poster_url)}

@@ -21,24 +21,25 @@ const RatingTimelineGraph = ({ data }) => {
           Drift: {data.drift > 0 ? '+' : ''}{data.drift.toFixed(1)}
         </span>
       </h3>
-      <ResponsiveContainer width="100%" height="80%">
-        <LineChart data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#2d3748" vertical={false} />
-          <XAxis 
-            dataKey="name" 
-            stroke="#718096" 
-            fontSize={10} 
-            tickLine={false} 
-            axisLine={false} 
-          />
-          <YAxis 
-            domain={[0, 10]} 
-            stroke="#718096" 
-            fontSize={10} 
-            tickLine={false} 
-            axisLine={false}
-            ticks={[0, 2, 4, 6, 8, 10]}
-          />
+      <div className="h-[calc(100%-40px)] w-full relative" style={{ minWidth: '1px', minHeight: '1px' }}>
+        <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} debounce={50}>
+          <LineChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#2d3748" vertical={false} />
+            <XAxis 
+              dataKey="name" 
+              stroke="#718096" 
+              fontSize={10} 
+              tickLine={false} 
+              axisLine={false} 
+            />
+            <YAxis 
+              domain={[0, 10]} 
+              stroke="#718096" 
+              fontSize={10} 
+              tickLine={false} 
+              axisLine={false}
+              ticks={[0, 2, 4, 6, 8, 10]}
+            />
           <Tooltip 
             contentStyle={{ backgroundColor: '#1a202c', border: '1px solid #2d3748', borderRadius: '8px', fontSize: '10px' }}
             itemStyle={{ color: '#6366f1' }}
@@ -53,7 +54,8 @@ const RatingTimelineGraph = ({ data }) => {
             animationDuration={1500}
           />
         </LineChart>
-      </ResponsiveContainer>
+        </ResponsiveContainer>
+      </div>
       <div className="mt-2 flex justify-between text-[10px] text-gray-500">
         <span>Volatility: {data.volatility.toFixed(2)}</span>
         <span>Consistency: {(data.consistency_index * 100).toFixed(0)}%</span>

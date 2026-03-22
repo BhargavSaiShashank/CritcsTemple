@@ -86,6 +86,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                 verdict: initialData.verdict || 'Good',
                 status: initialData.status || 'published',
                 is_featured: initialData.is_featured || false,
+                is_must_watch: initialData.is_must_watch || false,
                 author: initialData.author || '',
                 watch_links: initialData.watch_links || '',
                 movie_poster_url: initialData.movie_poster_url || '',
@@ -96,7 +97,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                 tags: initialData.tags || [],
                 language: initialData.language || '',
                 trailer_url: initialData.trailer_url || '',
-                movie_year: initialData.movie_year || '',
+                movie_year: initialData.movie_year ? initialData.movie_year.toString() : '',
                 oscar_rank: initialData.oscar_rank || 0,
                 scheduled_date: initialData.scheduled_date ? initialData.scheduled_date.slice(0, 16) : '',
                 content_type: initialData.content_type || 'movie',
@@ -111,6 +112,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             verdict: '',
             status: 'published',
             is_featured: false,
+            is_must_watch: false,
             author: '',
             watch_links: '',
             movie_poster_url: '',
@@ -121,7 +123,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             tags: [],
             language: '',
             trailer_url: movie?.trailer_url || '',
-            movie_year: movie?.release_year || '',
+            movie_year: movie?.release_year ? movie.release_year.toString() : '',
             oscar_rank: 0,
             scheduled_date: '',
             content_type: movie?.content_type || 'movie',
@@ -166,14 +168,26 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
         fetchTimeline();
     }, [movie]);
 
-    const handlePhaseUpdate = async (phase) => {
+    const handlePhaseUpdate = async (phaseName) => {
+        // Ensure we have a valid movie_id
+        const movieId = movie.imdb_id || movie.id || initialData?.movie_id;
+        
+        if (!movieId || movieId === 0 || movieId === '0') {
+            console.error("[EVOLUTION_REGISTRY] Cannot update without valid movie_id", { movie, initialData });
+            alert("This record lacks a persistent identity (movie_id). Please re-select from search or ensure it has an IMDB ID.");
+            return;
+        }
+
         setPhaseLoading(true);
         try {
             const payload = {
-                movie_id: movie.imdb_id || movie.id,
-                phase_name: phase,
+                movie_id: String(movieId),
+                phase_name: phaseName,
                 score: parseFloat(averageScore),
-                metadata: { mood: 'Normal', context: 'Standard Review' }
+                metadata: { 
+                    date: new Date().toISOString(),
+                    context: "Admin Ritual Update"
+                }
             };
             const response = await updateDynamicRating(payload);
             setRatingTimeline(response.data);
@@ -555,6 +569,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
         const payload = {
             ...formData,
             verdict: formData.verdict ? normalizeVerdict(formData.verdict) : null,
+            is_must_watch: formData.is_must_watch,
             aspects: cleanedAspects,
             slug,
             status,
@@ -1114,6 +1129,33 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                             </div>
                         </div>
 
+                        <div className="flex flex-wrap gap-8 items-center bg-white/[0.03] border border-white/10 rounded-3xl p-8 backdrop-blur-xl">
+                            <label className="flex items-center gap-4 cursor-pointer group">
+                                <div
+                                    onClick={() => setFormData(prev => ({ ...prev, is_featured: !prev.is_featured }))}
+                                    className={`w-14 h-7 rounded-full transition-all relative ${formData.is_featured ? 'bg-amber-500 shadow-[0_0_15px_rgba(245,166,35,0.4)]' : 'bg-white/10'}`}
+                                >
+                                    <div className={`absolute top-1 w-5 h-5 rounded-full transition-all ${formData.is_featured ? 'left-8 bg-black' : 'left-1 bg-white/40'}`} />
+                                </div>
+                                <div className="space-y-0.5">
+                                    <span className="text-xs font-black uppercase tracking-widest text-white/80 group-hover:text-amber-500 transition-colors">Spotlight Featured</span>
+                                    <p className="text-[10px] text-white/30 italic">Primary Carousel visibility</p>
+                                </div>
+                            </label>
+
+                            <label className="flex items-center gap-4 cursor-pointer group">
+                                <div
+                                    onClick={() => setFormData(prev => ({ ...prev, is_must_watch: !prev.is_must_watch }))}
+                                    className={`w-14 h-7 rounded-full transition-all relative ${formData.is_must_watch ? 'bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)]' : 'bg-white/10'}`}
+                                >
+                                    <div className={`absolute top-1 w-5 h-5 rounded-full transition-all ${formData.is_must_watch ? 'left-8 bg-black' : 'left-1 bg-white/40'}`} />
+                                </div>
+                                <div className="space-y-0.5">
+                                    <span className="text-xs font-black uppercase tracking-widest text-white/80 group-hover:text-red-500 transition-colors">Must Watch Legacy</span>
+                                    <p className="text-[10px] text-white/30 italic">Discovery Section inclusion</p>
+                                </div>
+                            </label>
+                        </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                             <div className="space-y-8">
                                 <label className="text-[10px] font-black uppercase tracking-[0.6em] text-amber-500/40">Publication Status</label>
@@ -1169,6 +1211,23 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                                 <div className="space-y-1">
                                     <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 group-hover:text-amber-500 transition-colors">Featured Sanctuary Post</p>
                                     <p className="text-[8px] font-bold text-white/10 uppercase tracking-widest">Mark this critique for the main archives</p>
+                                </div>
+                            </label>
+
+                            <label className="flex items-center gap-6 cursor-pointer group w-fit">
+                                <div className={`w-10 h-10 rounded-2xl border flex items-center justify-center transition-all duration-700 ${formData.is_must_watch ? 'bg-indigo-500 border-indigo-500 -rotate-12 scale-110 shadow-[0_0_30px_rgba(99,102,241,0.4)]' : 'bg-white/5 border-white/10 group-hover:border-indigo-500/30'
+                                    }`}>
+                                    {formData.is_must_watch && <Heart size={18} className="text-black fill-black" />}
+                                </div>
+                                <input
+                                    type="checkbox"
+                                    className="hidden"
+                                    checked={formData.is_must_watch}
+                                    onChange={e => setFormData({ ...formData, is_must_watch: e.target.checked })}
+                                />
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 group-hover:text-indigo-500 transition-colors">Must Watch Designation</p>
+                                    <p className="text-[8px] font-bold text-white/10 uppercase tracking-widest">Pin to the "Must Watch" high-priority scroll</p>
                                 </div>
                             </label>
 

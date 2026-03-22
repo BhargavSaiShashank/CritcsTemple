@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Clapperboard, Star } from 'lucide-react';
+import { getProxyImageUrl } from '../services/api';
 
 const SanctuaryCard = ({ movie, review, cardRef }) => {
     const viewportRef = useRef(null);
@@ -256,7 +257,7 @@ const SanctuaryCard = ({ movie, review, cardRef }) => {
                     <div style={styles.main}>
                         <div style={styles.posterFrame}>
                             <img
-                                src={imageFailed ? "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&q=80&w=800" : movie.poster}
+                                src={imageFailed ? "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&q=80&w=800" : getProxyImageUrl(movie.poster)}
                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                 alt={movie.title}
                                 crossOrigin="anonymous"

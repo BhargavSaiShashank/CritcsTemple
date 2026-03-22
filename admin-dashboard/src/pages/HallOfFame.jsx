@@ -5,7 +5,7 @@ import {
     Home, Plus, Trash2, Save, X, Search, Clapperboard,
     ArrowLeft, Loader2, Edit3, GripVertical
 } from 'lucide-react';
-import { getCategories, createCategory, updateCategory, deleteCategory, getReviews } from '../services/api';
+import { getCategories, createCategory, updateCategory, deleteCategory, getReviews, getProxyImageUrl } from '../services/api';
 import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
 
 export default function HallOfFame() {
@@ -301,7 +301,7 @@ export default function HallOfFame() {
                                                                     className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${isSelected ? 'bg-amber-500/10 border-amber-500/30' : 'bg-[#111] border-white/5 hover:border-white/20'
                                                                         }`}
                                                                 >
-                                                                    <img src={r.movie_poster_url || '/placeholder.jpg'} alt="" className="w-8 h-12 object-cover rounded opacity-80" />
+                                                                    <img src={getProxyImageUrl(r.movie_poster_url) || '/placeholder.jpg'} alt="" className="w-8 h-12 object-cover rounded opacity-80" />
                                                                     <div className="flex-1 min-w-0">
                                                                         <h4 className="text-sm font-bold truncate">{r.movie_title}</h4>
                                                                         <p className="text-xs text-white/40 truncate">{r.verdict}</p>
@@ -317,7 +317,7 @@ export default function HallOfFame() {
                                                             if (!r) return null;
                                                             return (
                                                                 <div key={slug} className="flex items-center gap-3 p-3 rounded-xl bg-[#111] border border-white/5">
-                                                                    <img src={r.movie_poster_url || '/placeholder.jpg'} alt="" className="w-8 h-12 object-cover rounded opacity-80" />
+                                                                    <img src={getProxyImageUrl(r.movie_poster_url) || '/placeholder.jpg'} alt="" className="w-8 h-12 object-cover rounded opacity-80" />
                                                                     <div className="flex-1 min-w-0">
                                                                         <h4 className="text-sm font-bold truncate">{r.movie_title}</h4>
                                                                         <p className="text-xs text-white/40 truncate">{r.verdict}</p>

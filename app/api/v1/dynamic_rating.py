@@ -5,7 +5,7 @@ from app.services.rating_service import RatingService
 
 router = APIRouter()
 
-@router.post("/", response_model=DynamicRatingInDB)
+@router.post("", response_model=DynamicRatingInDB)
 async def update_movie_rating(rating_data: DynamicRatingCreate):
     try:
         return await RatingService.update_rating(

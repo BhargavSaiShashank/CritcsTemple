@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { auth } from '../services/firebase'
-import { fetchMovieFromOMDb, searchMovies, fetchShowFromTMDB, searchShows, createReview, exportDataVault } from '../services/api'
+import { fetchMovieFromOMDb, searchMovies, fetchShowFromTMDB, searchShows, createReview, exportDataVault, getProxyImageUrl } from '../services/api'
 import { useNavigate, Link } from 'react-router-dom';
 import ReviewForm from '../components/ReviewForm'
 import {
@@ -425,7 +425,7 @@ const Dashboard = () => {
                                                 <img
                                                     src={failedPosters.has(res.Poster) || res.Poster === 'N/A' || !res.Poster.includes('http')
                                                         ? 'https://images.unsplash.com/photo-1485846234645-a62644f84728?q=30&w=1000'
-                                                        : res.Poster}
+                                                        : getProxyImageUrl(res.Poster)}
                                                     className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-1000 scale-105 group-hover:scale-100"
                                                     alt=""
                                                     onError={(e) => handlePosterError(e, res.Poster)}
@@ -473,7 +473,7 @@ const Dashboard = () => {
                                         <img
                                             src={failedPosters.has(movie.poster_url)
                                                 ? 'https://images.unsplash.com/photo-1485846234645-a62644f84728?q=30&w=1000'
-                                                : movie.poster_url}
+                                                : getProxyImageUrl(movie.poster_url)}
                                             className="w-full h-full object-cover"
                                             alt=""
                                             onError={(e) => handlePosterError(e, movie.poster_url)}

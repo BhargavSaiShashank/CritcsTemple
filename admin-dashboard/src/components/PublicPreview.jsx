@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Star, Calendar, Quote as QuoteIcon, Zap, Camera, Music, Heart, TrendingUp } from 'lucide-react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, PolarRadiusAxis, Tooltip } from 'recharts';
+import { getProxyImageUrl } from '../services/api';
 
 const ASPECT_GROUPS = [
     { name: 'Narrative', icon: QuoteIcon, color: '#818cf8', aspects: ['story', 'screenplay', 'originality', 'opening', 'climax'] },
@@ -83,7 +84,7 @@ const PublicPreview = ({ review, movie }) => {
             {/* Cinematic Banner */}
             <div className="relative h-44 overflow-hidden">
                 <img 
-                    src={review.movie_poster_url || movie.poster_url} 
+                    src={getProxyImageUrl(review.movie_poster_url || movie.poster_url)} 
                     className="w-full h-full object-cover opacity-30 filter saturate-50 contrast-125"
                     alt="" 
                 />
@@ -139,8 +140,8 @@ const PublicPreview = ({ review, movie }) => {
                              <TrendingUp size={12} className="text-white/20" />
                              <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30">Structural DNA</span>
                         </div>
-                        <div className="h-56 w-full border border-white/5 rounded-3xl bg-white/[0.01] p-4 relative">
-                            <ResponsiveContainer width="100%" height="100%">
+                        <div className="h-56 w-full border border-white/5 rounded-3xl bg-white/[0.01] p-4 relative overflow-hidden" style={{ minWidth: '1px', minHeight: '1px' }}>
+                            <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} debounce={50}>
                                 <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
                                     <PolarGrid stroke="rgba(255,255,255,0.05)" />
                                     <PolarAngleAxis dataKey="subject" tick={{ fill: 'rgba(255,255,255,0.2)', fontSize: 7, fontWeight: 900 }} />

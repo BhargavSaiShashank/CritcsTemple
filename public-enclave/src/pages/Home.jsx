@@ -23,6 +23,7 @@ const VERDICT_COLOR = {
 
 export default function Home() {
     const [featuredReviews, setFeaturedReviews] = useState([]);
+    const [mustWatchReviews, setMustWatchReviews] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isAutoPlaying, setIsAutoPlaying] = useState(true);
     const [error, setError] = useState(null);
@@ -183,6 +184,13 @@ export default function Home() {
         getLatestReviews(5, 0, '', 'All', 'All', 'date', 'desc')
             .then(({ data }) => {
                 if (data && data.length > 0) setFeaturedReviews(data);
+            })
+            .catch(console.error);
+
+        // Fetch Must Watch Reviews
+        getLatestReviews(10, 0, '', 'All', 'All', 'date', 'desc', null, null, true)
+            .then(({ data }) => {
+                if (data) setMustWatchReviews(data);
             })
             .catch(console.error);
     }, []);
@@ -518,7 +526,7 @@ export default function Home() {
             </section>
 
             {/* ── DISCOVERY CAROUSEL ── */}
-            <DiscoveryCarousel reviews={featuredReviews} loading={featuredReviews.length === 0} />
+            <DiscoveryCarousel reviews={mustWatchReviews} loading={mustWatchReviews.length === 0 && loading} />
 
             {/* ── ARCHIVE GRID ── */}
             <section className="max-w-container" style={{ paddingTop: '64px', paddingBottom: '100px' }}>

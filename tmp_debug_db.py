@@ -1,28 +1,26 @@
 import asyncio
-from app.db.mongodb import connect_to_mongo, get_database
+from app.db.mongodb import connect_to_mongo, get_database, close_mongo_connection
 
-async def run():
+async def check_db():
     await connect_to_mongo()
     db = get_database()
     
-    # Get all movie IDs with Science Fiction genre
-    movies = await db.movies.find({"genres": "Science Fiction"}).to_list(100)
-    sci_fi_tmdb_ids = [m.get('tmdb_id') for m in movies]
-    sci_fi_imdb_ids = [m.get('imdb_id') for m in movies]
+    print("--- Dynamic Ratings ---")
+    ratings_cursor = db.dynamic_ratings.find()
+    ratings_count = 0
+    async for r in ratings_cursor:
+        ratings_count += 1
+        print(f"Movie ID: {r.get('movie_id')} (Type: {type(r.get('movie_id'))})")
     
-    print(f"Science Fiction TMDB IDs: {sci_fi_tmdb_ids}")
-    
-    # Get reviews for these movies
-    reviews = await db.reviews.find({
-        "$or": [
-            {"movie_id": {"$in": sci_fi_tmdb_ids}},
-            {"movie_id": {"$in": sci_fi_imdb_ids}}
-        ]
-    }).to_list(100)
-    
-    print("\nScience Fiction Reviews Found:")
-    for r in reviews:
-        print(f"- {r.get('movie_title')}: {r.get('overall_rating')}")
+    if ratings_count == 0:
+        print("No dynamic ratings found.")
+        
+    print("\n--- Reviews Sample ---")
+    reviews_cursor = db.reviews.find().limit(5)
+    async for rev in reviews_cursor:
+        print(f"Slug: {rev.get('slug')}, Movie ID: {rev.get('movie_id')} (Type: {type(rev.get('movie_id'))})")
+        
+    await close_mongo_connection()
 
 if __name__ == "__main__":
-    asyncio.run(run())
+    asyncio.run(check_db())

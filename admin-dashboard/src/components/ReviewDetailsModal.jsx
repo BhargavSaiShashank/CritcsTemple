@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Trash2, Calendar, Star, TrendingUp } from 'lucide-react';
+import { getProxyImageUrl } from '../services/api';
 
 const ReviewDetailsModal = ({ review, isOpen, onClose, onDelete }) => {
     if (!review) return null;
@@ -27,7 +28,7 @@ const ReviewDetailsModal = ({ review, isOpen, onClose, onDelete }) => {
                         {/* Header Image */}
                         <div className="relative h-48 md:h-64 flex-shrink-0 bg-black">
                             <img
-                                src={review.movie_poster_url || "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&q=80&w=800"}
+                                src={getProxyImageUrl(review.movie_poster_url) || "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&q=80&w=800"}
                                 alt={review.movie_title}
                                 className="w-full h-full object-cover opacity-60"
                                 onError={(e) => {

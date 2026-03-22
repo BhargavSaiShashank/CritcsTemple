@@ -1,15 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import ColorThief from 'colorthief';
+import { getProxyImageUrl } from '../services/api';
 
 const BackgroundAtmosphere = ({ imageUrl }) => {
     const [colors, setColors] = useState(['#fbbf24', '#0c0c0c']); // Default amber/black
 
     useEffect(() => {
-        if (!imageUrl || imageUrl === 'N/A') return;
+        if (!imageUrl || imageUrl === 'N/A') {
+            setColors(['#fbbf24', '#0c0c0c']);
+            return;
+        }
+        
+        const proxiedUrl = getProxyImageUrl(imageUrl);
+        if (!proxiedUrl) return;
 
         const img = new Image();
         img.crossOrigin = 'Anonymous';
-        img.src = imageUrl;
+        img.src = proxiedUrl;
 
         img.onload = () => {
             try {

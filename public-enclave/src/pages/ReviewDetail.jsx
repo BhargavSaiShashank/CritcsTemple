@@ -266,8 +266,9 @@ export default function ReviewDetail() {
     }, [slug]);
 
     useEffect(() => {
-        if (review?.movie_id || review?.imdb_id) {
-            getRatingTimeline(review.movie_id || review.imdb_id)
+        const targetId = review?.movie_id || review?.imdb_id || (review?.movie?.tmdb_id) || (review?.movie?.imdb_id);
+        if (targetId) {
+            getRatingTimeline(targetId)
                 .then(res => setRatingTimeline(res.data))
                 .catch(() => setRatingTimeline(null));
         }
