@@ -65,7 +65,9 @@ const ReviewDetailsModal = ({ review, isOpen, onClose, onDelete }) => {
                                     </span>
                                     <div className="flex items-center gap-1 text-amber-500 bg-black/40 px-3 py-1 rounded-full backdrop-blur-md border border-white/5">
                                         <Star size={12} fill="currentColor" />
-                                        <span className="text-xs font-black">{review.overall_rating}</span>
+                                        <span className="text-xs font-black">
+                                            {typeof review.overall_rating === 'object' ? review.overall_rating.score.toFixed(2) : (parseFloat(review.overall_rating) || 0).toFixed(2)}
+                                        </span>
                                     </div>
                                     <div className="flex items-center gap-2 text-white/50 bg-black/40 px-3 py-1 rounded-full backdrop-blur-md border border-white/5 text-[10px] uppercase font-bold tracking-wider">
                                         <Calendar size={12} />

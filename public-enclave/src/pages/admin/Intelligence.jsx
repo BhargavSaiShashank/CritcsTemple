@@ -247,7 +247,9 @@ const Intelligence = () => {
                         </div>
                         <div className="flex items-center gap-2 text-amber-500">
                             <Star size={12} fill="currentColor" />
-                            <span className="text-sm font-black italic">{review.overall_rating}</span>
+                            <span className="text-sm font-black italic">
+                                {typeof review.overall_rating === 'object' ? review.overall_rating.score.toFixed(2) : (parseFloat(review.overall_rating) || 0).toFixed(2)}
+                            </span>
                         </div>
                     </div>
                 </motion.div>

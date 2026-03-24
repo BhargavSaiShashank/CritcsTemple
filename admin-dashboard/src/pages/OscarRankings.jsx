@@ -266,7 +266,9 @@ export default function OscarRankings() {
                                                     <span className="text-[9px] font-black text-[#FFD700]/70 uppercase tracking-[0.2em] bg-[#FFD700]/10 px-3 py-1.5 rounded-md">
                                                         {c.verdict || 'UNRATED'}
                                                     </span>
-                                                    <span className="text-sm font-bold text-white/40">{c.overall_rating}/10</span>
+                                                    <span className="text-sm font-bold text-white/40">
+                                                        {typeof c.overall_rating === 'object' ? c.overall_rating.score.toFixed(2) : (parseFloat(c.overall_rating) || 0).toFixed(2)}/10
+                                                    </span>
                                                 </div>
                                             </div>
 

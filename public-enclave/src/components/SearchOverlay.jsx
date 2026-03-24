@@ -182,7 +182,7 @@ const SearchOverlay = ({ isOpen, onClose }) => {
                                             <h4 style={{ margin: '0 0 4px', fontSize: '16px', fontWeight: 600 }}>{movie.movie_title}</h4>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                                 <span style={{ fontSize: '12px', color: '#f5a623', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700 }}>
-                                                    <Star size={12} fill="#f5a623" /> {movie.overall_rating}
+                                                    <Star size={12} fill="#f5a623" /> {typeof movie.overall_rating === 'object' ? movie.overall_rating.score.toFixed(2) : (parseFloat(movie.overall_rating) || 0).toFixed(2)}
                                                 </span>
                                                 <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>
                                                     {movie.verdict}
