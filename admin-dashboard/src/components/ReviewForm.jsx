@@ -101,6 +101,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                 oscar_rank: initialData.oscar_rank || 0,
                 scheduled_date: initialData.scheduled_date ? initialData.scheduled_date.slice(0, 16) : '',
                 content_type: initialData.content_type || 'movie',
+                micro_calibration: initialData.micro_calibration || null,
                 aspects: { ...defaultAspects, ...(initialData.aspects || {}) }
             };
         }
@@ -127,6 +128,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             oscar_rank: 0,
             scheduled_date: '',
             content_type: movie?.content_type || 'movie',
+            micro_calibration: null,
             aspects: defaultAspects
         };
     });
@@ -379,19 +381,18 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
         const aspects = formData.aspects || {};
 
         const categories = {
-            'Narrative': { keys: ['story', 'screenplay', 'originality', 'opening', 'climax', 'themes_depth'], weight: 0.25 },
+            'Narrative': { keys: ['story', 'screenplay', 'originality', 'opening', 'climax', 'themes_depth'], weight: 0.35 },
             'Direction': { keys: ['direction', 'acting', 'blocking_staging'], weight: 0.25 },
-            'Soul': { keys: ['pacing', 'emotional_impact', 'rewatch_value', 'immersion'], weight: 0.20 },
             'Visuals': { keys: ['cinematography', 'editing', 'production_design', 'vfx', 'visual_storytelling'], weight: 0.15 },
-            'Audio': { keys: ['bg_score', 'music', 'sound_design'], weight: 0.15 }
+            'Audio': { keys: ['bg_score', 'music', 'sound_design'], weight: 0.10 },
+            'Soul': { keys: ['pacing', 'emotional_impact', 'rewatch_value', 'immersion'], weight: 0.15 }
         };
 
         let weightedScore = 0.0;
         let activeWeightTotal = 0.0;
-        let craftPenalty = 0.0;
         let catAverages = {};
 
-        // Step 1: Base Score & Craft Penalty
+        // Step 1: Category Averages & Base Weighted Score
         for (const [catName, info] of Object.entries(categories)) {
             const catScores = [];
             for (const key of info.keys) {
@@ -399,9 +400,6 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                     const scoreVal = parseFloat(aspects[key].score);
                     if (scoreVal > 0) {
                         catScores.push(scoreVal);
-                        if (scoreVal <= 4.5) {
-                            craftPenalty += 0.03;
-                        }
                     }
                 }
             }
@@ -416,59 +414,50 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
         if (activeWeightTotal === 0) return "0.00";
 
         const baseScore = weightedScore / activeWeightTotal;
+        let finalScore = baseScore;
 
-        // Step 2: Variance Penalty
+        // Step 2: Foundation Penalty
+        const narrativeAvg = catAverages['Narrative'] || 0;
+        const directionAvg = catAverages['Direction'] || 0;
+        const soulAvg = catAverages['Soul'] || 0;
+
+        if (narrativeAvg < 6.5) finalScore -= 0.15;
+        if (directionAvg < 6.5) finalScore -= 0.10;
+        if (soulAvg < 6.0) finalScore -= 0.05;
+
+        // Step 3: Refined Variance Penalty
         const catVals = Object.values(catAverages);
-        let variancePenalty = 0.0;
-        if (catVals.length > 0) {
+        if (catVals.length > 0 && Math.min(...catVals) < 7.0) {
             const maxCat = Math.max(...catVals);
             const minCat = Math.min(...catVals);
-            const variance = maxCat - minCat;
-            if (variance >= 3) variancePenalty = 0.10;
-            else if (variance >= 2) variancePenalty = 0.05;
+            const gap = maxCat - minCat;
+            if (gap >= 3.0) finalScore -= 0.10;
+            else if (gap >= 2.0) finalScore -= 0.05;
         }
 
-        // Step 3: Foundation Penalty
-        let foundationPenalty = 0.0;
-        if (catAverages['Narrative'] !== undefined && catAverages['Narrative'] < 6.5) {
-            foundationPenalty += 0.10;
-        }
-        if (catAverages['Direction'] !== undefined && catAverages['Direction'] < 6.5) {
-            foundationPenalty += 0.05;
-        }
-
-        // Step 4: Greatness Boost
-        const above85 = catVals.filter(v => v >= 8.5).length;
-        const above83 = catVals.filter(v => v >= 8.3).length;
+        // Step 4: Controlled Boosts
         let boost = 0.0;
-        if (above85 >= 4) {
-            boost = 0.10;
-        } else if (above83 >= 3) {
-            boost = 0.05;
+        if (catVals.length === 5) {
+            if (catVals.every(v => v >= 8.5)) boost += 0.07;
+            else if (catVals.filter(v => v >= 8.3).length >= 3) boost += 0.03;
         }
+        finalScore += boost;
 
-        // Step 5: Emotion Adjustment
-        let emotionAdj = 0.0;
-        if (aspects['emotional_impact'] && isFinite(parseFloat(aspects['emotional_impact'].score))) {
-            const eiScore = parseFloat(aspects['emotional_impact'].score);
-            if (eiScore > 0) {
-                const narrAvg = catAverages['Narrative'] || 0;
-                if (eiScore >= 8.5 && narrAvg >= 7.0) {
-                    emotionAdj = 0.05;
-                } else if (eiScore <= 5.5) {
-                    emotionAdj = -0.05;
-                }
-            }
-        }
+        // Step 5: Micro-Calibration (New)
+        if (formData.micro_calibration === "Soul" && soulAvg >= 9.0) finalScore += 0.02;
+        else if (formData.micro_calibration === "Narrative" && narrativeAvg >= 9.0) finalScore += 0.02;
 
-        // Step 6: Final Score Compilation
-        let finalScore = baseScore + boost + emotionAdj - variancePenalty - foundationPenalty - craftPenalty;
+        // Step 6: Soul Gate
+        if (soulAvg < 7.0 && finalScore > 8.5) finalScore = 8.5;
 
-        if (finalScore > 10.0) finalScore = 10.0;
-        if (finalScore < 0.0) finalScore = 0.0;
+        // Final Ceiling
+        if (finalScore > 9.70) finalScore = 9.70;
+
+        // Clamp 0-10
+        finalScore = Math.max(0, Math.min(10, finalScore));
 
         return finalScore.toFixed(2);
-    }, [formData.aspects])
+    }, [formData.aspects, formData.micro_calibration])
 
     const [aiLoading, setAiLoading] = useState(false);
 
@@ -992,6 +981,27 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                             placeholder="Written by..."
                             className="w-full bg-transparent border-b border-white/5 py-4 text-xl md:text-2xl font-black text-amber-500/80 outline-none focus:border-amber-500/30 transition-all placeholder:text-white/5 tracking-tighter"
                         />
+                    </div>
+
+                    <div className="space-y-6">
+                        <label className="text-[10px] font-black uppercase tracking-[0.6em] text-white/10">Micro-Calibration (Divine Adjustment)</label>
+                        <div className="flex gap-3">
+                            {['None', 'Soul', 'Narrative'].map(type => (
+                                <button
+                                    key={type}
+                                    type="button"
+                                    onClick={() => setFormData({ ...formData, micro_calibration: type === 'None' ? null : type })}
+                                    className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                                        (formData.micro_calibration === type || (type === 'None' && !formData.micro_calibration))
+                                            ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/20'
+                                            : 'bg-white/5 text-white/40 hover:bg-white/10'
+                                    }`}
+                                >
+                                    {type}
+                                </button>
+                            ))}
+                        </div>
+                        <p className="text-[9px] text-white/20 italic">Manual +0.02 boost if specific peaks are met (Soul or Narrative ≥ 9.0).</p>
                     </div>
 
                     <div className="space-y-6">

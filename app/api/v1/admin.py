@@ -89,7 +89,7 @@ async def create_review(
     
     # Auto-calculate overall rating if not provided or to ensure accuracy
     if review_dict.get("overall_rating") is None or review_dict.get("overall_rating") == 0:
-        review_dict["overall_rating"] = calculate_overall_score(review.aspects)
+        review_dict["overall_rating"] = calculate_overall_score(review.aspects, review.micro_calibration)
         
     review_dict["created_at"] = datetime.utcnow()
     review_dict["updated_at"] = datetime.utcnow()
@@ -133,12 +133,15 @@ async def update_review(
     if "aspects" in update_dict and "overall_rating" not in update_dict:
         from app.models.review import AspectRatings
         aspects_obj = AspectRatings(**update_dict["aspects"])
-        update_dict["overall_rating"] = calculate_overall_score(aspects_obj)
+        # Use micro_calibration from update_data if present, else from existing review
+        m_cal = update_data.micro_calibration if update_data.micro_calibration is not None else existing.get("micro_calibration")
+        update_dict["overall_rating"] = calculate_overall_score(aspects_obj, m_cal)
     elif update_dict.get("overall_rating") == 0 and "aspects" in update_dict:
         # If rating is explicitly 0 but aspects are provided, recalculate
         from app.models.review import AspectRatings
         aspects_obj = AspectRatings(**update_dict["aspects"])
-        update_dict["overall_rating"] = calculate_overall_score(aspects_obj)
+        m_cal = update_data.micro_calibration if update_data.micro_calibration is not None else existing.get("micro_calibration")
+        update_dict["overall_rating"] = calculate_overall_score(aspects_obj, m_cal)
     
     # Track history
     history_entry = {

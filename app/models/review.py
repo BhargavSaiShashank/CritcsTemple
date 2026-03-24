@@ -62,6 +62,7 @@ class ReviewBase(BaseModel):
     slug: str
     overall_rating: float = Field(0.0, ge=0, le=10)
     verdict: Optional[Verdict] = None
+    micro_calibration: Optional[str] = None # None, "Soul", "Narrative"
     oscar_rank: Optional[int] = None
     summary: Optional[str] = None
     language: Optional[str] = None # Manual Linguistic DNA override
@@ -93,6 +94,7 @@ class ReviewUpdate(BaseModel):
     content_type: Optional[str] = None
     overall_rating: Optional[float] = None
     verdict: Optional[Verdict] = None
+    micro_calibration: Optional[str] = None
     oscar_rank: Optional[int] = None
     summary: Optional[str] = None
     language: Optional[str] = None
