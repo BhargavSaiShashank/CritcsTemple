@@ -3,7 +3,7 @@ import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyBbOCsFlP6KQynJc-V4b8lJit3WxL9kFZQ",
+    apiKey: "AIzaSyC3Yw_R7HMQIVvQZhUnibq8_SKI9XnKerE",
     authDomain: "review-3acab.firebaseapp.com",
     projectId: "review-3acab",
     storageBucket: "review-3acab.firebasestorage.app",
