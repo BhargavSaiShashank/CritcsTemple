@@ -7,11 +7,11 @@ def calculate_overall_score(aspects: AspectRatings) -> float:
     aspect_dict = aspects.dict()
     
     categories = {
-        'Narrative': {'keys': ['story', 'screenplay', 'originality', 'opening', 'climax'], 'weight': 0.25},
-        'Direction': {'keys': ['direction', 'acting', 'dialogues'], 'weight': 0.25},
-        'Soul': {'keys': ['pacing', 'emotional_impact', 'rewatch_value'], 'weight': 0.20},
-        'Visuals': {'keys': ['cinematography', 'editing', 'production_design', 'vfx'], 'weight': 0.15},
-        'Audio': {'keys': ['bg_score', 'music'], 'weight': 0.15}
+        'Narrative': {'keys': ['story', 'screenplay', 'originality', 'opening', 'climax', 'themes_depth'], 'weight': 0.25},
+        'Direction': {'keys': ['direction', 'acting', 'blocking_staging'], 'weight': 0.25},
+        'Soul': {'keys': ['pacing', 'emotional_impact', 'rewatch_value', 'immersion'], 'weight': 0.20},
+        'Visuals': {'keys': ['cinematography', 'editing', 'production_design', 'vfx', 'visual_storytelling'], 'weight': 0.15},
+        'Audio': {'keys': ['bg_score', 'music', 'sound_design'], 'weight': 0.15}
     }
 
     cat_averages = {}

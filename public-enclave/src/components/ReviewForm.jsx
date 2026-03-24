@@ -9,27 +9,27 @@ const aspectGroups = [
     {
         name: 'Narrative',
         icon: <Quote size={18} />,
-        aspects: ['story', 'screenplay', 'originality', 'opening', 'climax']
+        aspects: ['story', 'screenplay', 'originality', 'opening', 'climax', 'themes_depth']
     },
     {
         name: 'Direction',
         icon: <Zap size={18} />,
-        aspects: ['direction', 'acting', 'dialogues']
+        aspects: ['direction', 'acting', 'blocking_staging']
     },
     {
         name: 'Visuals',
         icon: <Camera size={18} />,
-        aspects: ['cinematography', 'editing', 'production_design', 'vfx']
+        aspects: ['cinematography', 'editing', 'production_design', 'vfx', 'visual_storytelling']
     },
     {
         name: 'Audio',
         icon: <Music size={18} />,
-        aspects: ['bg_score', 'music']
+        aspects: ['bg_score', 'music', 'sound_design']
     },
     {
         name: 'Soul',
         icon: <Heart size={18} />,
-        aspects: ['pacing', 'emotional_impact', 'rewatch_value']
+        aspects: ['pacing', 'emotional_impact', 'rewatch_value', 'immersion']
     }
 ]
 
@@ -136,11 +136,11 @@ const ReviewForm = ({ movie, onSubmit, loading }) => {
         const aspects = formData.aspects || {};
 
         const categories = {
-            'Narrative': { keys: ['story', 'screenplay', 'originality', 'opening', 'climax'], weight: 0.25 },
-            'Direction': { keys: ['direction', 'acting', 'dialogues'], weight: 0.25 },
-            'Soul': { keys: ['pacing', 'emotional_impact', 'rewatch_value'], weight: 0.20 },
-            'Visuals': { keys: ['cinematography', 'editing', 'production_design', 'vfx'], weight: 0.15 },
-            'Audio': { keys: ['bg_score', 'music'], weight: 0.15 }
+            'Narrative': { keys: ['story', 'screenplay', 'originality', 'opening', 'climax', 'themes_depth'], weight: 0.25 },
+            'Direction': { keys: ['direction', 'acting', 'blocking_staging'], weight: 0.25 },
+            'Soul': { keys: ['pacing', 'emotional_impact', 'rewatch_value', 'immersion'], weight: 0.20 },
+            'Visuals': { keys: ['cinematography', 'editing', 'production_design', 'vfx', 'visual_storytelling'], weight: 0.15 },
+            'Audio': { keys: ['bg_score', 'music', 'sound_design'], weight: 0.15 }
         };
 
         let weightedScore = 0.0;

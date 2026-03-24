@@ -42,6 +42,11 @@ class AspectRatings(BaseModel):
     opening: Optional[AspectRating] = None
     emotional_impact: Optional[AspectRating] = None
     rewatch_value: Optional[AspectRating] = None
+    themes_depth: Optional[AspectRating] = None
+    blocking_staging: Optional[AspectRating] = None
+    visual_storytelling: Optional[AspectRating] = None
+    sound_design: Optional[AspectRating] = None
+    immersion: Optional[AspectRating] = None
 
 class Reactions(BaseModel):
     agree: int = 0
