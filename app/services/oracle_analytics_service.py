@@ -22,6 +22,7 @@ class OracleAnalyticsService:
             "Drama", "Family", "Fantasy", "History", "Horror", "Music", "Mystery", 
             "Romance", "Science Fiction", "Thriller", "War", "Western", "Sci-Fi"
         ]
+        self.semaphore = asyncio.Semaphore(5)  # Limit concurrent external requests
 
     async def fetch_tmdb_language(self, client: httpx.AsyncClient, movie_id: Any) -> str:
         """Fetch original language from TMDB using either TMDB ID or IMDB ID."""
@@ -70,7 +71,11 @@ class OracleAnalyticsService:
         id_to_lang = {}
         
         async with httpx.AsyncClient() as client:
-            tasks = {mid: self.fetch_tmdb_language(client, mid) for mid in movie_ids}
+            async def semaphore_fetch(mid):
+                async with self.semaphore:
+                    return await self.fetch_tmdb_language(client, mid)
+
+            tasks = {mid: semaphore_fetch(mid) for mid in movie_ids}
             if tasks:
                 results = await asyncio.gather(*tasks.values())
                 id_to_lang = dict(zip(tasks.keys(), results))
@@ -117,9 +122,17 @@ class OracleAnalyticsService:
                     genre = g
                     break
 
+            # 2. Extract Overall Rating (V7.2 Compatibility)
+            rating = r.get("overall_rating", 0)
+            if isinstance(rating, dict):
+                overall_rating = float(rating.get("score", 0))
+            else:
+                try: overall_rating = float(rating)
+                except: overall_rating = 0
+
             row = {
                 "id": str(r["_id"]),
-                "overall_rating": float(r.get("overall_rating", 0)),
+                "overall_rating": overall_rating,
                 "published_at": r.get("published_at") or r.get("created_at") or datetime.now(),
                 "language": display_lang,
                 "genre": genre

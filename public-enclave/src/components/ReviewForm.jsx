@@ -9,7 +9,7 @@ const aspectGroups = [
     {
         name: 'Narrative',
         icon: <Quote size={18} />,
-        aspects: ['story', 'screenplay', 'originality', 'opening', 'climax', 'themes_depth']
+        aspects: ['story', 'screenplay', 'originality', 'opening', 'climax', 'thematic_depth']
     },
     {
         name: 'Direction',
@@ -137,7 +137,7 @@ const ReviewForm = ({ movie, onSubmit, loading }) => {
         const aspects = formData.aspects || {};
 
         const categories = {
-            'Narrative': { keys: ['story', 'screenplay', 'originality', 'opening', 'climax', 'themes_depth'], weight: 0.35 },
+            'Narrative': { keys: ['story', 'screenplay', 'originality', 'opening', 'climax', 'thematic_depth'], weight: 0.35 },
             'Direction': { keys: ['direction', 'acting', 'blocking_staging'], weight: 0.25 },
             'Visuals': { keys: ['cinematography', 'editing', 'production_design', 'vfx', 'visual_storytelling'], weight: 0.15 },
             'Audio': { keys: ['bg_score', 'music', 'sound_design'], weight: 0.10 },

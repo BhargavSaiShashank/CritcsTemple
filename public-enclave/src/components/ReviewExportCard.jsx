@@ -23,7 +23,7 @@ const VERDICT_MAP = {
 };
 
 const ASPECT_GROUPS = [
-    { name: 'Narrative', color: '#818cf8', aspects: ['story', 'screenplay', 'themes_depth', 'originality', 'opening_climax'] },
+    { name: 'Narrative', color: '#818cf8', aspects: ['story', 'screenplay', 'thematic_depth', 'originality', 'opening_climax'] },
     { name: 'Direction', color: '#f59e0b', aspects: ['vision', 'blocking_staging', 'pacing', 'executive_control'] },
     { name: 'Acting', color: '#10b981', aspects: ['performance', 'chemistry', 'presence', 'casting'] },
     { name: 'Visuals', color: '#34d399', aspects: ['cinematography', 'production_design', 'visual_storytelling'] },

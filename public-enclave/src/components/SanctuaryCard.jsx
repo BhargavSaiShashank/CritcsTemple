@@ -64,7 +64,7 @@ const SanctuaryCard = ({ movie, review, cardRef }) => {
             { label: 'NARRATIVE', val: getAvg(['story', 'screenplay', 'originality', 'opening', 'climax']) },
             { label: 'EXECUTION', val: getAvg(['direction', 'acting', 'dialogues', 'thematic_depth']) },
             { label: 'VISUALS', val: getAvg(['cinematography', 'editing', 'production_design', 'vfx']) },
-            { label: 'AUDIO', val: getAvg(['bg_score', 'music']) },
+            { label: 'AUDIO', val: getAvg(['bg_score', 'music', 'sound_design']) },
             { label: 'SOUL', val: getAvg(['pacing', 'emotional_impact', 'rewatch_value']) }
         ];
     };
@@ -204,7 +204,7 @@ const SanctuaryCard = ({ movie, review, cardRef }) => {
         },
         dnaGrid: {
             display: 'grid',
-            gridTemplateColumns: 'repeat(6, 1fr)',
+            gridTemplateColumns: 'repeat(5, 1fr)',
             gap: '12px'
         },
         dnaBarTrack: {
@@ -245,7 +245,7 @@ const SanctuaryCard = ({ movie, review, cardRef }) => {
                             </div>
                             <div>
                                 <h2 style={{ fontSize: '14px', fontWeight: '900', margin: '0', fontStyle: 'italic' }}>SANCTUARY ARCHIVE</h2>
-                                <p style={{ fontSize: '7px', fontWeight: '900', letterSpacing: '0.5em', margin: '0', color: colors.amber }}>DIVINE IMPRINT V5.0</p>
+                                <p style={{ fontSize: '7px', fontWeight: '900', letterSpacing: '0.5em', margin: '0', color: colors.amber }}>DIVINE IMPRINT V7.2</p>
                             </div>
                         </div>
                         <div style={{ padding: '8px 18px', borderRadius: '99px', border: `1px solid ${colors.amberDeep}`, fontSize: '9px', fontWeight: '900', color: colors.amber, letterSpacing: '0.2em' }}>

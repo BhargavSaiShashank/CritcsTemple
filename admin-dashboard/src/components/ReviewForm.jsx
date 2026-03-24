@@ -48,7 +48,7 @@ const CRITICAL_PRESETS = [
             story: 6.5, screenplay: 6.0, originality: 8.5, opening: 9.0, climax: 8.5,
             direction: 9.5, acting: 7.5, dialogues: 6.0, thematic_depth: 8.5,
             cinematography: 10, editing: 9.8, production_design: 10, vfx: 9.5,
-            bg_score: 10, music: 9.5,
+            bg_score: 10, music: 9.5, sound_design: 10,
             pacing: 8.5, emotional_impact: 9.0, rewatch_value: 8.0
         }
     }
@@ -73,7 +73,7 @@ const aspectGroups = [
     {
         name: 'Audio',
         icon: <Music size={18} />,
-        aspects: ['bg_score', 'music']
+        aspects: ['bg_score', 'music', 'sound_design']
     },
     {
         name: 'Soul',
@@ -116,13 +116,19 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
         if (savedDraft) {
             try {
                 const parsed = JSON.parse(savedDraft);
-                // Clean aspects of nulls
-                const cleanAspects = Object.fromEntries(
-                    Object.entries(parsed.aspects || {}).filter(([_, v]) => v != null)
-                );
+                // Normalize and clean aspects
+                const normalizedDraftAspects = {};
+                Object.entries(parsed.aspects || {}).forEach(([key, val]) => {
+                    if (val != null) {
+                        normalizedDraftAspects[key] = typeof val === 'object'
+                            ? { score: parseFloat(val.score) || 0, comment: val.comment || '' }
+                            : { score: parseFloat(val) || 0, comment: '' };
+                    }
+                });
+                
                 return {
                     ...parsed,
-                    aspects: { ...defaultAspects, ...cleanAspects }
+                    aspects: { ...defaultAspects, ...normalizedDraftAspects }
                 };
             } catch (e) {
                 console.error("Failed to parse draft", e);
@@ -130,10 +136,16 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
         }
 
         if (initialData) {
-            // Clean initial aspects of nulls
-            const cleanInitialAspects = Object.fromEntries(
-                Object.entries(initialData.aspects || {}).filter(([_, v]) => v != null)
-            );
+            // Normalize and clean initial aspects
+            const normalizedInitialAspects = {};
+            Object.entries(initialData.aspects || {}).forEach(([key, val]) => {
+                if (val != null) {
+                    normalizedInitialAspects[key] = typeof val === 'object'
+                        ? { score: parseFloat(val.score) || 0, comment: val.comment || '' }
+                        : { score: parseFloat(val) || 0, comment: '' };
+                }
+            });
+
             return {
                 summary: initialData.summary || '',
                 movie_title: initialData.movie_title || '',
@@ -157,7 +169,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                 scheduled_date: initialData.scheduled_date ? initialData.scheduled_date.slice(0, 16) : '',
                 content_type: initialData.content_type || 'movie',
                 micro_calibration: initialData.micro_calibration || null,
-                aspects: { ...defaultAspects, ...cleanInitialAspects }
+                aspects: { ...defaultAspects, ...normalizedInitialAspects }
             };
         }
 
@@ -435,10 +447,10 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
         // V7.2 SCORING ENGINE (THE DEFINITIVE MATRIX)
         const aspectsMap = formData.aspects || {};
         const categories = {
-            'Narrative': { keys: ['story', 'screenplay', 'originality', 'opening', 'climax'], weights: [0.09, 0.08, 0.05, 0.03, 0.05] },
+            'Narrative': { keys: ['story', 'screenplay', 'originality', 'opening', 'climax'], weights: [0.09, 0.08, 0.05, 0.08, 0.05] },
             'Execution': { keys: ['direction', 'acting', 'dialogues', 'thematic_depth'], weights: [0.10, 0.07, 0.03, 0.05] },
-            'Visuals': { keys: ['cinematography', 'editing', 'production_design', 'vfx'], weights: [0.06, 0.06, 0.05, 0.03] },
-            'Audio': { keys: ['bg_score', 'music'], weights: [0.06, 0.04] },
+            'Visuals': { keys: ['cinematography', 'editing', 'production_design', 'vfx'], weights: [0.06, 0.04, 0.03, 0.02] },
+            'Audio': { keys: ['bg_score', 'music', 'sound_design'], weights: [0.04, 0.03, 0.03] },
             'Soul': { keys: ['pacing', 'emotional_impact', 'rewatch_value'], weights: [0.05, 0.06, 0.04] }
         };
 
@@ -449,7 +461,8 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
         Object.entries(categories).forEach(([name, cat]) => {
             let catSum = 0;
             cat.keys.forEach((key, idx) => {
-                const s = parseFloat(aspectsMap[key]?.score) || 0;
+                const aspect = aspectsMap[key];
+                const s = typeof aspect === 'object' ? (parseFloat(aspect?.score) || 0) : (parseFloat(aspect) || 0);
                 baseScore += s * cat.weights[idx];
                 catSum += s;
                 aspectScores.push(s);
@@ -966,7 +979,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                         ))}
                     </div>
                     <p className="text-[8px] font-medium text-gray-600 italic text-center leading-relaxed">
-                        Register the current score ({averageScore}) to the temporal registry to track your perception drift.
+                        Register the current score ({numericScore}) to the temporal registry to track your perception drift.
                     </p>
                 </div>
 

@@ -30,7 +30,7 @@ const VERDICT_MAP = {
 const getV = (v) => VERDICT_MAP[v] || { color: '#9ca3af', bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.1)', glow: 'transparent' };
 
 const ASPECT_GROUPS = [
-    { name: 'Narrative', icon: QuoteIcon, color: '#818cf8', aspects: ['story', 'screenplay', 'originality', 'opening', 'climax', 'themes_depth'] },
+    { name: 'Narrative', icon: QuoteIcon, color: '#818cf8', aspects: ['story', 'screenplay', 'originality', 'opening', 'climax', 'thematic_depth'] },
     { name: 'Direction', icon: Zap, color: '#f59e0b', aspects: ['direction', 'acting', 'blocking_staging'] },
     { name: 'Visuals', icon: Camera, color: '#34d399', aspects: ['cinematography', 'editing', 'production_design', 'vfx', 'visual_storytelling'] },
     { name: 'Audio', icon: Music, color: '#f472b6', aspects: ['bg_score', 'music', 'sound_design'] },

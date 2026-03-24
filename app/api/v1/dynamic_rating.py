@@ -21,7 +21,7 @@ async def update_movie_rating(rating_data: DynamicRatingCreate):
 async def get_rating_timeline(movie_id: str):
     rating = await RatingService.get_rating_timeline(movie_id)
     if not rating:
-        raise HTTPException(status_code=404, detail="Rating timeline not found")
+        return DynamicRatingInDB(movie_id=movie_id, phases={})
     return DynamicRatingInDB(**rating)
 
 @router.delete("/{movie_id}")

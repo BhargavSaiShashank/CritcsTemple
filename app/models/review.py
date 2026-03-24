@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, validator, ConfigDict
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Union
 from datetime import datetime
 from enum import Enum
 
@@ -25,28 +25,34 @@ class AspectRating(BaseModel):
     comment: Optional[str] = None
 
 class AspectRatings(BaseModel):
+    # Narrative (5)
     story: Optional[AspectRating] = None
     screenplay: Optional[AspectRating] = None
+    originality: Optional[AspectRating] = None
+    opening: Optional[AspectRating] = None
+    climax: Optional[AspectRating] = None
+    
+    # Execution (4)
     direction: Optional[AspectRating] = None
     acting: Optional[AspectRating] = None
+    dialogues: Optional[AspectRating] = None
+    thematic_depth: Optional[AspectRating] = None
+    
+    # Visuals (4)
     cinematography: Optional[AspectRating] = None
     editing: Optional[AspectRating] = None
-    bg_score: Optional[AspectRating] = None
-    music: Optional[AspectRating] = None
     production_design: Optional[AspectRating] = None
     vfx: Optional[AspectRating] = None
-    originality: Optional[AspectRating] = None
+    
+    # Audio (3)
+    bg_score: Optional[AspectRating] = None
+    music: Optional[AspectRating] = None
+    sound_design: Optional[AspectRating] = None
+    
+    # Soul (3)
     pacing: Optional[AspectRating] = None
-    dialogues: Optional[AspectRating] = None
-    climax: Optional[AspectRating] = None
-    opening: Optional[AspectRating] = None
     emotional_impact: Optional[AspectRating] = None
     rewatch_value: Optional[AspectRating] = None
-    themes_depth: Optional[AspectRating] = None
-    blocking_staging: Optional[AspectRating] = None
-    visual_storytelling: Optional[AspectRating] = None
-    sound_design: Optional[AspectRating] = None
-    immersion: Optional[AspectRating] = None
 
 class Reactions(BaseModel):
     agree: int = 0
@@ -60,7 +66,7 @@ class ReviewBase(BaseModel):
     movie_poster_url: Optional[str] = None
     status: str = "draft" # draft, published
     slug: str
-    overall_rating: float = Field(0.0, ge=0, le=10)
+    overall_rating: Union[float, Dict[str, Any]] = Field(0.0)
     verdict: Optional[Verdict] = None
     micro_calibration: Optional[str] = None # None, "Soul", "Narrative"
     oscar_rank: Optional[int] = None
@@ -92,7 +98,7 @@ class ReviewCreate(ReviewBase):
 class ReviewUpdate(BaseModel):
     status: Optional[str] = None
     content_type: Optional[str] = None
-    overall_rating: Optional[float] = None
+    overall_rating: Optional[Union[float, Dict[str, Any]]] = None
     verdict: Optional[Verdict] = None
     micro_calibration: Optional[str] = None
     oscar_rank: Optional[int] = None
