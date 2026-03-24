@@ -5,7 +5,7 @@ import {
     Save, X, Calendar, MessageSquare, Star, Sliders, Layout, 
     Type, Globe, Hash, Info, User, Check, Trash2, Edit3, 
     Sparkles, Eye, Download, List, Loader2, Quote, Zap, Camera, Music, Heart,
-    TrendingUp, Award, Layers, Ghost, Filter
+    TrendingUp, Award, Layers, Ghost, Filter, ChevronRight, Plus, MoreVertical, Archive, AlignLeft
 } from 'lucide-react'
 import { createReview, updateReview, getProxyImageUrl, getRatingTimeline, updateDynamicRating, resetRatingTimeline } from '../services/api'
 import SanctuaryCard from './SanctuaryCard';
