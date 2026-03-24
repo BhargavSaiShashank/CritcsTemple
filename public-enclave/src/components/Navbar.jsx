@@ -223,7 +223,7 @@ export default function Navbar({ onSearchOpen }) {
                     >
                         <Search size={18} />
                     </div>
-                    <button
+                    <div
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                         style={{
                             background: mobileMenuOpen ? 'rgba(245, 166, 35, 0.1)' : 'rgba(255, 255, 255, 0.03)',
@@ -231,15 +231,17 @@ export default function Navbar({ onSearchOpen }) {
                             borderRadius: '10px',
                             width: '36px',
                             height: '36px',
+                            minWidth: '36px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             color: mobileMenuOpen ? 'var(--theme-primary)' : '#fff',
-                            transition: 'all 0.3s ease'
+                            cursor: 'pointer',
+                            zIndex: 1002
                         }}
                     >
                         {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-                    </button>
+                    </div>
                 </div>
             </div>
 
