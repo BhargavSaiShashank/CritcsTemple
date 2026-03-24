@@ -5,11 +5,12 @@ import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, Pola
 import { getProxyImageUrl } from '../services/api';
 
 const ASPECT_GROUPS = [
-    { name: 'Narrative', icon: QuoteIcon, color: '#818cf8', aspects: ['story', 'screenplay', 'originality', 'opening', 'climax', 'themes_depth'] },
-    { name: 'Direction', icon: Zap, color: '#f59e0b', aspects: ['direction', 'acting', 'blocking_staging'] },
-    { name: 'Visuals', icon: Camera, color: '#34d399', aspects: ['cinematography', 'editing', 'production_design', 'vfx', 'visual_storytelling'] },
-    { name: 'Audio', icon: Music, color: '#f472b6', aspects: ['bg_score', 'music', 'sound_design'] },
-    { name: 'Soul', icon: Heart, color: '#fb7185', aspects: ['pacing', 'emotional_impact', 'rewatch_value', 'immersion'] },
+    { name: 'Narrative', icon: QuoteIcon, color: '#818cf8', aspects: ['story', 'screenplay', 'structure', 'originality', 'opening', 'climax'] },
+    { name: 'Direction', icon: Zap, color: '#f59e0b', aspects: ['vision', 'control', 'pacing'] },
+    { name: 'Performance', icon: TrendingUp, color: '#10b981', aspects: ['acting', 'chemistry', 'character_depth', 'presence'] },
+    { name: 'Visuals', icon: Camera, color: '#34d399', aspects: ['cinematography', 'editing', 'production_design', 'vfx', 'costume_makeup'] },
+    { name: 'Audio', icon: Music, color: '#f472b6', aspects: ['background_score', 'music', 'sound_design'] },
+    { name: 'Soul', icon: Heart, color: '#fb7185', aspects: ['emotional_impact', 'immersion', 'resonance', 'rewatchability'] },
 ];
 
 const VERDICT_MAP = {

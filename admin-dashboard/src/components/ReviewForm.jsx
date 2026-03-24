@@ -14,27 +14,32 @@ const aspectGroups = [
     {
         name: 'Narrative',
         icon: <Quote size={18} />,
-        aspects: ['story', 'screenplay', 'originality', 'opening', 'climax', 'themes_depth']
+        aspects: ['story', 'screenplay', 'structure', 'originality', 'opening', 'climax']
     },
     {
         name: 'Direction',
         icon: <Zap size={18} />,
-        aspects: ['direction', 'acting', 'blocking_staging']
+        aspects: ['vision', 'control', 'pacing']
+    },
+    {
+        name: 'Performance',
+        icon: <Plus size={18} />, // Acting/Human element
+        aspects: ['acting', 'chemistry', 'character_depth', 'presence']
     },
     {
         name: 'Visuals',
         icon: <Camera size={18} />,
-        aspects: ['cinematography', 'editing', 'production_design', 'vfx', 'visual_storytelling']
+        aspects: ['cinematography', 'editing', 'production_design', 'vfx', 'costume_makeup']
     },
     {
         name: 'Audio',
         icon: <Music size={18} />,
-        aspects: ['bg_score', 'music', 'sound_design']
+        aspects: ['background_score', 'music', 'sound_design']
     },
     {
         name: 'Soul',
         icon: <Heart size={18} />,
-        aspects: ['pacing', 'emotional_impact', 'rewatch_value', 'immersion']
+        aspects: ['emotional_impact', 'immersion', 'resonance', 'rewatchability']
     }
 ]
 
@@ -63,22 +68,33 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
         if (movie && (movie.imdb_id || movie.id)) return `review_draft_movie_${movie.imdb_id || movie.id}`;
         return 'review_draft_new';
     }, [id, movie]);
-
     const [formData, setFormData] = useState(() => {
+        const defaultAspects = aspectGroups.flatMap(g => g.aspects).reduce((acc, aspect) => ({
+            ...acc, [aspect]: { score: 0, comment: '' }
+        }), {});
+
         const savedDraft = localStorage.getItem(draftKey);
         if (savedDraft) {
             try {
-                return JSON.parse(savedDraft);
+                const parsed = JSON.parse(savedDraft);
+                // Clean aspects of nulls
+                const cleanAspects = Object.fromEntries(
+                    Object.entries(parsed.aspects || {}).filter(([_, v]) => v != null)
+                );
+                return {
+                    ...parsed,
+                    aspects: { ...defaultAspects, ...cleanAspects }
+                };
             } catch (e) {
                 console.error("Failed to parse draft", e);
             }
         }
 
-        const defaultAspects = aspectGroups.flatMap(g => g.aspects).reduce((acc, aspect) => ({
-            ...acc, [aspect]: { score: 0, comment: '' }
-        }), {});
-
         if (initialData) {
+            // Clean initial aspects of nulls
+            const cleanInitialAspects = Object.fromEntries(
+                Object.entries(initialData.aspects || {}).filter(([_, v]) => v != null)
+            );
             return {
                 summary: initialData.summary || '',
                 movie_title: initialData.movie_title || '',
@@ -102,7 +118,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                 scheduled_date: initialData.scheduled_date ? initialData.scheduled_date.slice(0, 16) : '',
                 content_type: initialData.content_type || 'movie',
                 micro_calibration: initialData.micro_calibration || null,
-                aspects: { ...defaultAspects, ...(initialData.aspects || {}) }
+                aspects: { ...defaultAspects, ...cleanInitialAspects }
             };
         }
 
@@ -128,7 +144,6 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             oscar_rank: 0,
             scheduled_date: '',
             content_type: movie?.content_type || 'movie',
-            micro_calibration: null,
             aspects: defaultAspects
         };
     });
@@ -381,26 +396,26 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
         const aspects = formData.aspects || {};
 
         const categories = {
-            'Narrative': { keys: ['story', 'screenplay', 'originality', 'opening', 'climax', 'themes_depth'], weight: 0.35 },
-            'Direction': { keys: ['direction', 'acting', 'blocking_staging'], weight: 0.25 },
-            'Visuals': { keys: ['cinematography', 'editing', 'production_design', 'vfx', 'visual_storytelling'], weight: 0.15 },
-            'Audio': { keys: ['bg_score', 'music', 'sound_design'], weight: 0.10 },
-            'Soul': { keys: ['pacing', 'emotional_impact', 'rewatch_value', 'immersion'], weight: 0.15 }
+            'Narrative': { keys: ['story', 'screenplay', 'structure', 'originality', 'opening', 'climax'], weight: 0.19 },
+            'Direction': { keys: ['vision', 'control', 'pacing'], weight: 0.19 },
+            'Performance': { keys: ['acting', 'chemistry', 'character_depth', 'presence'], weight: 0.17 },
+            'Visuals': { keys: ['cinematography', 'editing', 'production_design', 'vfx', 'costume_makeup'], weight: 0.15 },
+            'Audio': { keys: ['background_score', 'music', 'sound_design'], weight: 0.15 },
+            'Soul': { keys: ['emotional_impact', 'immersion', 'resonance', 'rewatchability'], weight: 0.15 }
         };
 
         let weightedScore = 0.0;
         let activeWeightTotal = 0.0;
         let catAverages = {};
 
-        // Step 1: Category Averages & Base Weighted Score
+        // Step 1: Category Averages
         for (const [catName, info] of Object.entries(categories)) {
             const catScores = [];
             for (const key of info.keys) {
-                if (aspects[key] && isFinite(parseFloat(aspects[key].score))) {
-                    const scoreVal = parseFloat(aspects[key].score);
-                    if (scoreVal > 0) {
-                        catScores.push(scoreVal);
-                    }
+                const aspect = aspects?.[key];
+                if (aspect && isFinite(parseFloat(aspect.score))) {
+                    const scoreVal = parseFloat(aspect.score);
+                    if (scoreVal > 0) catScores.push(scoreVal);
                 }
             }
             if (catScores.length > 0) {
@@ -413,51 +428,63 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
 
         if (activeWeightTotal === 0) return "0.00";
 
-        const baseScore = weightedScore / activeWeightTotal;
-        let finalScore = baseScore;
+        // Re-normalize weights if some categories are missing
+        let finalScore = weightedScore / activeWeightTotal;
 
-        // Step 2: Foundation Penalty
-        const narrativeAvg = catAverages['Narrative'] || 0;
-        const directionAvg = catAverages['Direction'] || 0;
-        const soulAvg = catAverages['Soul'] || 0;
+        // Step 2: Harmonic Synergy
+        let synergyBonus = 0;
+        // Auteur Synergy
+        if (catAverages['Narrative'] && catAverages['Direction']) {
+            if ((catAverages['Narrative'] + catAverages['Direction']) / 2 >= 9.1) synergyBonus += 0.05;
+        }
+        // Immersion Synergy
+        if (catAverages['Visuals'] && catAverages['Audio']) {
+            if ((catAverages['Visuals'] + catAverages['Audio']) / 2 >= 9.0) synergyBonus += 0.03;
+        }
+        // Performative Synergy
+        if (catAverages['Direction'] && catAverages['Performance']) {
+            if ((catAverages['Direction'] + catAverages['Performance']) / 2 >= 9.1) synergyBonus += 0.04;
+        }
+        finalScore += synergyBonus;
 
-        if (narrativeAvg < 6.5) finalScore -= 0.15;
-        if (directionAvg < 6.5) finalScore -= 0.10;
-        if (soulAvg < 6.0) finalScore -= 0.05;
+        // Step 3: Mastery Sparks & Transcendent Peaks
+        let sparkBonus = 0;
+        for (const avg of Object.values(catAverages)) {
+            if (avg >= 9.0) sparkBonus += 0.03;
+            if (avg === 10.0) sparkBonus += 0.07;
+        }
+        finalScore += sparkBonus;
 
-        // Step 3: Refined Variance Penalty
+        // Step 4: Fluid Gravity
+        let penalty = 0;
+        for (const avg of Object.values(catAverages)) {
+            if (avg < 6.5) penalty += (6.5 - avg) * 0.12;
+        }
+        finalScore -= penalty;
+
+        // Step 5: Fragmented Vision
         const catVals = Object.values(catAverages);
-        if (catVals.length > 0 && Math.min(...catVals) < 7.0) {
-            const maxCat = Math.max(...catVals);
-            const minCat = Math.min(...catVals);
-            const gap = maxCat - minCat;
-            if (gap >= 3.0) finalScore -= 0.10;
-            else if (gap >= 2.0) finalScore -= 0.05;
+        if (catVals.length > 1) {
+            const gap = Math.max(...catVals) - Math.min(...catVals);
+            if (gap > 4.5) finalScore -= 0.15;
         }
 
-        // Step 4: Controlled Boosts
-        let boost = 0.0;
-        if (catVals.length === 5) {
-            if (catVals.every(v => v >= 8.5)) boost += 0.07;
-            else if (catVals.filter(v => v >= 8.3).length >= 3) boost += 0.03;
+        // Step 6: Soul Divinity (Multiplier)
+        const soulAvg = catAverages['Soul'] || 0;
+        if (soulAvg >= 9.6) {
+            finalScore *= 1.01;
         }
-        finalScore += boost;
 
-        // Step 5: Micro-Calibration (New)
-        if (formData.micro_calibration === "Soul" && soulAvg >= 9.0) finalScore += 0.02;
-        else if (formData.micro_calibration === "Narrative" && narrativeAvg >= 9.0) finalScore += 0.02;
+        // Step 7: Soul Gates
+        if (soulAvg < 6.0 && finalScore > 7.5) finalScore = 7.5;
+        else if (soulAvg < 7.0 && finalScore > 8.5) finalScore = 8.5;
 
-        // Step 6: Soul Gate
-        if (soulAvg < 7.0 && finalScore > 8.5) finalScore = 8.5;
-
-        // Final Ceiling
-        if (finalScore > 9.70) finalScore = 9.70;
-
-        // Clamp 0-10
+        // Final Ceiling & Clamp
+        if (finalScore > 9.80) finalScore = 9.80;
         finalScore = Math.max(0, Math.min(10, finalScore));
 
         return finalScore.toFixed(2);
-    }, [formData.aspects, formData.micro_calibration])
+    }, [formData.aspects])
 
     const [aiLoading, setAiLoading] = useState(false);
 
@@ -529,7 +556,10 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             ...prev,
             aspects: {
                 ...prev.aspects,
-                [aspect]: { ...prev.aspects[aspect], [field]: value }
+                [aspect]: { 
+                    ...(prev.aspects?.[aspect] || { score: 0, comment: '' }), 
+                    [field]: value 
+                }
             }
         }))
     }
@@ -877,17 +907,17 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                                             <motion.div layoutId="focus-dot" className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_10px_#f59e0b]" />
                                         )}
                                     </div>
-                                    <span className="text-3xl md:text-4xl font-black text-white italic tracking-tighter">{formData.aspects[aspect].score}</span>
+                                    <span className="text-3xl md:text-4xl font-black text-white italic tracking-tighter">{(formData.aspects[aspect]?.score ?? 0)}</span>
                                 </div>
                                 <input
                                     type="range" min="0" max="10" step="0.1"
-                                    value={formData.aspects[aspect].score}
+                                    value={formData.aspects[aspect]?.score ?? 0}
                                     onChange={e => handleAspectChange(aspect, 'score', parseFloat(e.target.value))}
                                     className="w-full h-1 bg-white/5 rounded-full appearance-none cursor-pointer accent-amber-500"
                                 />
                                 <textarea
                                     placeholder="Add precision thought..."
-                                    value={formData.aspects[aspect].comment}
+                                    value={formData.aspects[aspect]?.comment ?? ''}
                                     onChange={e => handleAspectChange(aspect, 'comment', e.target.value)}
                                     className="w-full bg-transparent text-sm text-white/30 outline-none border-l border-white/5 focus:border-amber-500/30 pl-6 py-2 h-16 transition-all resize-none italic group-hover/item:text-white/60"
                                 />
@@ -981,27 +1011,6 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                             placeholder="Written by..."
                             className="w-full bg-transparent border-b border-white/5 py-4 text-xl md:text-2xl font-black text-amber-500/80 outline-none focus:border-amber-500/30 transition-all placeholder:text-white/5 tracking-tighter"
                         />
-                    </div>
-
-                    <div className="space-y-6">
-                        <label className="text-[10px] font-black uppercase tracking-[0.6em] text-white/10">Micro-Calibration (Divine Adjustment)</label>
-                        <div className="flex gap-3">
-                            {['None', 'Soul', 'Narrative'].map(type => (
-                                <button
-                                    key={type}
-                                    type="button"
-                                    onClick={() => setFormData({ ...formData, micro_calibration: type === 'None' ? null : type })}
-                                    className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                                        (formData.micro_calibration === type || (type === 'None' && !formData.micro_calibration))
-                                            ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/20'
-                                            : 'bg-white/5 text-white/40 hover:bg-white/10'
-                                    }`}
-                                >
-                                    {type}
-                                </button>
-                            ))}
-                        </div>
-                        <p className="text-[9px] text-white/20 italic">Manual +0.02 boost if specific peaks are met (Soul or Narrative ≥ 9.0).</p>
                     </div>
 
                     <div className="space-y-6">

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Award, Film, ChevronDown, Calendar } from 'lucide-react';
-import { getLatestReviews, getSettings } from '../services/api';
+import { getLatestReviews, getSettings, getOscarYears } from '../services/api';
 import ReviewGrid from '../components/ReviewGrid';
 
 export default function Oscars() {

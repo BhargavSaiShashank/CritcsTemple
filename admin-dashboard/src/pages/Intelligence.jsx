@@ -117,7 +117,7 @@ const Intelligence = () => {
                     <div className="flex items-center justify-between mb-10 relative">
                         <div>
                             <h2 className="text-2xl font-black italic">LEXICON PROFILE</h2>
-                            <p className="text-xs text-white/40 uppercase tracking-widest mt-1">15-Tier Structural Analysis</p>
+                            <p className="text-xs text-white/40 uppercase tracking-widest mt-1">25-Tier Structural Analysis</p>
                         </div>
                         <div className="w-12 h-12 bg-amber-500/10 rounded-2xl flex items-center justify-center">
                             <TrendingUp className="text-amber-500" size={24} />
@@ -130,7 +130,22 @@ const Intelligence = () => {
                                     <PolarGrid stroke="#ffffff10" />
                                     <PolarAngleAxis
                                         dataKey="subject"
-                                        tick={{ fill: "#ffffff40", fontSize: 10, fontWeight: 900 }}
+                                        tick={({ payload, x, y, textAnchor, stroke, radius }) => (
+                                            <g transform={`translate(${x},${y})`}>
+                                                <text
+                                                    x={0}
+                                                    y={0}
+                                                    dy={4}
+                                                    textAnchor={textAnchor}
+                                                    fill="#ffffff40"
+                                                    fontSize={window.innerWidth < 768 ? 6 : 8}
+                                                    fontWeight={900}
+                                                    className="uppercase tracking-tighter"
+                                                >
+                                                    {payload.value.length > 10 ? payload.value.substring(0, 8) + '..' : payload.value}
+                                                </text>
+                                            </g>
+                                        )}
                                     />
                                     <PolarRadiusAxis
                                         angle={30}

@@ -56,24 +56,34 @@ const Analytics = () => {
             range: tier.range
         })).reverse(); // Professional low-to-high flow
 
-        // 2. Genre DNA
+        // 2. Genre DNA / Collective Patterns
         const genreMap = {};
+        const commonNonGenres = ['Matthew_McConaughey', 'Christopher_Nolan', 'Cillian_Murphy', 'Hans_Zimmer', 'Anne_Hathaway', 'Timothee_Chalamet', 'Space', 'Time'];
+        
         reviews.forEach(r => {
-            const genresArr = r.tags || r.genres || [];
+            // Priority to real genres, fall back to tags but filter them
+            const genresArr = r.genres && r.genres.length > 0 ? r.genres : (r.tags || []);
+            
             genresArr.forEach(g => {
-                if (!genreMap[g]) genreMap[g] = { sum: 0, count: 0 };
-                genreMap[g].sum += (r.overall_rating || r.rating_temple || 0);
-                genreMap[g].count += 1;
+                const cleanTag = g.replace(/_/g, ' ');
+                // Filter out likely persona tags or non-genre metadata for the DNA chart if they aren't the primary focus
+                if (commonNonGenres.includes(g) || g.length > 20) return;
+
+                if (!genreMap[cleanTag]) genreMap[cleanTag] = { sum: 0, count: 0 };
+                genreMap[cleanTag].sum += (r.overall_rating || r.rating_temple || 0);
+                genreMap[cleanTag].count += 1;
             });
         });
+
         const genreDNA = Object.entries(genreMap)
             .map(([name, data]) => ({
-                subject: name,
+                subject: name.length > 12 ? name.substring(0, 10) + '..' : name,
+                full_name: name,
                 value: parseFloat((data.sum / data.count).toFixed(1)),
                 fullMark: 10
             }))
             .sort((a, b) => b.value - a.value)
-            .slice(0, 8); // Top 8 genres
+            .slice(0, 7); // Shorter list for better mobile spacing (7 is a good prime for radars)
 
         // 3. Overall Averages
         const avgScore = (reviews.reduce((acc, r) => acc + (r.overall_rating || r.rating_temple || 0), 0) / reviews.length).toFixed(1);
@@ -227,13 +237,13 @@ const Analytics = () => {
                                 <p className="text-[10px] text-white/20 font-bold uppercase tracking-widest italic">Average score by collective categories</p>
                             </div>
                             
-                            <div className="flex-1 min-h-[300px] relative" style={{ minWidth: '1px', minHeight: '1px' }}>
-                                <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} debounce={50}>
-                                    <RadarChart cx="50%" cy="50%" outerRadius="70%" data={stats?.genreDNA}>
+                            <div className="flex-1 min-h-[300px] w-full relative">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <RadarChart cx="50%" cy="50%" outerRadius="65%" data={stats?.genreDNA} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
                                         <PolarGrid stroke="#ffffff10" />
                                         <PolarAngleAxis 
                                             dataKey="subject" 
-                                            tick={{ fill: '#ffffff60', fontSize: 8, fontWeight: 900 }}
+                                            tick={{ fill: '#ffffff60', fontSize: window.innerWidth < 768 ? 7 : 9, fontWeight: 900 }}
                                         />
                                         <Radar
                                             name="Avg Score"
@@ -241,6 +251,20 @@ const Analytics = () => {
                                             stroke="#f59e0b"
                                             fill="#f59e0b"
                                             fillOpacity={0.4}
+                                            animationDuration={1500}
+                                        />
+                                        <Tooltip 
+                                            content={({ active, payload }) => {
+                                                if (active && payload && payload.length) {
+                                                    return (
+                                                        <div className="bg-black/90 border border-white/10 p-3 rounded-xl backdrop-blur-md">
+                                                            <p className="text-[10px] uppercase font-black text-amber-500 mb-1">{payload[0].payload.full_name}</p>
+                                                            <p className="text-lg font-black text-white">{payload[0].value}</p>
+                                                        </div>
+                                                    );
+                                                }
+                                                return null;
+                                            }}
                                         />
                                     </RadarChart>
                                 </ResponsiveContainer>

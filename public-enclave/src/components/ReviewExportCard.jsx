@@ -23,11 +23,12 @@ const VERDICT_MAP = {
 };
 
 const ASPECT_GROUPS = [
-    { name: 'Narrative', color: '#818cf8', aspects: ['story', 'screenplay', 'originality', 'opening', 'climax'] },
-    { name: 'Direction', color: '#f59e0b', aspects: ['direction', 'acting', 'dialogues'] },
-    { name: 'Visuals', color: '#34d399', aspects: ['cinematography', 'editing', 'production_design', 'vfx'] },
-    { name: 'Audio', color: '#f472b6', aspects: ['bg_score', 'music'] },
-    { name: 'Soul', color: '#fb7185', aspects: ['pacing', 'emotional_impact', 'rewatch_value'] },
+    { name: 'Narrative', color: '#818cf8', aspects: ['story', 'screenplay', 'themes_depth', 'originality', 'opening_climax'] },
+    { name: 'Direction', color: '#f59e0b', aspects: ['vision', 'blocking_staging', 'pacing', 'executive_control'] },
+    { name: 'Acting', color: '#10b981', aspects: ['performance', 'chemistry', 'presence', 'casting'] },
+    { name: 'Visuals', color: '#34d399', aspects: ['cinematography', 'production_design', 'visual_storytelling'] },
+    { name: 'Music', color: '#f472b6', aspects: ['score', 'sound_design', 'silence', 'soundtrack'] },
+    { name: 'Soul', color: '#fb7185', aspects: ['emotional_impact', 'rewatch_value', 'immersion', 'resonance'] },
 ];
 
 const getV = (v) => VERDICT_MAP[v] || { color: '#9ca3af', bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.1)', glow: 'transparent' };
@@ -148,7 +149,7 @@ const ReviewExportCard = React.forwardRef(({ review }, ref) => {
                                 </div>
 
                                 {/* Category Mini Badges */}
-                                {groupAverages.slice(0, 3).map(g => (
+                                {groupAverages.map(g => (
                                     <div key={g.name} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '20px', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '4px', minWidth: '100px', flex: 1 }}>
                                         <span style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.15em' }}>{g.name}</span>
                                         <span style={{ fontSize: '28px', fontWeight: 800, color: g.color }}>{g.avg.toFixed(2)}</span>

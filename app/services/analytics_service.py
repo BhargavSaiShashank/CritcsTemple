@@ -15,11 +15,12 @@ class AnalyticsService:
             reviews = await db.reviews.find({"status": "published"}).to_list(1000)
             
             aspect_keys = [
-                "story", "screenplay", "originality", "opening", "climax", "themes_depth",
-                "direction", "acting", "blocking_staging",
-                "cinematography", "editing", "production_design", "vfx", "visual_storytelling",
-                "bg_score", "music", "sound_design",
-                "pacing", "emotional_impact", "rewatch_value", "immersion"
+                "story", "screenplay", "structure", "originality", "opening", "climax",
+                "vision", "control", "pacing",
+                "acting", "chemistry", "character_depth", "presence",
+                "cinematography", "editing", "production_design", "vfx", "costume_makeup",
+                "background_score", "music", "sound_design",
+                "emotional_impact", "immersion", "resonance", "rewatchability"
             ]
 
             if not reviews:

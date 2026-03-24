@@ -32,14 +32,18 @@ class BiasService:
             return None
             
         df_reviews = pd.DataFrame(reviews)
-        overall_avg = df_reviews['overall_rating'].mean()
-        
         # 2. Fetch movie details for categories (genre, director, actor)
+        # Filter out invalid IDs that cause data pollution
+        df_reviews = df_reviews[df_reviews['movie_id'].notna() & (df_reviews['movie_id'] != 0) & (df_reviews['movie_id'] != '0')]
+        
         movie_ids = df_reviews['movie_id'].unique().tolist()
         movies_cursor = db.movies.find({
-            "$or": [
-                {"tmdb_id": {"$in": movie_ids}},
-                {"imdb_id": {"$in": movie_ids}}
+            "$and": [
+                {"tmdb_id": {"$nin": [0, "0", None]}},
+                {"$or": [
+                    {"tmdb_id": {"$in": movie_ids}},
+                    {"imdb_id": {"$in": movie_ids}}
+                ]}
             ]
         })
         movies = await movies_cursor.to_list(length=1000)
@@ -56,15 +60,34 @@ class BiasService:
             df = pd.merge(df_reviews, df_movies, left_on='movie_id', right_on='imdb_id', suffixes=('_rev', '_mov'))
         else:
             return None
+
+        # Filter for published and valid ratings after merge to ensure baseline matches the compared data
+        df = df[df['status'] == 'published']
+        if df.empty:
+            return None
+
+        overall_avg = df['overall_rating'].mean()
         
         # 3. Compute Genre Bias
         genre_data = []
+        # Normalization map for fragmented genres
+        GENRE_MAP = {
+            "Science Fiction": "Sci-Fi",
+            "Action & Adventure": "Action",
+            "N/A": None,
+            "null": None
+        }
+
         # Explode genres if it's a list
         df_genres = df.explode('genres')
         if not df_genres.empty and 'genres' in df_genres.columns:
+            # Apply normalization
+            df_genres['genres'] = df_genres['genres'].apply(lambda g: GENRE_MAP.get(g, g))
+            df_genres = df_genres[df_genres['genres'].notna()]
+            
             genre_stats = df_genres.groupby('genres')['overall_rating'].agg(['mean', 'count']).reset_index()
             for _, row in genre_stats.iterrows():
-                if row['count'] >= 1: # Minimum 1 movie to consider bias
+                if row['count'] >= 1: # Minimum 1 movie for chart visibility
                     genre_data.append(CategoryBias(
                         category=row['genres'],
                         average_rating=float(row['mean']),
@@ -109,8 +132,10 @@ class BiasService:
 
         # 6. Generate Insights
         insights = []
-        # Genre Insights
-        for gb in sorted(genre_data, key=lambda x: abs(x.deviation_score), reverse=True)[:3]:
+        # Genre Insights - Filter for significance (count >= 2) to avoid single-movie bias noise
+        significant_genres = [gb for gb in genre_data if gb.count >= 2]
+        
+        for gb in sorted(significant_genres, key=lambda x: abs(x.deviation_score), reverse=True)[:3]:
             if gb.deviation_score > 0.5:
                 insights.append(Insight(
                     type="genre",

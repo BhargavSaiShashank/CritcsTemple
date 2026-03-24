@@ -92,13 +92,9 @@ export default function DiscoveryCarousel({ title, reviews, loading }) {
         <div style={{ margin: '40px 0 60px 0', width: '100%' }}>
             <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '24px', paddingLeft: 'var(--page-padding)', paddingRight: 'var(--page-padding)', maxWidth: 'var(--max-width)', margin: '0 auto 24px auto' }}>
                 <div>
-                    <div style={{ fontSize: '10px', fontWeight: 800, color: 'rgba(245,166,35,0.8)', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <Star size={10} fill="currentColor" /> Premium selection
+                        <div style={{ fontSize: '10px', fontWeight: 700, color: '#f5a623', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '6px' }}>Hall of Glory</div>
+                        <h2 style={{ fontSize: '28px', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>Must-Watch Reviews</h2>
                     </div>
-                    <h2 style={{ fontSize: 'clamp(20px, 4vw, 28px)', fontWeight: 800, color: '#f2f2f2', letterSpacing: '-0.02em', lineHeight: 1 }}>
-                        {title || 'Must Watch'}
-                    </h2>
-                </div>
                 <Link to="/hall-of-fame" style={{ fontSize: '12px', fontWeight: 700, color: '#f5a623', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                     View Hall <ChevronRight size={14} />
                 </Link>

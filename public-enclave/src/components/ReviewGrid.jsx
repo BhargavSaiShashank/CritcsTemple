@@ -202,8 +202,6 @@ export default function ReviewGrid({ reviews, loading }) {
     if (!reviews?.length) {
         return (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 20px', color: 'rgba(255,255,255,0.2)', fontSize: '13px' }}>
-                <div style={{ width: '40px', height: '40px', border: '3px solid rgba(255,255,255,0.1)', borderTopColor: 'rgba(255,255,255,0.5)', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: '20px' }}>
-                </div>
                 No reviews yet
             </div>
         );

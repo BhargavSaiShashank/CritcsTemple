@@ -11,6 +11,10 @@ import Compare from './pages/Compare'
 import Predictions from './pages/Predictions'
 import Oscars from './pages/Oscars'
 import Settings from './pages/Settings'
+import Privacy from './pages/Privacy'
+import Guidelines from './pages/Guidelines'
+import Footer from './components/Footer'
+import Onboarding from './components/Onboarding'
 import CeremonyOracle from './components/CeremonyOracle'
 import SearchOverlay from './components/SearchOverlay'
 import IntroVideo from './components/IntroVideo'
@@ -148,6 +152,7 @@ const App = () => {
           <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <NativeListener onSearchOpen={() => setIsSearchOpen(true)} />
             <PrimalPulse />
+            <Onboarding />
             
             {/* Native Cinematic Intro */}
             {Capacitor.isNativePlatform() && !introFinished && (
@@ -165,8 +170,11 @@ const App = () => {
                 <Route path="/predictions" element={<Predictions />} />
                 <Route path="/oscars" element={<Oscars />} />
                 <Route path="/settings" element={<Settings />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/guidelines" element={<Guidelines />} />
               </Routes>
             </main>
+            <Footer />
             <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
             <CeremonyOracle />
           </div>

@@ -62,11 +62,12 @@ const SanctuaryCard = ({ movie, review, cardRef }) => {
         };
 
         return [
-            { label: 'NARRATIVE', val: getAvg(['story', 'screenplay', 'originality', 'opening', 'climax', 'themes_depth']) },
-            { label: 'DIRECTION', val: getAvg(['direction', 'acting', 'blocking_staging']) },
-            { label: 'VISUALS', val: getAvg(['cinematography', 'editing', 'production_design', 'vfx', 'visual_storytelling']) },
-            { label: 'AUDIO', val: getAvg(['bg_score', 'music', 'sound_design']) },
-            { label: 'SOUL', val: getAvg(['pacing', 'emotional_impact', 'rewatch_value', 'immersion']) }
+            { label: 'NARRATIVE', val: getAvg(['story', 'screenplay', 'structure', 'originality', 'opening', 'climax']) },
+            { label: 'DIRECTION', val: getAvg(['vision', 'control', 'pacing']) },
+            { label: 'PERFORMANCE', val: getAvg(['acting', 'chemistry', 'character_depth', 'presence']) },
+            { label: 'VISUALS', val: getAvg(['cinematography', 'editing', 'production_design', 'vfx', 'costume_makeup']) },
+            { label: 'AUDIO', val: getAvg(['background_score', 'music', 'sound_design']) },
+            { label: 'SOUL', val: getAvg(['emotional_impact', 'immersion', 'resonance', 'rewatchability']) }
         ];
     };
 
@@ -205,8 +206,8 @@ const SanctuaryCard = ({ movie, review, cardRef }) => {
         },
         dnaGrid: {
             display: 'grid',
-            gridTemplateColumns: 'repeat(5, 1fr)',
-            gap: '20px'
+            gridTemplateColumns: 'repeat(6, 1fr)',
+            gap: '12px'
         },
         dnaBarTrack: {
             height: '52px',
