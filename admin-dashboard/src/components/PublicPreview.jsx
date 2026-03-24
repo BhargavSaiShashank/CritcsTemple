@@ -6,7 +6,7 @@ import { getProxyImageUrl } from '../services/api';
 
 const ASPECT_GROUPS = [
     { name: 'Narrative', icon: QuoteIcon, color: '#818cf8', aspects: ['story', 'screenplay', 'originality', 'opening', 'climax'] },
-    { name: 'Direction', icon: Zap, color: '#f59e0b', aspects: ['direction', 'acting', 'dialogues'] },
+    { name: 'Execution', icon: Zap, color: '#f59e0b', aspects: ['direction', 'acting', 'dialogues', 'thematic_depth'] },
     { name: 'Visuals', icon: Camera, color: '#34d399', aspects: ['cinematography', 'editing', 'production_design', 'vfx'] },
     { name: 'Audio', icon: Music, color: '#f472b6', aspects: ['bg_score', 'music'] },
     { name: 'Soul', icon: Heart, color: '#fb7185', aspects: ['pacing', 'emotional_impact', 'rewatch_value'] },
@@ -115,12 +115,30 @@ const PublicPreview = ({ review, movie }) => {
 
                 {/* Score & Verdict Overlay */}
                 <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-[#111] border border-white/5 rounded-2xl p-5 flex flex-col items-center justify-center shadow-inner">
+                    <div className="bg-[#111] border border-white/5 rounded-2xl p-5 flex flex-col items-center justify-center shadow-inner relative overflow-hidden">
                         <span className="text-[8px] font-black uppercase tracking-widest text-white/20 mb-1">Overall DNA</span>
                         <div className="flex items-baseline gap-1 text-amber-500">
-                             <span className="text-4xl font-black italic tracking-tighter">{(parseFloat(review.overall_rating) || 0).toFixed(2)}</span>
+                             <span className="text-4xl font-black italic tracking-tighter">{(parseFloat(review.overall_rating?.score || review.overall_rating) || 0).toFixed(2)}</span>
                              <span className="text-[10px] text-white/10 not-italic font-black">/10</span>
                         </div>
+                        
+                        {/* Status Tags */}
+                        {review.overall_rating?.flags && (
+                            <div className="flex flex-wrap gap-1 mt-2 justify-center">
+                                {review.overall_rating.flags.isCapped && (
+                                    <span className="text-[6px] font-black bg-red-500/20 text-red-500 px-1.5 py-0.5 rounded uppercase tracking-tighter border border-red-500/20">Narrative Capped</span>
+                                )}
+                                {review.overall_rating.flags.isLegendary && (
+                                    <span className="text-[6px] font-black bg-amber-500/20 text-amber-500 px-1.5 py-0.5 rounded uppercase tracking-tighter border border-amber-500/20">Legendary State</span>
+                                )}
+                                {review.overall_rating.flags.isElite && (
+                                    <span className="text-[6px] font-black bg-purple-500/20 text-purple-500 px-1.5 py-0.5 rounded uppercase tracking-tighter border border-purple-500/20">Elite Synergy</span>
+                                )}
+                                {review.overall_rating.flags.mercyActive && (
+                                    <span className="text-[6px] font-black bg-blue-500/20 text-blue-500 px-1.5 py-0.5 rounded uppercase tracking-tighter border border-blue-500/20">Mercy Applied</span>
+                                )}
+                            </div>
+                        )}
                     </div>
                     <div className="bg-[#111] border border-white/5 rounded-2xl p-5 flex flex-col items-center justify-center text-center shadow-inner">
                          <span className="text-[8px] font-black uppercase tracking-widest text-white/20 mb-1">Divine Verdict</span>

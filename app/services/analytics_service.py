@@ -16,7 +16,7 @@ class AnalyticsService:
             
             aspect_keys = [
                 "story", "screenplay", "originality", "opening", "climax",
-                "direction", "acting", "dialogues",
+                "direction", "acting", "dialogues", "thematic_depth",
                 "cinematography", "editing", "production_design", "vfx",
                 "bg_score", "music",
                 "pacing", "emotional_impact", "rewatch_value"

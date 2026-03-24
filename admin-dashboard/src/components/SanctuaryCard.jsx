@@ -63,7 +63,7 @@ const SanctuaryCard = ({ movie, review, cardRef }) => {
 
         return [
             { label: 'NARRATIVE', val: getAvg(['story', 'screenplay', 'originality', 'opening', 'climax']) },
-            { label: 'DIRECTION', val: getAvg(['direction', 'acting', 'dialogues']) },
+            { label: 'EXECUTION', val: getAvg(['direction', 'acting', 'dialogues', 'thematic_depth']) },
             { label: 'VISUALS', val: getAvg(['cinematography', 'editing', 'production_design', 'vfx']) },
             { label: 'AUDIO', val: getAvg(['bg_score', 'music']) },
             { label: 'SOUL', val: getAvg(['pacing', 'emotional_impact', 'rewatch_value']) }
@@ -317,10 +317,32 @@ const SanctuaryCard = ({ movie, review, cardRef }) => {
                             <p style={{ fontSize: '14px', fontWeight: '800', color: '#fff', margin: '0' }}>{movie.director?.toUpperCase() || 'VISIONARY'}</p>
                         </div>
                         <div style={{ textAlign: 'right' }}>
-                            <p style={{ fontSize: '7px', fontWeight: '900', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.3em', textTransform: 'uppercase', marginBottom: '4px' }}>Sanctuary Score</p>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+                                <p style={{ fontSize: '7px', fontWeight: '900', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.3em', textTransform: 'uppercase' }}>Sanctuary Score</p>
+                                
+                                {/* Status Tags UI */}
+                                {review.overall_rating?.flags && (
+                                    <div style={{ display: 'flex', gap: '4px', marginBottom: '4px' }}>
+                                        {review.overall_rating.flags.isCapped && (
+                                            <span style={{ fontSize: '5px', fontWeight: '900', backgroundColor: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', padding: '1px 4px', borderRadius: '2px', textTransform: 'uppercase', letterSpacing: '0.05em', border: '1px solid rgba(239,68,68,0.2)' }}>Narrative Capped</span>
+                                        )}
+                                        {review.overall_rating.flags.isLegendary && (
+                                            <span style={{ fontSize: '5px', fontWeight: '900', backgroundColor: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b', padding: '1px 4px', borderRadius: '2px', textTransform: 'uppercase', letterSpacing: '0.05em', border: '1px solid rgba(245,158,11,0.2)' }}>Legendary State</span>
+                                        )}
+                                        {review.overall_rating.flags.isElite && (
+                                            <span style={{ fontSize: '5px', fontWeight: '900', backgroundColor: 'rgba(168, 85, 247, 0.15)', color: '#a855f7', padding: '1px 4px', borderRadius: '2px', textTransform: 'uppercase', letterSpacing: '0.05em', border: '1px solid rgba(168,85,247,0.2)' }}>Elite Synergy</span>
+                                        )}
+                                        {review.overall_rating.flags.mercyActive && (
+                                            <span style={{ fontSize: '5px', fontWeight: '900', backgroundColor: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', padding: '1px 4px', borderRadius: '2px', textTransform: 'uppercase', letterSpacing: '0.05em', border: '1px solid rgba(59,130,246,0.2)' }}>Mercy Applied</span>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                 <Star size={18} style={{ color: colors.amber, fill: colors.amber }} />
-                                <span style={{ fontSize: '38px', fontWeight: '900', fontStyle: 'italic', lineHeight: '1' }}>{review.overall_rating}</span>
+                                <span style={{ fontSize: '38px', fontWeight: '900', fontStyle: 'italic', lineHeight: '1' }}>
+                                    {typeof review.overall_rating === 'object' ? review.overall_rating.score.toFixed(2) : (parseFloat(review.overall_rating) || 0).toFixed(2)}
+                                </span>
                             </div>
                         </div>
                     </div>

@@ -17,9 +17,9 @@ const aspectGroups = [
         aspects: ['story', 'screenplay', 'originality', 'opening', 'climax']
     },
     {
-        name: 'Direction',
+        name: 'Execution',
         icon: <Zap size={18} />,
-        aspects: ['direction', 'acting', 'dialogues']
+        aspects: ['direction', 'acting', 'dialogues', 'thematic_depth']
     },
     {
         name: 'Visuals',
@@ -388,97 +388,91 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
     }
 
     const averageScore = useMemo(() => {
-        const aspects = formData.aspects || {};
-
+        // V7.2 SCORING ENGINE (THE DEFINITIVE MATRIX)
+        const aspectsMap = formData.aspects || {};
         const categories = {
-            'Narrative': { keys: ['story', 'screenplay', 'originality', 'opening', 'climax'], weight: 0.20 },
-            'Direction': { keys: ['direction', 'acting', 'dialogues'], weight: 0.20 },
-            'Visuals': { keys: ['cinematography', 'editing', 'production_design', 'vfx'], weight: 0.20 },
-            'Audio': { keys: ['bg_score', 'music'], weight: 0.20 },
-            'Soul': { keys: ['pacing', 'emotional_impact', 'rewatch_value'], weight: 0.20 }
+            'Narrative': { keys: ['story', 'screenplay', 'originality', 'opening', 'climax'], weights: [0.09, 0.08, 0.05, 0.03, 0.05] },
+            'Execution': { keys: ['direction', 'acting', 'dialogues', 'thematic_depth'], weights: [0.10, 0.07, 0.03, 0.05] },
+            'Visuals': { keys: ['cinematography', 'editing', 'production_design', 'vfx'], weights: [0.06, 0.06, 0.05, 0.03] },
+            'Audio': { keys: ['bg_score', 'music'], weights: [0.06, 0.04] },
+            'Soul': { keys: ['pacing', 'emotional_impact', 'rewatch_value'], weights: [0.05, 0.06, 0.04] }
         };
 
-        let weightedScore = 0.0;
-        let activeWeightTotal = 0.0;
+        let baseScore = 0.0;
         let catAverages = {};
+        let aspectScores = [];
 
-        // Step 1: Category Averages
-        for (const [catName, info] of Object.entries(categories)) {
-            const catScores = [];
-            for (const key of info.keys) {
-                const aspect = aspects?.[key];
-                if (aspect && isFinite(parseFloat(aspect.score))) {
-                    const scoreVal = parseFloat(aspect.score);
-                    if (scoreVal > 0) catScores.push(scoreVal);
-                }
+        Object.entries(categories).forEach(([name, cat]) => {
+            let catSum = 0;
+            cat.keys.forEach((key, idx) => {
+                const s = parseFloat(aspectsMap[key]?.score) || 0;
+                baseScore += s * cat.weights[idx];
+                catSum += s;
+                aspectScores.push(s);
+            });
+            catAverages[name] = catSum / cat.keys.length;
+        });
+
+        // 1. Excellence Bonus
+        const count90 = aspectScores.filter(s => s >= 9.0).length;
+        const count95 = aspectScores.filter(s => s >= 9.5).length;
+        const bonus = Math.min(0.20, (count90 * 0.02) + (count95 * 0.04));
+
+        // 2. Peak Reward
+        let peak = 0;
+        const minScore = Math.min(...aspectScores);
+        if (count95 >= 3 && minScore >= 7.5) peak = 0.10;
+
+        // 3. Penalties
+        // 3.1 Weak Link
+        let weakLinkPenalty = 0;
+        if (minScore < 6.5) weakLinkPenalty = 0.40;
+        else if (minScore < 7.0) weakLinkPenalty = 0.30;
+        else if (minScore < 7.5) weakLinkPenalty = 0.20;
+        else if (minScore < 8.0) weakLinkPenalty = 0.10;
+
+        // 3.2 Smoothed Inflation
+        let inflationPenalty = 0;
+        if (baseScore < 9.5 && count90 >= 10) {
+            inflationPenalty = (count90 - 9) * 0.05;
+            if (baseScore >= 9.3) inflationPenalty *= 0.5; // Smoothing
+            if (inflationPenalty > 0.25) inflationPenalty = 0.25;
+        }
+
+        // 3.3 Imbalance
+        const pillarAvgs = Object.values(catAverages);
+        const gap = Math.max(...pillarAvgs) - Math.min(...pillarAvgs);
+        let imbalancePenalty = 0;
+        if (gap > 2.0) imbalancePenalty = 0.25;
+        else if (gap > 1.5) imbalancePenalty = 0.15;
+
+        // 4. Overlap Mercy Fix
+        if (weakLinkPenalty > 0) imbalancePenalty = Math.min(0.10, imbalancePenalty);
+
+        let finalScore = baseScore + bonus + peak - (weakLinkPenalty + inflationPenalty + imbalancePenalty);
+
+        // 5. Narrative Guardrail (Hard Ceiling)
+        const nAvg = catAverages['Narrative'];
+        let isCapped = false;
+        if (nAvg < 7.5 && finalScore > 8.3) { finalScore = 8.3; isCapped = true; }
+        else if (nAvg < 8.0 && finalScore > 8.7) { finalScore = 8.7; isCapped = true; }
+        else if (nAvg < 8.5 && finalScore > 9.1) { finalScore = 9.1; isCapped = true; }
+
+        return {
+            score: Math.max(0, Math.min(10, finalScore)),
+            flags: {
+                isCapped,
+                isElite: baseScore >= 9.3 && baseScore < 9.5,
+                isLegendary: baseScore >= 9.5,
+                mercyActive: weakLinkPenalty > 0 && imbalancePenalty > 0
             }
-            if (catScores.length > 0) {
-                const catAvg = catScores.reduce((a, b) => a + b, 0) / catScores.length;
-                catAverages[catName] = catAvg;
-                weightedScore += (catAvg * info.weight);
-                activeWeightTotal += info.weight;
-            }
-        }
+        };
+    }, [formData.aspects]);
 
-        if (activeWeightTotal === 0) return "0.00";
+    const scoringResult = averageScore;
+    const numericScore = scoringResult.score.toFixed(2);
+    const activeFlags = scoringResult.flags;
 
-        // Re-normalize weights if some categories are missing
-        let finalScore = weightedScore / activeWeightTotal;
-
-        // Step 2: Harmonic Synergy
-        let synergyBonus = 0;
-        // Auteur Synergy
-        if (catAverages['Narrative'] && catAverages['Direction']) {
-            if ((catAverages['Narrative'] + catAverages['Direction']) / 2 >= 9.1) synergyBonus += 0.05;
-        }
-        // Immersion Synergy
-        if (catAverages['Visuals'] && catAverages['Audio']) {
-            if ((catAverages['Visuals'] + catAverages['Audio']) / 2 >= 9.0) synergyBonus += 0.03;
-        }
-        // Performative Synergy
-        if (catAverages['Direction'] && catAverages['Performance']) { // Note: Acting is now under Direction
-            if ((catAverages['Direction'] + catAverages['Performance']) / 2 >= 9.1) synergyBonus += 0.04;
-        }
-        finalScore += synergyBonus;
-
-        // Step 3: Mastery Sparks & Transcendent Peaks
-        let sparkBonus = 0;
-        for (const avg of Object.values(catAverages)) {
-            if (avg >= 9.0) sparkBonus += 0.03;
-            if (avg === 10.0) sparkBonus += 0.07;
-        }
-        finalScore += sparkBonus;
-
-        // Step 4: Fluid Gravity
-        let penalty = 0;
-        for (const avg of Object.values(catAverages)) {
-            if (avg < 6.5) penalty += (6.5 - avg) * 0.12;
-        }
-        finalScore -= penalty;
-
-        // Step 5: Fragmented Vision
-        const catVals = Object.values(catAverages);
-        if (catVals.length > 1) {
-            const gap = Math.max(...catVals) - Math.min(...catVals);
-            if (gap > 4.5) finalScore -= 0.15;
-        }
-
-        // Step 6: Soul Divinity (Multiplier)
-        const soulAvg = catAverages['Soul'] || 0;
-        if (soulAvg >= 9.6) {
-            finalScore *= 1.01;
-        }
-
-        // Step 7: Soul Gates
-        if (soulAvg < 6.0 && finalScore > 7.5) finalScore = 7.5;
-        else if (soulAvg < 7.0 && finalScore > 8.5) finalScore = 8.5;
-
-        // Final Ceiling & Clamp
-        if (finalScore > 9.80) finalScore = 9.80;
-        finalScore = Math.max(0, Math.min(10, finalScore));
-
-        return finalScore.toFixed(2);
-    }, [formData.aspects])
 
     const [aiLoading, setAiLoading] = useState(false);
 
@@ -595,7 +589,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             trailer_url: formData.trailer_url,
             movie_year: parseInt(formData.movie_year) || null,
             scheduled_date: formData.status === 'scheduled' ? formData.scheduled_date : null,
-            overall_rating: parseFloat(averageScore) || 0.0
+            overall_rating: parseFloat(numericScore) || 0.0
         };
 
         try {

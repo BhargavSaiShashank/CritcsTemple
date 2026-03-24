@@ -47,7 +47,7 @@ const Intelligence = () => {
                 ]);
                 const allowedAspects = [
                     'Story', 'Screenplay', 'Originality', 'Opening', 'Climax',
-                    'Direction', 'Acting', 'Dialogues',
+                    'Direction', 'Acting', 'Dialogues', 'Thematic Depth',
                     'Cinematography', 'Editing', 'Production Design', 'Vfx',
                     'Bg Score', 'Music',
                     'Pacing', 'Emotional Impact', 'Rewatch Value'
@@ -125,7 +125,7 @@ const Intelligence = () => {
                     <div className="flex items-center justify-between mb-10 relative">
                         <div>
                             <h2 className="text-2xl font-black italic">LEXICON PROFILE</h2>
-                            <p className="text-xs text-white/40 uppercase tracking-widest mt-1">17-Tier Structural Analysis</p>
+                            <p className="text-xs text-white/40 uppercase tracking-widest mt-1">19-Tier Structural Analysis</p>
                         </div>
                         <div className="w-12 h-12 bg-amber-500/10 rounded-2xl flex items-center justify-center">
                             <TrendingUp className="text-amber-500" size={24} />
