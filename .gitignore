@@ -7,3 +7,4 @@ node_modules/
 dist/
 # Keep the firebase admin sdk key OUT of git
 review-3acab-firebase-adminsdk-fbsvc-201483b04d.json
+backend-firebase-credentials.json
