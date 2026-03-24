@@ -51,7 +51,10 @@ const Analytics = () => {
         // 1. Verdict Distribution
         const distribution = VERDICT_SCALE.map(tier => ({
             name: tier.verdict,
-            count: reviews.filter(r => getVerdictForScore(r.overall_rating || r.rating_temple || 0).verdict === tier.verdict).length,
+            count: reviews.filter(r => {
+                const score = typeof r.overall_rating === 'object' ? r.overall_rating.score : (parseFloat(r.overall_rating || r.rating_temple) || 0);
+                return getVerdictForScore(score).verdict === tier.verdict;
+            }).length,
             color: tier.color,
             range: tier.range
         })).reverse(); // Professional low-to-high flow
@@ -70,7 +73,8 @@ const Analytics = () => {
                 if (commonNonGenres.includes(g) || g.length > 20) return;
 
                 if (!genreMap[cleanTag]) genreMap[cleanTag] = { sum: 0, count: 0 };
-                genreMap[cleanTag].sum += (r.overall_rating || r.rating_temple || 0);
+                const score = typeof r.overall_rating === 'object' ? r.overall_rating.score : (parseFloat(r.overall_rating || r.rating_temple) || 0);
+                genreMap[cleanTag].sum += score;
                 genreMap[cleanTag].count += 1;
             });
         });
@@ -86,7 +90,10 @@ const Analytics = () => {
             .slice(0, 7); // Shorter list for better mobile spacing (7 is a good prime for radars)
 
         // 3. Overall Averages
-        const avgScore = (reviews.reduce((acc, r) => acc + (r.overall_rating || r.rating_temple || 0), 0) / reviews.length).toFixed(1);
+        const avgScore = (reviews.reduce((acc, r) => {
+            const score = typeof r.overall_rating === 'object' ? r.overall_rating.score : (parseFloat(r.overall_rating || r.rating_temple) || 0);
+            return acc + score;
+        }, 0) / reviews.length).toFixed(1);
         const topVerdict = [...distribution].sort((a,b) => b.count - a.count)[0].name;
 
         return { distribution, genreDNA, avgScore, topVerdict, total: reviews.length };

@@ -895,7 +895,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                     <Sparkles className="mx-auto mb-4 md:mb-6 text-amber-500/40 animate-pulse" size={32} />
                     <p className="text-[10px] font-black uppercase tracking-[0.6em] text-white/20 mb-4">Temple Accuracy</p>
                     <div className="text-6xl md:text-8xl font-black text-white tracking-tighter mb-4 italic drop-shadow-[0_0_50px_rgba(245,158,11,0.2)]">
-                        {averageScore}
+                        {numericScore}
                     </div>
                     <div className="h-1 w-24 bg-gradient-to-r from-transparent via-amber-500/50 to-transparent mx-auto mb-4" />
                     <p className="text-amber-500 text-[10px] font-black uppercase tracking-[0.4em]">Master Distinction</p>
