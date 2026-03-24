@@ -45,12 +45,11 @@ const VERDICT_MAP = {
 const getV = (v) => VERDICT_MAP[v] || { color: '#9ca3af', bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.1)', glow: 'transparent' };
 
 const ASPECT_GROUPS = [
-    { name: 'Narrative', icon: QuoteIcon, color: '#818cf8', aspects: ['story', 'screenplay', 'thematic_depth', 'originality', 'opening_climax'] },
-    { name: 'Direction', icon: Zap, color: '#f59e0b', aspects: ['vision', 'blocking_staging', 'pacing', 'executive_control'] },
-    { name: 'Acting', icon: Target, color: '#10b981', aspects: ['performance', 'chemistry', 'presence', 'casting'] },
-    { name: 'Visuals', icon: Camera, color: '#34d399', aspects: ['cinematography', 'production_design', 'visual_storytelling'] },
-    { name: 'Music', icon: Music, color: '#f472b6', aspects: ['score', 'sound_design', 'silence', 'soundtrack'] },
-    { name: 'Soul', icon: Heart, color: '#fb7185', aspects: ['emotional_impact', 'rewatch_value', 'immersion', 'resonance'] },
+    { name: 'Narrative', icon: QuoteIcon, color: '#818cf8', aspects: ['story', 'screenplay', 'originality', 'opening', 'climax'] },
+    { name: 'Execution', icon: Zap, color: '#f59e0b', aspects: ['direction', 'acting', 'dialogues', 'thematic_depth'] },
+    { name: 'Visuals', icon: Camera, color: '#34d399', aspects: ['cinematography', 'editing', 'production_design', 'vfx'] },
+    { name: 'Audio', icon: Music, color: '#f472b6', aspects: ['bg_score', 'music', 'sound_design'] },
+    { name: 'Soul', icon: Heart, color: '#fb7185', aspects: ['pacing', 'emotional_impact', 'rewatch_value'] },
 ];
 
 const toLabel = (k) => k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());

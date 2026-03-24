@@ -451,22 +451,6 @@ export default function Home() {
                                     {hero?.movie_title || "Critic's Temple"}
                                 </h1>
 
-                                <motion.p
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.3 }}
-                                    style={{
-                                        fontSize: 'clamp(12px, 2vw, 14px)',
-                                        fontWeight: 800,
-                                        color: 'rgba(255,215,0,0.6)',
-                                        letterSpacing: '0.3em',
-                                        textTransform: 'uppercase',
-                                        marginBottom: '24px',
-                                        lineHeight: 1.4
-                                    }}
-                                >
-                                    A Profound Archive of <br className="desktop-hidden" /> Cinematic Critique & Analytics
-                                </motion.p>
 
                                 {hero?.summary && (
                                     <p style={{

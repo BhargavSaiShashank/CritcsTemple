@@ -23,12 +23,12 @@ export default function Onboarding() {
         {
             icon: <Star size={40} color="#FFD700" />,
             title: "The Final Verdict",
-            description: "We don't just rate movies. We conduct deep cinematic imprints across 22 distinct technical aspects."
+            description: "We don't just rate movies. We conduct deep cinematic imprints across 19 distinct technical aspects."
         },
         {
             icon: <Zap size={40} color="#f5a623" />,
             title: "Weighted Algorithm",
-            description: "Narrative (19%), Direction (19%), Acting (17%), Visuals (15%), Music (15%), and Soul (15%) combine for a clinical score."
+            description: "Narrative (35%), Execution (25%), Visuals (15%), Audio (10%), and Soul (15%) combine for a clinical score."
         },
         {
             icon: <Shield size={40} color="#7dd3fc" />,
