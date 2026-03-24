@@ -332,6 +332,9 @@ const SanctuaryCard = ({ movie, review, cardRef }) => {
                                         {review.overall_rating.flags.isElite && (
                                             <span style={{ fontSize: '5px', fontWeight: '900', backgroundColor: 'rgba(168, 85, 247, 0.15)', color: '#a855f7', padding: '1px 4px', borderRadius: '2px', textTransform: 'uppercase', letterSpacing: '0.05em', border: '1px solid rgba(168,85,247,0.2)' }}>Elite Synergy</span>
                                         )}
+                                        {review.overall_rating.flags.isTranscendent && (
+                                            <span style={{ fontSize: '5px', fontWeight: '900', backgroundColor: 'rgba(6, 182, 212, 0.15)', color: '#06b6d4', padding: '1px 4px', borderRadius: '2px', textTransform: 'uppercase', letterSpacing: '0.05em', border: '1px solid rgba(6,182,212,0.2)' }}>Transcendent Synergy</span>
+                                        )}
                                         {review.overall_rating.flags.mercyActive && (
                                             <span style={{ fontSize: '5px', fontWeight: '900', backgroundColor: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', padding: '1px 4px', borderRadius: '2px', textTransform: 'uppercase', letterSpacing: '0.05em', border: '1px solid rgba(59,130,246,0.2)' }}>Mercy Applied</span>
                                         )}

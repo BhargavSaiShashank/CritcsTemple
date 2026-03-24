@@ -1,7 +1,12 @@
 import React, { useState, useMemo, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronRight, Star, Quote, AlignLeft, Layout, Zap, Heart, Music, Camera, Plus, Loader2, Sparkles, Download, Eye, MoreVertical, X, Globe, Award, Archive, List } from 'lucide-react'
+import { 
+    Save, X, Calendar, MessageSquare, Star, Sliders, Layout, 
+    Type, Globe, Hash, Info, User, Check, Trash2, Edit3, 
+    Sparkles, Eye, Download, List, Loader2, Quote, Zap, Camera, Music, Heart,
+    TrendingUp, Award, Layers, Ghost, Filter
+} from 'lucide-react'
 import { createReview, updateReview, getProxyImageUrl, getRatingTimeline, updateDynamicRating, resetRatingTimeline } from '../services/api'
 import SanctuaryCard from './SanctuaryCard';
 import PublicPreview from './PublicPreview';
@@ -9,6 +14,45 @@ import RatingTimelineGraph from './RatingTimelineGraph';
 import html2canvas from 'html2canvas';
 import { VERDICT_SCALE } from '../constants/verdictScale';
 import { History, RefreshCw } from 'lucide-react';
+
+const CRITICAL_PRESETS = [
+    { 
+        id: 'blockbuster', 
+        name: 'Epic Blockbuster', 
+        description: 'High Visuals/Audio, Balanced Narrative',
+        values: {
+            story: 7.5, screenplay: 7.0, originality: 6.5, opening: 8.5, climax: 9.0,
+            direction: 8.5, acting: 8.0, dialogues: 7.0, thematic_depth: 6.0,
+            cinematography: 9.2, editing: 9.0, production_design: 9.5, vfx: 9.8,
+            bg_score: 9.5, music: 9.0,
+            pacing: 8.5, emotional_impact: 8.0, rewatch_value: 9.0
+        }
+    },
+    { 
+        id: 'auteur', 
+        name: 'Auteur Drama', 
+        description: 'Elite Writing and Thematic Depth',
+        values: {
+            story: 9.5, screenplay: 9.8, originality: 9.0, opening: 8.0, climax: 9.2,
+            direction: 9.5, acting: 9.5, dialogues: 9.2, thematic_depth: 9.8,
+            cinematography: 8.5, editing: 8.2, production_design: 8.0, vfx: 5.0,
+            bg_score: 8.5, music: 7.0,
+            pacing: 7.5, emotional_impact: 9.5, rewatch_value: 7.0
+        }
+    },
+    { 
+        id: 'sensory', 
+        name: 'Sensory Masterpiece', 
+        description: 'Technical Perfection, Minimalist Story',
+        values: {
+            story: 6.5, screenplay: 6.0, originality: 8.5, opening: 9.0, climax: 8.5,
+            direction: 9.5, acting: 7.5, dialogues: 6.0, thematic_depth: 8.5,
+            cinematography: 10, editing: 9.8, production_design: 10, vfx: 9.5,
+            bg_score: 10, music: 9.5,
+            pacing: 8.5, emotional_impact: 9.0, rewatch_value: 8.0
+        }
+    }
+];
 
 const aspectGroups = [
     {
@@ -449,7 +493,16 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
         // 4. Overlap Mercy Fix
         if (weakLinkPenalty > 0) imbalancePenalty = Math.min(0.10, imbalancePenalty);
 
-        let finalScore = baseScore + bonus + peak - (weakLinkPenalty + inflationPenalty + imbalancePenalty);
+        // 3.4 Transcendent Synergy (V7.2 Enhancement)
+        const highPillars = pillarAvgs.filter(a => a >= 9.2).length;
+        let transcendentBonus = 0;
+        let isTranscendent = false;
+        if (highPillars >= 4) {
+            transcendentBonus = 0.15;
+            isTranscendent = true;
+        }
+
+        let finalScore = baseScore + bonus + peak + transcendentBonus - (weakLinkPenalty + inflationPenalty + imbalancePenalty);
 
         // 5. Narrative Guardrail (Hard Ceiling)
         const nAvg = catAverages['Narrative'];
@@ -464,6 +517,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                 isCapped,
                 isElite: baseScore >= 9.3 && baseScore < 9.5,
                 isLegendary: baseScore >= 9.5,
+                isTranscendent,
                 mercyActive: weakLinkPenalty > 0 && imbalancePenalty > 0
             }
         };
@@ -475,6 +529,20 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
 
 
     const [aiLoading, setAiLoading] = useState(false);
+
+    const [showPresets, setShowPresets] = useState(false);
+    
+    const handleApplyPreset = (preset) => {
+        const updatedAspects = { ...formData.aspects };
+        Object.entries(preset.values).forEach(([key, val]) => {
+            updatedAspects[key] = {
+                ...(updatedAspects[key] || { comment: '' }),
+                score: val
+            };
+        });
+        setFormData(prev => ({ ...prev, aspects: updatedAspects }));
+        setShowPresets(false);
+    };
 
     const handleAIDraft = async () => {
         if (!movie && !formData.movie_title) {
@@ -632,6 +700,47 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
         <div className="relative">
             {/* Global Actions Floating Buttons */}
             <div className="fixed top-12 md:top-10 right-6 md:right-10 z-[100] flex items-center gap-3">
+                {/* Critical Presets Dropdown */}
+                <div className="relative">
+                    <button
+                        onClick={() => setShowPresets(!showPresets)}
+                        className={`w-12 h-12 rounded-2xl glass-obsidian border border-blue-500/20 flex items-center justify-center text-blue-400 shadow-2xl shadow-blue-500/10 active:scale-95 transition-all ${showPresets ? 'bg-blue-500/10' : ''}`}
+                        title="Critical Presets"
+                    >
+                        <Layers size={20} />
+                    </button>
+                    
+                    <AnimatePresence>
+                        {showPresets && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                className="absolute right-0 mt-4 w-72 glass-obsidian border border-white/10 rounded-3xl p-4 shadow-2xl z-[110] backdrop-blur-2xl"
+                            >
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-3 px-2 pb-2 border-b border-white/5">
+                                        <Filter size={14} className="text-blue-400" />
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Critical Templates</span>
+                                    </div>
+                                    <div className="grid gap-2">
+                                        {CRITICAL_PRESETS.map(preset => (
+                                            <button
+                                                key={preset.id}
+                                                onClick={() => handleApplyPreset(preset)}
+                                                className="w-full text-left p-4 rounded-2xl hover:bg-white/5 border border-transparent hover:border-white/10 transition-all group"
+                                            >
+                                                <p className="text-[11px] font-black uppercase tracking-wider text-white group-hover:text-blue-400 transition-colors">{preset.name}</p>
+                                                <p className="text-[9px] text-white/30 italic mt-1 line-clamp-1">{preset.description}</p>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+
                 <button
                     onClick={handleAIDraft}
                     disabled={aiLoading}

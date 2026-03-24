@@ -134,6 +134,9 @@ const PublicPreview = ({ review, movie }) => {
                                 {review.overall_rating.flags.isElite && (
                                     <span className="text-[6px] font-black bg-purple-500/20 text-purple-500 px-1.5 py-0.5 rounded uppercase tracking-tighter border border-purple-500/20">Elite Synergy</span>
                                 )}
+                                {review.overall_rating.flags.isTranscendent && (
+                                    <span className="text-[6px] font-black bg-cyan-500/20 text-cyan-500 px-1.5 py-0.5 rounded uppercase tracking-tighter border border-cyan-500/20">Transcendent Synergy</span>
+                                )}
                                 {review.overall_rating.flags.mercyActive && (
                                     <span className="text-[6px] font-black bg-blue-500/20 text-blue-500 px-1.5 py-0.5 rounded uppercase tracking-tighter border border-blue-500/20">Mercy Applied</span>
                                 )}
