@@ -62,12 +62,11 @@ const SanctuaryCard = ({ movie, review, cardRef }) => {
         };
 
         return [
-            { label: 'NARRATIVE', val: getAvg(['story', 'screenplay', 'structure', 'originality', 'opening', 'climax']) },
-            { label: 'DIRECTION', val: getAvg(['vision', 'control', 'pacing']) },
-            { label: 'PERFORMANCE', val: getAvg(['acting', 'chemistry', 'character_depth', 'presence']) },
-            { label: 'VISUALS', val: getAvg(['cinematography', 'editing', 'production_design', 'vfx', 'costume_makeup']) },
-            { label: 'AUDIO', val: getAvg(['background_score', 'music', 'sound_design']) },
-            { label: 'SOUL', val: getAvg(['emotional_impact', 'immersion', 'resonance', 'rewatchability']) }
+            { label: 'NARRATIVE', val: getAvg(['story', 'screenplay', 'originality', 'opening', 'climax']) },
+            { label: 'DIRECTION', val: getAvg(['direction', 'acting', 'dialogues']) },
+            { label: 'VISUALS', val: getAvg(['cinematography', 'editing', 'production_design', 'vfx']) },
+            { label: 'AUDIO', val: getAvg(['bg_score', 'music']) },
+            { label: 'SOUL', val: getAvg(['pacing', 'emotional_impact', 'rewatch_value']) }
         ];
     };
 

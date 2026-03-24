@@ -45,7 +45,15 @@ const Intelligence = () => {
                     getEngagementAnalytics(),
                     getReviews()
                 ]);
-                setDnaData(dnaRes.data || []);
+                const allowedAspects = [
+                    'Story', 'Screenplay', 'Originality', 'Opening', 'Climax',
+                    'Direction', 'Acting', 'Dialogues',
+                    'Cinematography', 'Editing', 'Production Design', 'Vfx',
+                    'Bg Score', 'Music',
+                    'Pacing', 'Emotional Impact', 'Rewatch Value'
+                ];
+                const filteredDNA = (dnaRes.data || []).filter(item => allowedAspects.includes(item.subject));
+                setDnaData(filteredDNA);
                 setEngagementData(engagementRes.data || { trending: [], consensus: [] });
                 setReviews(reviewsRes.data || []);
             } catch (err) {
@@ -117,7 +125,7 @@ const Intelligence = () => {
                     <div className="flex items-center justify-between mb-10 relative">
                         <div>
                             <h2 className="text-2xl font-black italic">LEXICON PROFILE</h2>
-                            <p className="text-xs text-white/40 uppercase tracking-widest mt-1">25-Tier Structural Analysis</p>
+                            <p className="text-xs text-white/40 uppercase tracking-widest mt-1">17-Tier Structural Analysis</p>
                         </div>
                         <div className="w-12 h-12 bg-amber-500/10 rounded-2xl flex items-center justify-center">
                             <TrendingUp className="text-amber-500" size={24} />
@@ -138,11 +146,11 @@ const Intelligence = () => {
                                                     dy={4}
                                                     textAnchor={textAnchor}
                                                     fill="#ffffff40"
-                                                    fontSize={window.innerWidth < 768 ? 6 : 8}
+                                                    fontSize={8}
                                                     fontWeight={900}
                                                     className="uppercase tracking-tighter"
                                                 >
-                                                    {payload.value.length > 10 ? payload.value.substring(0, 8) + '..' : payload.value}
+                                                    {payload.value}
                                                 </text>
                                             </g>
                                         )}

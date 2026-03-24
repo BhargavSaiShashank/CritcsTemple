@@ -14,32 +14,27 @@ const aspectGroups = [
     {
         name: 'Narrative',
         icon: <Quote size={18} />,
-        aspects: ['story', 'screenplay', 'structure', 'originality', 'opening', 'climax']
+        aspects: ['story', 'screenplay', 'originality', 'opening', 'climax']
     },
     {
         name: 'Direction',
         icon: <Zap size={18} />,
-        aspects: ['vision', 'control', 'pacing']
-    },
-    {
-        name: 'Performance',
-        icon: <Plus size={18} />, // Acting/Human element
-        aspects: ['acting', 'chemistry', 'character_depth', 'presence']
+        aspects: ['direction', 'acting', 'dialogues']
     },
     {
         name: 'Visuals',
         icon: <Camera size={18} />,
-        aspects: ['cinematography', 'editing', 'production_design', 'vfx', 'costume_makeup']
+        aspects: ['cinematography', 'editing', 'production_design', 'vfx']
     },
     {
         name: 'Audio',
         icon: <Music size={18} />,
-        aspects: ['background_score', 'music', 'sound_design']
+        aspects: ['bg_score', 'music']
     },
     {
         name: 'Soul',
         icon: <Heart size={18} />,
-        aspects: ['emotional_impact', 'immersion', 'resonance', 'rewatchability']
+        aspects: ['pacing', 'emotional_impact', 'rewatch_value']
     }
 ]
 
@@ -396,12 +391,11 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
         const aspects = formData.aspects || {};
 
         const categories = {
-            'Narrative': { keys: ['story', 'screenplay', 'structure', 'originality', 'opening', 'climax'], weight: 0.19 },
-            'Direction': { keys: ['vision', 'control', 'pacing'], weight: 0.19 },
-            'Performance': { keys: ['acting', 'chemistry', 'character_depth', 'presence'], weight: 0.17 },
-            'Visuals': { keys: ['cinematography', 'editing', 'production_design', 'vfx', 'costume_makeup'], weight: 0.15 },
-            'Audio': { keys: ['background_score', 'music', 'sound_design'], weight: 0.15 },
-            'Soul': { keys: ['emotional_impact', 'immersion', 'resonance', 'rewatchability'], weight: 0.15 }
+            'Narrative': { keys: ['story', 'screenplay', 'originality', 'opening', 'climax'], weight: 0.20 },
+            'Direction': { keys: ['direction', 'acting', 'dialogues'], weight: 0.20 },
+            'Visuals': { keys: ['cinematography', 'editing', 'production_design', 'vfx'], weight: 0.20 },
+            'Audio': { keys: ['bg_score', 'music'], weight: 0.20 },
+            'Soul': { keys: ['pacing', 'emotional_impact', 'rewatch_value'], weight: 0.20 }
         };
 
         let weightedScore = 0.0;
@@ -442,7 +436,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             if ((catAverages['Visuals'] + catAverages['Audio']) / 2 >= 9.0) synergyBonus += 0.03;
         }
         // Performative Synergy
-        if (catAverages['Direction'] && catAverages['Performance']) {
+        if (catAverages['Direction'] && catAverages['Performance']) { // Note: Acting is now under Direction
             if ((catAverages['Direction'] + catAverages['Performance']) / 2 >= 9.1) synergyBonus += 0.04;
         }
         finalScore += synergyBonus;
