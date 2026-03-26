@@ -13,6 +13,7 @@ import Oscars from './pages/Oscars'
 import Settings from './pages/Settings'
 import Privacy from './pages/Privacy'
 import Guidelines from './pages/Guidelines'
+import Intelligence from './pages/Intelligence'
 import Footer from './components/Footer'
 import Onboarding from './components/Onboarding'
 import CeremonyOracle from './components/CeremonyOracle'
@@ -172,6 +173,7 @@ const App = () => {
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/guidelines" element={<Guidelines />} />
+                <Route path="/intelligence" element={<Intelligence />} />
               </Routes>
             </main>
             <Footer />

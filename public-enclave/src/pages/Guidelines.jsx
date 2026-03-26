@@ -32,17 +32,17 @@ export default function Guidelines() {
                         <Rule 
                             icon={<MessageSquare size={18} />}
                             title="01. Objective Subjectivity"
-                            content="Critique the art, not the person. We encourage deep analysis and harsh truth, provided it remains focused on the cinematic craft."
+                            content="Critique the art, not the person. V8.0 demands deep analysis and harsh truth, provided it remains focused on the cinematic craft and structural merit."
                         />
                         <Rule 
                             icon={<BookOpen size={18} />}
                             title="02. Spoilers Protocol"
-                            content="Respect the temporal experience of others. Use spoiler warnings for any critical plot unravellings in your imprints."
+                            content="Respect the temporal experience of others. Use spoiler warnings for any critical plot unravellings. Undisclosed spoilers disrupt the Sanctuary's atmospheric integrity."
                         />
                         <Rule 
                             icon={<AlertTriangle size={18} />}
-                            title="03. No Defilement"
-                            content="Hate speech, harassment, or non-cinematic spam will result in a permanent expulsion from The Temple."
+                            title="03. Elite Conduct"
+                            content="Hate speech, harassment, or non-cinematic spam will result in a permanent expulsion. The Sanctuary is a space for high-tier critique and intellectual refinement."
                         />
                     </section>
                 </motion.div>

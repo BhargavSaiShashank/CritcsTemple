@@ -61,18 +61,9 @@ const Intelligence = () => {
         return matchesStatus && matchesSearch;
     });
 
-    const handleDelete = async (id) => {
-        if (window.confirm("Are you sure you want to permanently delete this critique?")) {
-            try {
-                await deleteReview(id);
-                setReviews(reviews.filter(r => (r._id || r.id) !== id));
-                setIsModalOpen(false);
-                setSelectedReview(null);
-            } catch (err) {
-                console.error("Failed to delete review:", err);
-                alert("Failed to delete the critique. Check console for details.");
-            }
-        }
+    const handleDelete = () => {
+        // Disabled for public interface
+        console.log("Expulsion locked in public view.");
     };
 
     return (
@@ -92,13 +83,9 @@ const Intelligence = () => {
                 </div>
 
                 <div className="flex gap-4">
-                    <Link
-                        to="/dashboard"
-                        className="flex items-center gap-3 bg-white/5 hover:bg-white/10 px-8 py-4 rounded-2xl border border-white/5 transition-all group"
-                    >
-                        <LayoutDashboard size={18} className="group-hover:text-amber-500 transition-colors" />
-                        <span className="text-xs font-bold uppercase tracking-widest">Dashboard</span>
-                    </Link>
+                    <div className="flex items-center gap-3 bg-amber-500/10 px-6 py-2 rounded-xl border border-amber-500/20">
+                        <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Protocol V8.0 Active</span>
+                    </div>
                 </div>
             </div>
 
@@ -116,8 +103,8 @@ const Intelligence = () => {
                             <h2 className="text-2xl font-black italic">LEXICON PROFILE</h2>
                             <p className="text-xs text-white/40 uppercase tracking-widest mt-1">15-Tier Structural Analysis</p>
                         </div>
-                        <div className="w-12 h-12 bg-amber-500/10 rounded-2xl flex items-center justify-center">
-                            <TrendingUp className="text-amber-500" size={24} />
+                        <div className="w-12 h-12 bg-amber-500/20 rounded-2xl flex items-center justify-center border border-amber-500/30">
+                            <Star className="text-amber-500" size={24} fill="currentColor" />
                         </div>
                     </div>
 

@@ -32,17 +32,17 @@ export default function Privacy() {
                         <PrivacySection 
                             icon={<Lock size={20} />}
                             title="Authentication"
-                            content="We use Google Firebase for authentication. Your email and basic profile info are used strictly to identify your reviews and predictions. We do not sell your personal identifier to third-party data harvesters."
+                            content="We use Google Firebase for biometric and credentialed authentication. Your temporal identity (email) is used strictly to anchor your reviews and projections within the Sanctuary ecosystem. We do not sell your personal identifier to third-party data harvesters."
                         />
                         <PrivacySection 
                             icon={<Database size={20} />}
-                            title="Data Storage"
-                            content="Your reviews, ratings, and predictions are stored securely in our database. This data is used to generate the global analytics and 'must-watch' recommendations that define our platform."
+                            title="Sanctuary Storage"
+                            content="Your imprints, ratings, and bias simulations are stored securely. This data feeds our proprietary V8.0 Sanctuary Protocol—generating the global analytics and 'Elite' recommendations that define our platform's critical hierarchy."
                         />
                         <PrivacySection 
                             icon={<Eye size={20} />}
-                            title="Visibility"
-                            content="By default, your reviews and predictions are public as part of the cinematic record. If you wish to delete your imprints, you may do so at any time through your profile settings (coming soon to mobile)."
+                            title="Visibility & Imprints"
+                            content="By default, your cinematic imprints are public as part of the permanent record. Under the Sanctuary Protocol, you retain the right to expunge your data at any time through your profile settings (accessible on mobile)."
                         />
                     </section>
                 </motion.div>
