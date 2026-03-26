@@ -109,6 +109,23 @@ export default function OscarRankings() {
         }
     };
 
+    const snubs = useMemo(() => {
+        return allReviews.filter(r => {
+            const score = typeof r.overall_rating === 'object' ? r.overall_rating.score : (parseFloat(r.overall_rating) || 0);
+            const hasOscarTag = (r.tags || []).includes('oscar');
+            const rank = r.oscar_rank || 0;
+            
+            // SNUB LOGIC: Masterpieces not in Top 5 or Elite unranked
+            if (score >= 9.0 && (rank > 5 || rank === 0)) return true;
+            if (score >= 8.5 && rank === 0) return true;
+            return false;
+        }).sort((a, b) => {
+            const scoreA = typeof a.overall_rating === 'object' ? a.overall_rating.score : (parseFloat(a.overall_rating) || 0);
+            const scoreB = typeof b.overall_rating === 'object' ? b.overall_rating.score : (parseFloat(b.overall_rating) || 0);
+            return scoreB - scoreA;
+        });
+    }, [allReviews]);
+
     const searchResults = allReviews.filter(r => 
         r.movie_title?.toLowerCase().includes(searchQuery.toLowerCase()) && 
         !contenders.find(c => c._id === r._id)
@@ -176,6 +193,33 @@ export default function OscarRankings() {
                         </div>
                         
                         <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                            {!searchQuery && snubs.length > 0 && (
+                                <div className="mb-8 space-y-4">
+                                    <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-[#FFD700]">
+                                        <Sparkles size={12} /> Archival Snub Alerts
+                                    </div>
+                                    {snubs.slice(0, 5).map(r => (
+                                        <div 
+                                            key={r._id}
+                                            onClick={() => addToContenders(r)}
+                                            className="group relative flex items-center gap-4 p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20 hover:border-amber-500 transition-all cursor-pointer overflow-hidden"
+                                        >
+                                            <div className="absolute top-0 right-0 p-2 bg-amber-500/10 text-amber-500 rounded-bl-xl opacity-50">
+                                                <Award size={10} />
+                                            </div>
+                                            <img src={getProxyImageUrl(r.movie_poster_url)} className="w-10 h-14 object-cover rounded shadow-lg" alt="poster" />
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-xs font-black text-white/90 truncate">{r.movie_title}</p>
+                                                <p className="text-[9px] text-amber-500 font-black mt-1 uppercase tracking-tighter">
+                                                    Sanctuary Rating: {typeof r.overall_rating === 'object' ? r.overall_rating.score : r.overall_rating}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <div className="h-px bg-white/5 mx-2" />
+                                </div>
+                            )}
+
                             {searchQuery && searchResults.length === 0 && (
                                 <p className="text-xs font-medium text-white/30 text-center py-12 italic">No remaining cinematic subjects.</p>
                             )}
