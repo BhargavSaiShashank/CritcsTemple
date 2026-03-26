@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip
-} from 'recharts';
-import {
-    TrendingUp, History, LayoutDashboard, Loader2, Star, ChevronRight, Filter, Search
+    TrendingUp, History, LayoutDashboard, Loader2, Star, ChevronRight, Filter, Search, Shield
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { getLatestReviews } from '../services/api';
