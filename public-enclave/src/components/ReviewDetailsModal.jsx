@@ -34,15 +34,8 @@ const ReviewDetailsModal = ({ review, isOpen, onClose, onDelete }) => {
                             <div className="absolute inset-0 bg-gradient-to-t from-[#080808] to-transparent" />
                             <div className="absolute top-6 right-6 flex gap-4">
                                 <button
-                                    onClick={() => onDelete(review._id || review.id)}
-                                    className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-full backdrop-blur-md transition-colors group"
-                                    title="Delete Review"
-                                >
-                                    <Trash2 size={20} className="group-hover:scale-110 transition-transform" />
-                                </button>
-                                <button
                                     onClick={onClose}
-                                    className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-md transition-colors"
+                                    className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-md transition-all border border-white/10 hover:scale-105 active:scale-95"
                                 >
                                     <X size={20} />
                                 </button>
@@ -157,8 +150,10 @@ const ReviewDetailsModal = ({ review, isOpen, onClose, onDelete }) => {
                                 <div className="space-y-8">
                                     <div className="bg-white/5 backdrop-blur-md rounded-[32px] p-8 border border-white/5 shadow-2xl sticky top-0">
                                         <div className="flex items-center gap-3 mb-6 border-b border-white/10 pb-4">
-                                            <TrendingUp size={18} className="text-amber-500" />
-                                            <h3 className="text-sm font-black uppercase tracking-[0.3em] text-white/80">Structural DNA</h3>
+                                            <div className="p-2 bg-amber-500/10 rounded-lg">
+                                                <TrendingUp size={16} className="text-amber-500" />
+                                            </div>
+                                            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white">Structural DNA</h3>
                                         </div>
                                         <div className="space-y-4">
                                             {aspectKeys.length > 0 ? (
@@ -166,15 +161,17 @@ const ReviewDetailsModal = ({ review, isOpen, onClose, onDelete }) => {
                                                     const aspect = review.aspects[key];
                                                     if (!aspect || !aspect.score) return null;
                                                     return (
-                                                        <div key={key} className="space-y-2">
+                                                        <div key={key} className="space-y-1.5">
                                                             <div className="flex justify-between items-end">
-                                                                <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">{key.replace('_', ' ')}</span>
-                                                                <span className="text-xs font-black text-amber-500">{aspect.score}/10</span>
+                                                                <span className="text-[9px] font-black uppercase tracking-widest text-white/40">{key.replace('_', ' ')}</span>
+                                                                <span className="text-[10px] font-black text-amber-500 italic">{aspect.score.toFixed(1)}</span>
                                                             </div>
-                                                            <div className="w-full h-1.5 bg-black rounded-full overflow-hidden">
-                                                                <div
-                                                                    className="h-full bg-gradient-to-r from-amber-700 to-amber-400 rounded-full"
-                                                                    style={{ width: `${(aspect.score / 10) * 100}%` }}
+                                                            <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                                                                <motion.div
+                                                                    initial={{ width: 0 }}
+                                                                    animate={{ width: `${(aspect.score / 10) * 100}%` }}
+                                                                    transition={{ duration: 1, ease: "easeOut" }}
+                                                                    className="h-full bg-amber-500 rounded-full shadow-[0_0_8px_rgba(245,158,11,0.3)]"
                                                                 />
                                                             </div>
                                                         </div>
