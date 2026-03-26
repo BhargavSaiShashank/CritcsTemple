@@ -8,7 +8,7 @@ const ASPECT_GROUPS = [
     { name: 'Narrative', icon: QuoteIcon, color: '#818cf8', aspects: ['story', 'screenplay', 'originality', 'opening', 'climax'] },
     { name: 'Execution', icon: Zap, color: '#f59e0b', aspects: ['direction', 'acting', 'dialogues', 'thematic_depth'] },
     { name: 'Visuals', icon: Camera, color: '#34d399', aspects: ['cinematography', 'editing', 'production_design', 'vfx'] },
-    { name: 'Audio', icon: Music, color: '#f472b6', aspects: ['bg_score', 'music'] },
+    { name: 'Audio', icon: Music, color: '#f472b6', aspects: ['bg_score', 'music', 'sound_design'] },
     { name: 'Soul', icon: Heart, color: '#fb7185', aspects: ['pacing', 'emotional_impact', 'rewatch_value'] },
 ];
 
