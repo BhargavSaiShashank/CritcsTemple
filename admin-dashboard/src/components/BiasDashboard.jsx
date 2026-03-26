@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { getBiasMetrics, recomputeBias } from '../services/api';
 import InsightCard from './InsightCard';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { RefreshCw, ShieldAlert, Award, User, TrendingUp } from 'lucide-react';
+import { RefreshCw, ShieldAlert, Award, User, TrendingUp, Zap } from 'lucide-react';
 
 const BiasDashboard = () => {
   const [bias, setBias] = useState(null);
