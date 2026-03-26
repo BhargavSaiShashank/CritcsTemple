@@ -146,5 +146,3 @@ const ReviewDetailsModal = ({ review, isOpen, onClose }) => {
 };
 
 export default ReviewDetailsModal;
-
-export default ReviewDetailsModal;
