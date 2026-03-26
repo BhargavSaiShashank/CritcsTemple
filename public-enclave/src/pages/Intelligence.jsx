@@ -8,75 +8,12 @@ import { getLatestReviews } from '../services/api';
 import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
 import ReviewDetailsModal from '../components/ReviewDetailsModal';
 
-const ProtocolItem = ({ icon: Icon, title, text }) => (
-    <motion.div 
-        whileHover={{ x: 5 }}
-        style={{ 
-            display: 'flex', 
-            gap: '16px', 
-            padding: '16px', 
-            borderRadius: '16px', 
-            transition: 'all 0.3s ease',
-            background: 'rgba(255,255,255,0.02)',
-            border: '1px solid rgba(255,255,255,0.05)'
-        }}
-        className="group hover-glass"
-    >
-        <div style={{ 
-            width: '40px', 
-            height: '40px', 
-            borderRadius: '12px', 
-            background: 'var(--amber-dim)', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            border: '1px solid var(--border)',
-            color: 'var(--amber)'
-        }}>
-            <Icon size={18} />
-        </div>
-        <div style={{ flex: 1 }}>
-            <div style={{ 
-                fontSize: '10px', 
-                fontWeight: 900, 
-                color: 'var(--amber)', 
-                textTransform: 'uppercase', 
-                letterSpacing: '0.2em', 
-                marginBottom: '4px' 
-            }}>{title}</div>
-            <div style={{ 
-                fontSize: '12px', 
-                color: 'var(--text-2)', 
-                fontWeight: 500, 
-                lineHeight: 1.6 
-            }}>{text}</div>
-        </div>
-    </motion.div>
-);
-
 const Intelligence = () => {
-    const [dnaData, setDnaData] = useState([]);
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [filter, setFilter] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedReview, setSelectedReview] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [failedPosters, setFailedPosters] = useState(() => {
-        const saved = localStorage.getItem('failed_sanctuary_posters');
-        return saved ? new Set(JSON.parse(saved)) : new Set();
-    });
-
-    useEffect(() => {
-        localStorage.setItem('failed_sanctuary_posters', JSON.stringify(Array.from(failedPosters)));
-    }, [failedPosters]);
-
-    const handlePosterError = (e, url) => {
-        if (url && !failedPosters.has(url)) {
-            setFailedPosters(prev => new Set(prev).add(url));
-        }
-        e.target.src = "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&q=80&w=800";
-    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -94,201 +31,143 @@ const Intelligence = () => {
     }, []);
 
     const filteredReviews = reviews.filter(r => {
-        const matchesStatus = filter === 'all' ? true : r.status === filter;
-        const matchesSearch = r.summary.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            r.verdict.toLowerCase().includes(searchTerm.toLowerCase());
-        return matchesStatus && matchesSearch;
+        const matchesSearch = r.movie_title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                             r.summary?.toLowerCase().includes(searchTerm.toLowerCase());
+        return matchesSearch;
     });
 
-    const handleDelete = () => {
-        // Disabled for public interface
-        console.log("Expulsion locked in public view.");
-    };
-
     return (
-        <div className="min-h-screen p-6 md:p-12 relative overflow-hidden">
-            <BackgroundAtmosphere imageUrl={reviews[0]?.movie_id ? `https://images.unsplash.com/photo-1485846234645-a62644f84728?q=30&w=1000` : null} />
+        <div style={{ background: '#080808', minHeight: '100vh', padding: '120px 0 80px' }}>
+            <BackgroundAtmosphere imageUrl={reviews[0]?.movie_poster_url} />
 
-            {/* Header / Nav */}
-            <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-16 relative z-10">
-                <div className="space-y-2">
-                    <div className="flex items-center gap-3 text-amber-500/60 mb-2">
-                        <TrendingUp size={20} />
-                        <span className="text-[10px] font-black uppercase tracking-[0.5em]">Sanctuary Intelligence</span>
-                    </div>
-                    <h1 className="text-4xl md:text-5xl font-black italic tracking-tighter">
-                        CINEMATIC <span className="text-amber-500">DNA</span>
-                    </h1>
-                </div>
-
-                <div className="flex gap-4">
-                    <div className="flex items-center gap-3 bg-amber-500/10 px-6 py-2 rounded-xl border border-amber-500/20">
-                        <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Protocol V8.0 Active</span>
-                    </div>
-                </div>
-            </div>
-
-            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 relative z-10">
-                {/* Protocol Section */}
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="lg:col-span-12 xl:col-span-5 glass-obsidian shadow-2xl-premium"
-                    style={{ borderRadius: '40px', padding: '40px', position: 'relative', overflow: 'hidden' }}
+            <div className="max-w-container">
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    style={{ maxWidth: '900px', margin: '0 auto', position: 'relative', zIndex: 10 }}
                 >
-                    <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(245,166,35,0.05) 0%, transparent 100%)', pointerEvents: 'none' }} />
-
-                    <div className="flex items-center justify-between mb-10 relative">
-                        <div>
-                            <h2 className="text-2xl font-black italic">LEXICON PROFILE</h2>
-                            <p className="text-xs text-white/40 uppercase tracking-widest mt-1">15-Tier Structural Analysis</p>
+                    <header style={{ marginBottom: '80px', textAlign: 'center' }}>
+                        <div style={{ display: 'inline-flex', padding: '12px', background: 'rgba(245,166,35,0.1)', borderRadius: '16px', marginBottom: '20px' }}>
+                            <TrendingUp size={32} color="var(--amber)" />
                         </div>
-                        <div className="w-12 h-12 bg-amber-500/20 rounded-2xl flex items-center justify-center border border-amber-500/30">
-                            <Star className="text-amber-500" size={24} fill="currentColor" />
-                        </div>
-                    </div>
+                        <h1 style={{ fontSize: 'clamp(2.5rem, 6vw, 4rem)', fontWeight: 900, color: '#fff', letterSpacing: '-0.04em', marginBottom: '16px', fontStyle: 'italic' }}>
+                            Cinematic DNA Protocol
+                        </h1>
+                        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '14px', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+                            SANCTUARY CORE V8.0 • ACTIVE
+                        </p>
+                    </header>
 
-                    <div className="space-y-4 relative">
-                        <div className="mb-8">
-                            <h3 className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] mb-4">Core Modalities</h3>
-                            <ProtocolItem 
-                                icon={TrendingUp}
-                                title="Refinement HUD" 
-                                text="Real-time weight visualization using the Hammer/Zenith dichotomy to ensure score transparency." 
-                            />
-                            <ProtocolItem 
-                                icon={Shield}
-                                title="Bias Shield" 
-                                text="Multi-layer simulation that neutralizes genre sensitivity and critic strictness float." 
-                            />
-                            <ProtocolItem 
-                                icon={Star}
-                                title="Snub Detection" 
-                                text="Automated identification of high-rating masterpieces (≥ 8.5) missing from award hierarchies." 
-                            />
+                    <section style={{ display: 'grid', gap: '32px', marginBottom: '100px' }}>
+                        <ProtocolCard 
+                            icon={<TrendingUp size={24} />}
+                            title="Refinement HUD"
+                            content="Our scoring engine utilizes the Hammer/Zenith dichotomy—a dual-layered weighting system that separates technical craft from emotional resonance. Every decimal point is a temporal imprint of focus."
+                        />
+                        <ProtocolCard 
+                            icon={<Shield size={24} />}
+                            title="Bias Shield"
+                            content="Proprietary simulation layers neutralize genre-specific drift and critic strictness. Whether it's a minimal indie or a maximalist blockbuster, the Shield ensures an absolute peer-to-peer comparison."
+                        />
+                        <ProtocolCard 
+                            icon={<Star size={24} />}
+                            title="Masterpiece Detection"
+                            content="The protocol automatically identifies high-tier critiques (≥ 8.5) that have been culturally overlooked by mainstream award hierarchies. We prioritize truth over buzz."
+                        />
+                    </section>
+
+                    <div style={{ height: '1px', background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)', marginBottom: '80px' }} />
+
+                    <div style={{ marginBottom: '40px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'rgba(255,255,255,0.4)' }}>
+                            <History size={20} />
+                            <h2 style={{ fontSize: '14px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.3em' }}>History Gallery</h2>
                         </div>
                         
-                        <div className="pt-6 border-t border-white/5">
-                            <h3 className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] mb-4">System Status</h3>
-                            <div className="bg-black/40 rounded-3xl p-6 border border-white/5 backdrop-blur-md">
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                                    <span style={{ fontSize: '10px', fontWeight: 900, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.2em' }}>Temporal Imprint</span>
-                                    <span style={{ fontSize: '10px', fontWeight: 900, color: 'var(--amber)', textTransform: 'uppercase', letterSpacing: '0.2em' }}>Active</span>
+                        <div style={{ position: 'relative' }}>
+                            <Search size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', opacity: 0.3 }} />
+                            <input 
+                                type="text"
+                                placeholder="Search the record..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    background: 'rgba(255,255,255,0.03)',
+                                    border: '1px solid rgba(255,255,255,0.1)',
+                                    borderRadius: '16px',
+                                    padding: '16px 16px 16px 50px',
+                                    color: '#fff',
+                                    fontSize: '14px',
+                                    fontWeight: 500,
+                                    outline: 'none',
+                                    transition: 'all 0.3s ease'
+                                }}
+                            />
+                        </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
+                        {loading ? (
+                            [1, 2, 3, 4].map(i => <div key={i} style={{ height: '120px', background: 'rgba(255,255,255,0.02)', borderRadius: '20px' }} className="skeleton" />)
+                        ) : filteredReviews.map((review, idx) => (
+                            <motion.div
+                                key={review._id || idx}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: idx * 0.05 }}
+                                onClick={() => { setSelectedReview(review); setIsModalOpen(true); }}
+                                style={{ 
+                                    background: 'rgba(255,255,255,0.02)', 
+                                    border: '1px solid rgba(255,255,255,0.05)', 
+                                    borderRadius: '20px', 
+                                    padding: '20px',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    gap: '16px',
+                                    alignItems: 'center'
+                                }}
+                                whileHover={{ scale: 1.02, background: 'rgba(255,255,255,0.04)' }}
+                            >
+                                <div style={{ width: '60px', height: '90px', borderRadius: '12px', overflow: 'hidden', flexShrink: 0 }}>
+                                    <img src={review.movie_poster_url} style={{ width: '100%', h: '100%', objectFit: 'cover' }} alt="" />
                                 </div>
-                                <p style={{ fontSize: '11px', color: 'var(--text-2)', fontWeight: 500, fontStyle: 'italic', lineHeight: 1.7 }}>
-                                    "The Sanctuary Protocol V8.0 is a living critical engine. Every score is a permanent imprint of craft, resonance, and technical execution."
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-        </motion.div>
-
-                {/* History Gallery Section */ }
-    <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="lg:col-span-12 xl:col-span-7 space-y-8"
-    >
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4">
-            <div>
-                <div className="flex items-center gap-3 text-white/40 mb-2">
-                    <History size={20} />
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em]">Sanctuary Scroll</span>
-                </div>
-                <h2 className="text-3xl font-black italic">HISTORY <span className="text-amber-500">GALLERY</span></h2>
-            </div>
-
-            <div className="flex gap-4">
-                <div className="relative">
-                    <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" />
-                    <input
-                        type="text"
-                        placeholder="SEARCH VERDICTS..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="bg-white/5 border border-white/10 rounded-xl pl-12 pr-6 py-3 text-[10px] font-black uppercase tracking-widest focus:outline-none focus:border-amber-500/50 transition-all w-full md:w-64"
-                    />
-                </div>
-            </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-20">
-            {loading ? (
-                [1, 2, 3, 4].map(i => (
-                    <div key={i} className="h-48 bg-white/5 rounded-3xl animate-pulse" />
-                ))
-            ) : filteredReviews.map((review, idx) => (
-                <motion.div
-                    key={review._id || review.id}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3 + (idx * 0.05) }}
-                    whileHover={{ scale: 1.02, y: -5 }}
-                    onClick={() => {
-                        setSelectedReview(review);
-                        setIsModalOpen(true);
-                    }}
-                    className="group bg-white/5 backdrop-blur-xl border border-white/5 p-6 rounded-[32px] flex gap-6 hover:border-amber-500/30 transition-all duration-500 cursor-pointer"
-                >
-                    <div className="w-24 aspect-[2/3] rounded-2xl overflow-hidden bg-white/5 shadow-xl transition-transform duration-700 group-hover:scale-110">
-                        <img
-                            src={failedPosters.has(review.movie_poster_url) || !review.movie_poster_url
-                                ? "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&q=80&w=800"
-                                : review.movie_poster_url}
-                            className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-700"
-                            alt={review.movie_title}
-                            onError={(e) => handlePosterError(e, review.movie_poster_url)}
-                        />
-                    </div>
-                    <div className="flex-1 flex flex-col justify-between py-2">
-                        <div className="space-y-2">
-                            <div className="flex items-center gap-2">
-                                <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">{review.verdict}</span>
-                                <div className="h-1 w-1 rounded-full bg-white/20" />
-                                <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">
-                                    {new Date(review.created_at).toLocaleDateString()}
-                                </span>
-                            </div>
-                            <h3 className="text-lg font-bold line-clamp-2 leading-tight group-hover:text-amber-400 transition-colors uppercase">
-                                {review.movie_title || `Critique #${(review._id || review.id || '').slice(-4)}`}
-                            </h3>
-                            <p className="text-xs text-white/40 line-clamp-2 font-medium italic">
-                                "{review.summary}"
-                            </p>
-                        </div>
-                        <div className="flex items-center gap-2 text-amber-500">
-                            <Star size={12} fill="currentColor" />
-                            <span className="text-sm font-black italic">
-                                {typeof review.overall_rating === 'object' ? review.overall_rating.score.toFixed(2) : (parseFloat(review.overall_rating) || 0).toFixed(2)}
-                            </span>
-                        </div>
+                                <div>
+                                    <div style={{ fontSize: '9px', fontWeight: 900, color: 'var(--amber)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px' }}>{review.verdict}</div>
+                                    <div style={{ fontSize: '14px', fontWeight: 800, color: '#fff', marginBottom: '4px' }} className="line-clamp-1">{review.movie_title}</div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--amber)', fontSize: '13px', fontWeight: 900 }}>
+                                        <Star size={10} fill="currentColor" />
+                                        <span>{parseFloat(review.overall_rating || 0).toFixed(2)}</span>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
                     </div>
                 </motion.div>
-            ))}
-
-            {!loading && filteredReviews.length === 0 && (
-                <div className="col-span-full py-20 text-center space-y-4 opacity-40">
-                    <History size={48} className="mx-auto" />
-                    <p className="text-xs uppercase tracking-[0.4em] font-black">Sanctuary Empty</p>
-                </div>
-            )}
-        </div>
-    </motion.div>
             </div>
 
-            {/* Review Details Modal */}
             <ReviewDetailsModal
                 review={selectedReview}
                 isOpen={isModalOpen}
-                onClose={() => {
-                    setIsModalOpen(false);
-                    setTimeout(() => setSelectedReview(null), 300); // Wait for exit animation
-                }}
-                onDelete={handleDelete}
+                onClose={() => { setIsModalOpen(false); setTimeout(() => setSelectedReview(null), 300); }}
+                onDelete={() => {}}
             />
         </div>
     );
 };
+
+function ProtocolCard({ icon, title, content }) {
+    return (
+        <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '24px', padding: '40px', backdropFilter: 'blur(10px)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px', color: 'var(--amber)' }}>
+                <div style={{ padding: '10px', background: 'rgba(245,166,35,0.1)', borderRadius: '12px' }}>{icon}</div>
+                <h2 style={{ fontSize: '20px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', fontStyle: 'italic' }}>{title}</h2>
+            </div>
+            <p style={{ color: 'rgba(255,255,255,0.5)', lineHeight: 1.8, fontSize: '16px', fontWeight: 500 }}>
+                {content}
+            </p>
+        </div>
+    );
+}
 
 export default Intelligence;
