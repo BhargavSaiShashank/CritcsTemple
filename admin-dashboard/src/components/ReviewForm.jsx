@@ -883,8 +883,43 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                     <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
                     <Sparkles className="mx-auto mb-4 md:mb-6 text-amber-500/40 animate-pulse" size={32} />
                     <p className="text-[10px] font-black uppercase tracking-[0.6em] text-white/20 mb-4">Temple Accuracy</p>
-                    <div className="text-6xl md:text-8xl font-black text-white tracking-tighter mb-4 italic drop-shadow-[0_0_50px_rgba(245,158,11,0.2)]">
-                        {numericScore}
+                    <div className="relative inline-block">
+                        <div className="text-6xl md:text-8xl font-black text-white tracking-tighter mb-4 italic drop-shadow-[0_0_50px_rgba(245,158,11,0.2)]">
+                            {numericScore}
+                        </div>
+                        
+                        {/* REFINEMENT HUD: PROTOCOL V8.0 LOGIC INDICATORS */}
+                        <div className="absolute -top-4 -right-8 flex flex-col gap-2">
+                            {activeFlags.isCapped && (
+                                <motion.div 
+                                    initial={{ scale: 0, rotate: -45 }}
+                                    animate={{ scale: 1, rotate: 0 }}
+                                    className="bg-red-500/20 border border-red-500/40 p-2 rounded-xl backdrop-blur-md cursor-help group/hammer"
+                                    title="THE HAMMER: Gradient Penalty Active"
+                                >
+                                    <span className="text-lg">🔨</span>
+                                    <div className="absolute left-full ml-3 top-0 scale-0 group-hover/hammer:scale-100 transition-all origin-left bg-black/90 border border-white/10 p-3 rounded-xl w-48 text-left z-[100] shadow-2xl">
+                                        <p className="text-[9px] font-black uppercase text-red-400 tracking-widest mb-1">Gradient Penalty</p>
+                                        <p className="text-[10px] text-white/60 font-medium italic leading-relaxed">The Hammer has fallen. A pillar average below 6.5 or 7.0 is pulling this score down.</p>
+                                    </div>
+                                </motion.div>
+                            )}
+                            
+                            {activeFlags.isElite && (
+                                <motion.div 
+                                    initial={{ scale: 0, rotate: 45 }}
+                                    animate={{ scale: 1, rotate: 0 }}
+                                    className="bg-amber-500/20 border border-amber-500/40 p-2 rounded-xl backdrop-blur-md cursor-help group/zenith"
+                                    title="THE ZENITH: Synergy Boost Active"
+                                >
+                                    <span className="text-lg animate-pulse">🌟</span>
+                                    <div className="absolute left-full ml-3 top-0 scale-0 group-hover/zenith:scale-100 transition-all origin-left bg-black/90 border border-white/10 p-3 rounded-xl w-48 text-left z-[100] shadow-2xl">
+                                        <p className="text-[9px] font-black uppercase text-amber-500 tracking-widest mb-1">Elite Synergy</p>
+                                        <p className="text-[10px] text-white/60 font-medium italic leading-relaxed">Zenith Harmony detected. Elite Narrative & Execution synergy is amplifying this score.</p>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </div>
                     </div>
                     <div className="h-1 w-24 bg-gradient-to-r from-transparent via-amber-500/50 to-transparent mx-auto mb-4" />
                     <p className="text-amber-500 text-[10px] font-black uppercase tracking-[0.4em]">Master Distinction</p>
