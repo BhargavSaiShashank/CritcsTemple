@@ -11,14 +11,45 @@ import ReviewDetailsModal from '../components/ReviewDetailsModal';
 const ProtocolItem = ({ icon: Icon, title, text }) => (
     <motion.div 
         whileHover={{ x: 5 }}
-        className="group flex gap-4 p-4 rounded-2xl hover:bg-white/5 transition-all border border-transparent hover:border-white/10"
+        style={{ 
+            display: 'flex', 
+            gap: '16px', 
+            padding: '16px', 
+            borderRadius: '16px', 
+            transition: 'all 0.3s ease',
+            background: 'rgba(255,255,255,0.02)',
+            border: '1px solid rgba(255,255,255,0.05)'
+        }}
+        className="group hover-glass"
     >
-        <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20 group-hover:bg-amber-500 group-hover:text-black transition-all">
+        <div style={{ 
+            width: '40px', 
+            height: '40px', 
+            borderRadius: '12px', 
+            background: 'var(--amber-dim)', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            border: '1px solid var(--border)',
+            color: 'var(--amber)'
+        }}>
             <Icon size={18} />
         </div>
-        <div className="flex-1">
-            <div className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-1 group-hover:text-amber-400">{title}</div>
-            <div className="text-xs text-white/50 font-medium leading-relaxed">{text}</div>
+        <div style={{ flex: 1 }}>
+            <div style={{ 
+                fontSize: '10px', 
+                fontWeight: 900, 
+                color: 'var(--amber)', 
+                textTransform: 'uppercase', 
+                letterSpacing: '0.2em', 
+                marginBottom: '4px' 
+            }}>{title}</div>
+            <div style={{ 
+                fontSize: '12px', 
+                color: 'var(--text-2)', 
+                fontWeight: 500, 
+                lineHeight: 1.6 
+            }}>{text}</div>
         </div>
     </motion.div>
 );
@@ -98,13 +129,14 @@ const Intelligence = () => {
             </div>
 
             <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 relative z-10">
-                {/* Radar Chart Section */}
+                {/* Protocol Section */}
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="lg:col-span-12 xl:col-span-5 bg-white/5 backdrop-blur-3xl rounded-[40px] border border-white/10 p-10 relative overflow-hidden group shadow-2xl"
+                    className="lg:col-span-12 xl:col-span-5 glass-obsidian shadow-2xl-premium"
+                    style={{ borderRadius: '40px', padding: '40px', position: 'relative', overflow: 'hidden' }}
                 >
-                    <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent pointer-events-none" />
+                    <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(245,166,35,0.05) 0%, transparent 100%)', pointerEvents: 'none' }} />
 
                     <div className="flex items-center justify-between mb-10 relative">
                         <div>
@@ -139,11 +171,11 @@ const Intelligence = () => {
                         <div className="pt-6 border-t border-white/5">
                             <h3 className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] mb-4">System Status</h3>
                             <div className="bg-black/40 rounded-3xl p-6 border border-white/5 backdrop-blur-md">
-                                <div className="flex items-center justify-between mb-4">
-                                    <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">Temporal Imprint</span>
-                                    <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Active</span>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                                    <span style={{ fontSize: '10px', fontWeight: 900, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.2em' }}>Temporal Imprint</span>
+                                    <span style={{ fontSize: '10px', fontWeight: 900, color: 'var(--amber)', textTransform: 'uppercase', letterSpacing: '0.2em' }}>Active</span>
                                 </div>
-                                <p className="text-[11px] text-white/30 font-medium italic leading-relaxed">
+                                <p style={{ fontSize: '11px', color: 'var(--text-2)', fontWeight: 500, fontStyle: 'italic', lineHeight: 1.7 }}>
                                     "The Sanctuary Protocol V8.0 is a living critical engine. Every score is a permanent imprint of craft, resonance, and technical execution."
                                 </p>
                             </div>
