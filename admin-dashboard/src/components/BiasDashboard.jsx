@@ -8,6 +8,7 @@ const BiasDashboard = () => {
   const [bias, setBias] = useState(null);
   const [loading, setLoading] = useState(true);
   const [recomputing, setRecomputing] = useState(false);
+  const [simulation, setSimulation] = useState({ strictness: 0, sensitivity: 1.0 });
 
   const loadData = async () => {
     setLoading(true);
@@ -96,17 +97,62 @@ const BiasDashboard = () => {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {/* SIMULATOR CONTROLS */}
+        <div className="md:col-span-1 bg-amber-500/5 border border-amber-500/10 p-6 rounded-2xl space-y-6">
+          <div className="flex items-center gap-2 text-amber-500 mb-2">
+            <Zap size={16} />
+            <p className="text-[10px] font-black uppercase tracking-widest">Bias Simulator</p>
+          </div>
+          
+          <div className="space-y-3">
+            <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-tighter text-white/40">
+              <label>Strictness Offset</label>
+              <span>{simulation.strictness > 0 ? '+' : ''}{simulation.strictness.toFixed(1)}</span>
+            </div>
+            <input 
+              type="range" min="-1.5" max="1.5" step="0.1"
+              value={simulation.strictness}
+              onChange={(e) => setSimulation({ ...simulation, strictness: parseFloat(e.target.value) })}
+              className="w-full h-1 bg-white/5 rounded-full appearance-none cursor-pointer accent-amber-500"
+            />
+            <p className="text-[8px] text-white/20 italic">Simulate being more/less critical globally.</p>
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-tighter text-white/40">
+              <label>Genre Sensitivity</label>
+              <span>{simulation.sensitivity.toFixed(1)}x</span>
+            </div>
+            <input 
+              type="range" min="0.5" max="2.0" step="0.1"
+              value={simulation.sensitivity}
+              onChange={(e) => setSimulation({ ...simulation, sensitivity: parseFloat(e.target.value) })}
+              className="w-full h-1 bg-white/5 rounded-full appearance-none cursor-pointer accent-indigo-500"
+            />
+            <p className="text-[8px] text-white/20 italic">Amplifies/Dampens your genre deviations.</p>
+          </div>
+
+          <button 
+            onClick={() => setSimulation({ strictness: 0, sensitivity: 1.0 })}
+            className="w-full py-2 bg-white/5 border border-white/10 rounded-xl text-[8px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-all"
+          >
+            Reset Simulation
+          </button>
+        </div>
+
         {/* Overall Stat Card */}
         <div className="bg-white/5 border border-white/10 p-6 rounded-2xl relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <User size={80} />
           </div>
-          <p className="text-xs font-bold text-gray-500 uppercase mb-2">Total Average</p>
-          <p className="text-5xl font-black text-white">{bias.overall_average?.toFixed(2)}</p>
+          <p className="text-xs font-bold text-gray-500 uppercase mb-2">Simulated Average</p>
+          <p className={`text-5xl font-black transition-colors ${simulation.strictness !== 0 ? 'text-amber-500' : 'text-white'}`}>
+            {(bias.overall_average + simulation.strictness).toFixed(2)}
+          </p>
           <div className="mt-4 flex items-center gap-2 text-indigo-400 text-[10px] font-bold">
              <Award size={12} />
-             <span>Verified Rating Profile</span>
+             <span>{simulation.strictness === 0 ? 'Live Profile' : 'Projected Archive State'}</span>
           </div>
         </div>
 
@@ -115,11 +161,11 @@ const BiasDashboard = () => {
            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <TrendingUp size={80} />
           </div>
-          <p className="text-xs font-bold text-gray-500 uppercase mb-2">Hype Bias Score</p>
-          <p className="text-5xl font-black text-white">{bias.hype_bias_score?.toFixed(1)}</p>
+          <p className="text-xs font-bold text-gray-500 uppercase mb-2">Perception Float</p>
+          <p className="text-5xl font-black text-white">{(bias.hype_bias_score * (1/simulation.sensitivity)).toFixed(1)}</p>
           <div className={`mt-4 flex items-center gap-2 text-[10px] font-bold ${bias.hype_bias_score > 1.0 ? 'text-red-400' : 'text-green-400'}`}>
              <ShieldAlert size={12} />
-             <span>{bias.hype_bias_score > 1.0 ? 'High Sentiment Shift' : 'Stable Perception'}</span>
+             <span>{simulation.sensitivity > 1.0 ? 'Simulating High Volatility' : 'Stable Perception'}</span>
           </div>
         </div>
 
@@ -138,7 +184,7 @@ const BiasDashboard = () => {
         </h3>
         <div className="h-64 mt-4 relative" style={{ minWidth: '1px', minHeight: '1px' }}>
           <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} debounce={50}>
-            <BarChart data={bias.genre_bias}>
+            <BarChart data={bias.genre_bias.map(g => ({ ...g, deviation: g.deviation * simulation.sensitivity }))}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff05" />
               <XAxis 
                 dataKey="category" 
