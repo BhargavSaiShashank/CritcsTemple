@@ -39,7 +39,7 @@ const Intelligence = () => {
 
     return (
         <div className="intelligence-page">
-            <BackgroundAtmosphere imageUrl={reviews[0]?.movie_poster_url} />
+            <BackgroundAtmosphere imageUrl={null} />
 
             <div className="max-w-container">
                 <motion.div 
@@ -55,75 +55,29 @@ const Intelligence = () => {
                             Cinematic DNA Protocol
                         </h1>
                         <p className="protocol-subtitle">
-                            SANCTUARY CORE V8.0 • ACTIVE
+                            SANCTUARY CORE V8.0 • ELITE ENCLAVE
                         </p>
                     </header>
 
                     <section className="protocol-grid">
                         <ProtocolCard 
                             icon={<TrendingUp size={24} />}
-                            title="Refinement HUD"
-                            content="Our scoring engine utilizes the Hammer/Zenith dichotomy—a dual-layered weighting system that separates technical craft from emotional resonance. Every decimal point is a temporal imprint of focus."
+                            title="The Hammer & Zenith"
+                            content="The Protocol operates on a proprietary duality. 'The Hammer' measures the cold, technical precision of the cinematic craft, while 'The Zenith' captures the transcendent emotional impact. True greatness is found in their absolute intersection."
                         />
                         <ProtocolCard 
                             icon={<Shield size={24} />}
-                            title="Bias Shield"
-                            content="Proprietary simulation layers neutralize genre-specific drift and critic strictness. Whether it's a minimal indie or a maximalist blockbuster, the Shield ensures an absolute peer-to-peer comparison."
+                            title="Bias Shield V8.0"
+                            content="Our Shield is an automated refinement layer that neutralizes genre-specific drifts and critic strictness. It ensures that every review, regardless of genre or era, is processed through a normalized, absolute peer-to-peer lens."
                         />
                         <ProtocolCard 
                             icon={<Star size={24} />}
-                            title="Masterpiece Detection"
-                            content="The protocol automatically identifies high-tier critiques (≥ 8.5) that have been culturally overlooked by mainstream award hierarchies. We prioritize truth over buzz."
+                            title="Pillar Equilibrium"
+                            content="The Protocol analyzes nineteen distinct cinematic aspects across five conceptual pillars. Each aspect is weighted through an iterative stabilization process to ensure the final score represents a cinematic reality rather than a statistical fluke."
                         />
                     </section>
 
                     <div style={{ height: '1px', background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)', marginBottom: '80px' }} />
-
-                    <div className="history-section-header">
-                         <div className="history-title-wrapper">
-                            <History size={20} />
-                            <h2 className="history-title">History Gallery</h2>
-                        </div>
-                        
-                        <div className="search-wrapper">
-                            <Search size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', opacity: 0.3 }} />
-                            <input 
-                                type="text"
-                                placeholder="Search the record..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="search-input"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="history-grid">
-                        {loading ? (
-                            [1, 2, 3, 4].map(i => <div key={i} style={{ height: '120px', background: 'rgba(255,255,255,0.02)', borderRadius: '20px' }} className="skeleton" />)
-                        ) : filteredReviews.map((review, idx) => (
-                            <motion.div
-                                key={review._id || idx}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: idx * 0.05 }}
-                                onClick={() => { setSelectedReview(review); setIsModalOpen(true); }}
-                                className="history-item"
-                                whileHover={{ scale: 1.02 }}
-                            >
-                                <div style={{ width: '60px', height: '90px', borderRadius: '12px', overflow: 'hidden', flexShrink: 0 }}>
-                                    <img src={review.movie_poster_url} style={{ width: '100%', h: '100%', objectFit: 'cover' }} alt="" />
-                                </div>
-                                <div>
-                                    <div style={{ fontSize: '9px', fontWeight: 900, color: 'var(--amber)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px' }}>{review.verdict}</div>
-                                    <div style={{ fontSize: '14px', fontWeight: 800, color: '#fff', marginBottom: '4px' }} className="line-clamp-1">{review.movie_title}</div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--amber)', fontSize: '13px', fontWeight: 900 }}>
-                                        <Star size={10} fill="currentColor" />
-                                        <span>{parseFloat(review.overall_rating || 0).toFixed(2)}</span>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
                 </motion.div>
             </div>
 
