@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { getLatestReviews } from '../services/api';
 import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
 import ReviewDetailsModal from '../components/ReviewDetailsModal';
+import './Intelligence.css';
 
 const Intelligence = () => {
     const [reviews, setReviews] = useState([]);
@@ -37,7 +38,7 @@ const Intelligence = () => {
     });
 
     return (
-        <div style={{ background: '#080808', minHeight: '100vh', padding: '120px 0 80px' }}>
+        <div className="intelligence-page">
             <BackgroundAtmosphere imageUrl={reviews[0]?.movie_poster_url} />
 
             <div className="max-w-container">
@@ -46,19 +47,19 @@ const Intelligence = () => {
                     animate={{ opacity: 1, y: 0 }}
                     style={{ maxWidth: '900px', margin: '0 auto', position: 'relative', zIndex: 10 }}
                 >
-                    <header style={{ marginBottom: '80px', textAlign: 'center' }}>
-                        <div style={{ display: 'inline-flex', padding: '12px', background: 'rgba(245,166,35,0.1)', borderRadius: '16px', marginBottom: '20px' }}>
+                    <header className="protocol-header">
+                        <div className="protocol-icon-wrapper">
                             <TrendingUp size={32} color="var(--amber)" />
                         </div>
-                        <h1 style={{ fontSize: 'clamp(2.5rem, 6vw, 4rem)', fontWeight: 900, color: '#fff', letterSpacing: '-0.04em', marginBottom: '16px', fontStyle: 'italic' }}>
+                        <h1 className="protocol-title">
                             Cinematic DNA Protocol
                         </h1>
-                        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '14px', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+                        <p className="protocol-subtitle">
                             SANCTUARY CORE V8.0 • ACTIVE
                         </p>
                     </header>
 
-                    <section style={{ display: 'grid', gap: '32px', marginBottom: '100px' }}>
+                    <section className="protocol-grid">
                         <ProtocolCard 
                             icon={<TrendingUp size={24} />}
                             title="Refinement HUD"
@@ -78,36 +79,25 @@ const Intelligence = () => {
 
                     <div style={{ height: '1px', background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)', marginBottom: '80px' }} />
 
-                    <div style={{ marginBottom: '40px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'rgba(255,255,255,0.4)' }}>
+                    <div className="history-section-header">
+                         <div className="history-title-wrapper">
                             <History size={20} />
-                            <h2 style={{ fontSize: '14px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.3em' }}>History Gallery</h2>
+                            <h2 className="history-title">History Gallery</h2>
                         </div>
                         
-                        <div style={{ position: 'relative' }}>
+                        <div className="search-wrapper">
                             <Search size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', opacity: 0.3 }} />
                             <input 
                                 type="text"
                                 placeholder="Search the record..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                style={{
-                                    width: '100%',
-                                    background: 'rgba(255,255,255,0.03)',
-                                    border: '1px solid rgba(255,255,255,0.1)',
-                                    borderRadius: '16px',
-                                    padding: '16px 16px 16px 50px',
-                                    color: '#fff',
-                                    fontSize: '14px',
-                                    fontWeight: 500,
-                                    outline: 'none',
-                                    transition: 'all 0.3s ease'
-                                }}
+                                className="search-input"
                             />
                         </div>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
+                    <div className="history-grid">
                         {loading ? (
                             [1, 2, 3, 4].map(i => <div key={i} style={{ height: '120px', background: 'rgba(255,255,255,0.02)', borderRadius: '20px' }} className="skeleton" />)
                         ) : filteredReviews.map((review, idx) => (
@@ -117,17 +107,8 @@ const Intelligence = () => {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: idx * 0.05 }}
                                 onClick={() => { setSelectedReview(review); setIsModalOpen(true); }}
-                                style={{ 
-                                    background: 'rgba(255,255,255,0.02)', 
-                                    border: '1px solid rgba(255,255,255,0.05)', 
-                                    borderRadius: '20px', 
-                                    padding: '20px',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    gap: '16px',
-                                    alignItems: 'center'
-                                }}
-                                whileHover={{ scale: 1.02, background: 'rgba(255,255,255,0.04)' }}
+                                className="history-item"
+                                whileHover={{ scale: 1.02 }}
                             >
                                 <div style={{ width: '60px', height: '90px', borderRadius: '12px', overflow: 'hidden', flexShrink: 0 }}>
                                     <img src={review.movie_poster_url} style={{ width: '100%', h: '100%', objectFit: 'cover' }} alt="" />
@@ -158,12 +139,12 @@ const Intelligence = () => {
 
 function ProtocolCard({ icon, title, content }) {
     return (
-        <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '24px', padding: '40px', backdropFilter: 'blur(10px)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px', color: 'var(--amber)' }}>
-                <div style={{ padding: '10px', background: 'rgba(245,166,35,0.1)', borderRadius: '12px' }}>{icon}</div>
-                <h2 style={{ fontSize: '20px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', fontStyle: 'italic' }}>{title}</h2>
+        <div className="protocol-card">
+            <div className="protocol-card-header">
+                <div className="protocol-card-icon">{icon}</div>
+                <h2 className="protocol-card-title">{title}</h2>
             </div>
-            <p style={{ color: 'rgba(255,255,255,0.5)', lineHeight: 1.8, fontSize: '16px', fontWeight: 500 }}>
+            <p className="protocol-card-content">
                 {content}
             </p>
         </div>
