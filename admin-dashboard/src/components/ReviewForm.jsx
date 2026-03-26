@@ -444,97 +444,73 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
     }
 
     const averageScore = useMemo(() => {
-        // V7.2 SCORING ENGINE (THE DEFINITIVE MATRIX)
         const aspectsMap = formData.aspects || {};
-        const categories = {
-            'Narrative': { keys: ['story', 'screenplay', 'originality', 'opening', 'climax'], weights: [0.09, 0.08, 0.05, 0.08, 0.05] },
-            'Execution': { keys: ['direction', 'acting', 'dialogues', 'thematic_depth'], weights: [0.10, 0.07, 0.03, 0.05] },
-            'Visuals': { keys: ['cinematography', 'editing', 'production_design', 'vfx'], weights: [0.06, 0.04, 0.03, 0.02] },
-            'Audio': { keys: ['bg_score', 'music', 'sound_design'], weights: [0.04, 0.03, 0.03] },
-            'Soul': { keys: ['pacing', 'emotional_impact', 'rewatch_value'], weights: [0.05, 0.06, 0.04] }
+        const getS = (k) => {
+            const aspect = aspectsMap[k];
+            return typeof aspect === 'object' ? (parseFloat(aspect?.score) || 0) : (parseFloat(aspect) || 0);
         };
 
-        let baseScore = 0.0;
-        let catAverages = {};
-        let aspectScores = [];
+        // PROTOCOL V8.0: VIEWER-CRITIC OPTIMIZED WEIGHTS
+        const weights = {
+            story: 0.08, screenplay: 0.09, originality: 0.04, opening: 0.02, climax: 0.02,
+            direction: 0.10, acting: 0.08, dialogues: 0.04, thematic_depth: 0.03,
+            cinematography: 0.09, editing: 0.07, production_design: 0.04, vfx: 0.03,
+            sound_design: 0.06, bg_score: 0.04, music: 0.03,
+            emotional_impact: 0.08, rewatch_value: 0.03, pacing: 0.03
+        };
 
-        Object.entries(categories).forEach(([name, cat]) => {
-            let catSum = 0;
-            cat.keys.forEach((key, idx) => {
-                const aspect = aspectsMap[key];
-                const s = typeof aspect === 'object' ? (parseFloat(aspect?.score) || 0) : (parseFloat(aspect) || 0);
-                baseScore += s * cat.weights[idx];
-                catSum += s;
-                aspectScores.push(s);
-            });
-            catAverages[name] = catSum / cat.keys.length;
+        let baseScore = 0;
+        Object.entries(weights).forEach(([key, weight]) => {
+            baseScore += getS(key) * weight;
         });
 
-        // 1. Excellence Bonus
-        const count90 = aspectScores.filter(s => s >= 9.0).length;
-        const count95 = aspectScores.filter(s => s >= 9.5).length;
-        const bonus = Math.min(0.20, (count90 * 0.02) + (count95 * 0.04));
+        // Category Averages for Refinements
+        const nAvg = (getS('story') + getS('screenplay') + getS('originality') + getS('opening') + getS('climax')) / 5;
+        const eAvg = (getS('direction') + getS('acting') + getS('dialogues') + getS('thematic_depth')) / 4;
+        const vAvg = (getS('cinematography') + getS('editing') + getS('production_design') + getS('vfx')) / 4;
+        const aAvg = (getS('sound_design') + getS('bg_score') + getS('music')) / 3;
+        const sAvg = (getS('emotional_impact') + getS('rewatch_value') + getS('pacing')) / 3;
 
-        // 2. Peak Reward
-        let peak = 0;
-        const minScore = Math.min(...aspectScores);
-        if (count95 >= 3 && minScore >= 7.5) peak = 0.10;
+        let finalScore = baseScore;
 
-        // 3. Penalties
-        // 3.1 Weak Link
-        let weakLinkPenalty = 0;
-        if (minScore < 6.5) weakLinkPenalty = 0.40;
-        else if (minScore < 7.0) weakLinkPenalty = 0.30;
-        else if (minScore < 7.5) weakLinkPenalty = 0.20;
-        else if (minScore < 8.0) weakLinkPenalty = 0.10;
+        // 🟢 THE HAMMER: DYNAMIC GRADIENT PENALTIES
+        if (nAvg < 6.5) finalScore -= (6.5 - nAvg) * 0.40;
+        if (eAvg < 6.5) finalScore -= (6.5 - eAvg) * 0.30;
+        if (sAvg < 7.0) finalScore -= (7.0 - sAvg) * 0.20;
 
-        // 3.2 Smoothed Inflation
-        let inflationPenalty = 0;
-        if (baseScore < 9.5 && count90 >= 10) {
-            inflationPenalty = (count90 - 9) * 0.05;
-            if (baseScore >= 9.3) inflationPenalty *= 0.5; // Smoothing
-            if (inflationPenalty > 0.25) inflationPenalty = 0.25;
+        // 🟢 THE ZENITH: SYNERGY BOOSTS
+        let isElite = false;
+        if (nAvg >= 9.0 && eAvg >= 9.0) {
+            const synergy = ((nAvg - 9.0) + (eAvg - 9.0)) * 0.15;
+            finalScore += synergy;
+            isElite = true;
         }
 
-        // 3.3 Imbalance
-        const pillarAvgs = Object.values(catAverages);
-        const gap = Math.max(...pillarAvgs) - Math.min(...pillarAvgs);
-        let imbalancePenalty = 0;
-        if (gap > 2.0) imbalancePenalty = 0.25;
-        else if (gap > 1.5) imbalancePenalty = 0.15;
+        // 🟢 LEGENDARY HARMONY (All Pillar Bonus)
+        const allAvgs = [nAvg, eAvg, vAvg, aAvg, sAvg];
+        const isLegendary = allAvgs.every(a => a >= 8.5);
+        if (isLegendary) finalScore += 0.10;
 
-        // 4. Overlap Mercy Fix
-        if (weakLinkPenalty > 0) imbalancePenalty = Math.min(0.10, imbalancePenalty);
+        // 🟢 CONSISTENCY CHECK
+        const gap = Math.max(...allAvgs) - Math.min(...allAvgs);
+        if (gap > 2.0) finalScore -= 0.15;
 
-        // 3.4 Transcendent Synergy (V7.2 Enhancement)
-        const highPillars = pillarAvgs.filter(a => a >= 9.2).length;
-        let transcendentBonus = 0;
-        let isTranscendent = false;
-        if (highPillars >= 4) {
-            transcendentBonus = 0.15;
-            isTranscendent = true;
+        // Micro Calibration
+        if (formData.micro_calibration) {
+            finalScore += parseFloat(formData.micro_calibration);
         }
-
-        let finalScore = baseScore + bonus + peak + transcendentBonus - (weakLinkPenalty + inflationPenalty + imbalancePenalty);
-
-        // 5. Narrative Guardrail (Hard Ceiling)
-        const nAvg = catAverages['Narrative'];
-        let isCapped = false;
-        if (nAvg < 7.5 && finalScore > 8.3) { finalScore = 8.3; isCapped = true; }
-        else if (nAvg < 8.0 && finalScore > 8.7) { finalScore = 8.7; isCapped = true; }
-        else if (nAvg < 8.5 && finalScore > 9.1) { finalScore = 9.1; isCapped = true; }
 
         return {
-            score: Math.max(0, Math.min(10, finalScore)),
+            score: Math.max(0, Math.min(9.70, finalScore)),
             flags: {
-                isCapped,
-                isElite: baseScore >= 9.3 && baseScore < 9.5,
-                isLegendary: baseScore >= 9.5,
-                isTranscendent,
-                mercyActive: weakLinkPenalty > 0 && imbalancePenalty > 0
+                isCapped: nAvg < 6.5,
+                isElite,
+                isLegendary,
+                isTranscendent: finalScore >= 9.2,
+                mercyActive: false
             }
         };
-    }, [formData.aspects]);
+    }, [formData.aspects, formData.micro_calibration]);
 
     const scoringResult = averageScore;
     const numericScore = scoringResult.score.toFixed(2);
