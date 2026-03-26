@@ -22,7 +22,7 @@ const ReviewDetailsModal = ({ review, isOpen, onClose, onDelete }) => {
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="fixed top-[5%] left-[5%] right-[5%] bottom-[5%] md:top-[10%] md:left-[15%] md:right-[15%] md:bottom-[10%] bg-[#080808] border border-white/10 rounded-[32px] md:rounded-[40px] z-[101] overflow-hidden flex flex-col shadow-2xl"
+                        className="fixed top-[5%] left-[5%] right-[5%] bottom-[5%] md:top-[10%] md:left-[15%] md:right-[15%] md:bottom-[10%] review-modal-content overflow-hidden flex flex-col"
                     >
                         {/* Header Image */}
                         <div className="relative h-48 md:h-64 flex-shrink-0 bg-black">
@@ -148,7 +148,7 @@ const ReviewDetailsModal = ({ review, isOpen, onClose, onDelete }) => {
 
                                 {/* Sidebar: Aspects DNA */}
                                 <div className="space-y-8">
-                                    <div className="bg-white/5 backdrop-blur-md rounded-[32px] p-8 border border-white/5 shadow-2xl sticky top-0">
+                                    <div className="dna-sidebar sticky top-0">
                                         <div className="flex items-center gap-3 mb-6 border-b border-white/10 pb-4">
                                             <div className="p-2 bg-amber-500/10 rounded-lg">
                                                 <TrendingUp size={16} className="text-amber-500" />
@@ -166,12 +166,12 @@ const ReviewDetailsModal = ({ review, isOpen, onClose, onDelete }) => {
                                                                 <span className="text-[9px] font-black uppercase tracking-widest text-white/40">{key.replace('_', ' ')}</span>
                                                                 <span className="text-[10px] font-black text-amber-500 italic">{aspect.score.toFixed(1)}</span>
                                                             </div>
-                                                            <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                                                            <div className="aspect-bar-container">
                                                                 <motion.div
                                                                     initial={{ width: 0 }}
                                                                     animate={{ width: `${(aspect.score / 10) * 100}%` }}
                                                                     transition={{ duration: 1, ease: "easeOut" }}
-                                                                    className="h-full bg-amber-500 rounded-full shadow-[0_0_8px_rgba(245,158,11,0.3)]"
+                                                                    className="aspect-bar-fill"
                                                                 />
                                                             </div>
                                                         </div>
