@@ -11,11 +11,19 @@ import { getLatestReviews } from '../services/api';
 import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
 import ReviewDetailsModal from '../components/ReviewDetailsModal';
 
-const ProtocolItem = ({ title, text }) => (
-    <div className="border-l-2 border-amber-500/30 pl-4 py-1">
-        <div className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-1">{title}</div>
-        <div className="text-xs text-white/40 font-medium leading-relaxed">{text}</div>
-    </div>
+const ProtocolItem = ({ icon: Icon, title, text }) => (
+    <motion.div 
+        whileHover={{ x: 5 }}
+        className="group flex gap-4 p-4 rounded-2xl hover:bg-white/5 transition-all border border-transparent hover:border-white/10"
+    >
+        <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20 group-hover:bg-amber-500 group-hover:text-black transition-all">
+            <Icon size={18} />
+        </div>
+        <div className="flex-1">
+            <div className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-1 group-hover:text-amber-400">{title}</div>
+            <div className="text-xs text-white/50 font-medium leading-relaxed">{text}</div>
+        </div>
+    </motion.div>
 );
 
 const Intelligence = () => {
@@ -111,24 +119,35 @@ const Intelligence = () => {
                         </div>
                     </div>
 
-                    <div className="space-y-8 relative">
-                        <ProtocolItem 
-                            title="Refinement HUD" 
-                            text="Real-time visual feedback using the Hammer/Zenith dichotomy to visualize score weights." 
-                        />
-                        <ProtocolItem 
-                            title="Bias Shield" 
-                            text="Proprietary simulation layers that protect critical integrity from genre and strictness biases." 
-                        />
-                        <ProtocolItem 
-                            title="Masterpiece Detection" 
-                            text="Automated identification of high-tier critiques that deserve cultural prioritization." 
-                        />
+                    <div className="space-y-4 relative">
+                        <div className="mb-8">
+                            <h3 className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] mb-4">Core Modalities</h3>
+                            <ProtocolItem 
+                                icon={TrendingUp}
+                                title="Refinement HUD" 
+                                text="Real-time weight visualization using the Hammer/Zenith dichotomy to ensure score transparency." 
+                            />
+                            <ProtocolItem 
+                                icon={Shield}
+                                title="Bias Shield" 
+                                text="Multi-layer simulation that neutralizes genre sensitivity and critic strictness float." 
+                            />
+                            <ProtocolItem 
+                                icon={Star}
+                                title="Snub Detection" 
+                                text="Automated identification of high-rating masterpieces (≥ 8.5) missing from award hierarchies." 
+                            />
+                        </div>
                         
-                        <div className="pt-4">
-                            <div className="bg-amber-500/5 rounded-2xl p-4 border border-amber-500/10">
-                                <p className="text-[9px] uppercase tracking-[0.2em] text-amber-500/60 font-black leading-normal">
-                                    The Sanctuary Protocol V8.0 is a living critical engine. Every score is a temporal imprint of craft, resonance, and technical execution.
+                        <div className="pt-6 border-t border-white/5">
+                            <h3 className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] mb-4">System Status</h3>
+                            <div className="bg-black/40 rounded-3xl p-6 border border-white/5 backdrop-blur-md">
+                                <div className="flex items-center justify-between mb-4">
+                                    <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">Temporal Imprint</span>
+                                    <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Active</span>
+                                </div>
+                                <p className="text-[11px] text-white/30 font-medium italic leading-relaxed">
+                                    "The Sanctuary Protocol V8.0 is a living critical engine. Every score is a permanent imprint of craft, resonance, and technical execution."
                                 </p>
                             </div>
                         </div>
