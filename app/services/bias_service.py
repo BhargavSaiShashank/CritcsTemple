@@ -61,12 +61,14 @@ class BiasService:
         else:
             return None
 
-        # Filter for published and valid ratings after merge to ensure baseline matches the compared data
-        df = df[df['status'] == 'published']
-        if df.empty:
+        # Filter for published reviews and calculate the "Global Divine Average" from the full set
+        df_published = df_reviews[df_reviews['status'] == 'published']
+        if df_published.empty:
             return None
+        
+        overall_avg = df_published['overall_rating'].mean()
 
-        overall_avg = df['overall_rating'].mean()
+        # Merge reviews with movie metadata for detailed category analysis
         
         # 3. Compute Genre Bias
         genre_data = []
