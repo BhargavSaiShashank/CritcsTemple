@@ -31,16 +31,16 @@ const ReviewCard = ({ review, index, showRanking }) => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: index * 0.05 }}
             style={{ 
-                flex: `0 0 ${isAndroid ? '180px' : '280px'}`, 
-                marginRight: isAndroid ? '16px' : '24px', 
-                height: isAndroid ? '270px' : '420px',
+                flex: `0 0 ${isAndroid ? '120px' : '280px'}`, 
+                marginRight: isAndroid ? '12px' : '24px', 
+                height: isAndroid ? '180px' : '420px',
                 position: 'relative' 
             }}
         >
             <Link to={`/review/${review.slug}`} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
                 <div style={{
                     height: '100%',
-                    borderRadius: isAndroid ? '16px' : '20px',
+                    borderRadius: isAndroid ? '12px' : '20px',
                     overflow: 'hidden',
                     background: '#111',
                     border: '1px solid rgba(255,255,255,0.06)',
@@ -55,12 +55,12 @@ const ReviewCard = ({ review, index, showRanking }) => {
                     {/* Ranking Badge */}
                     {showRanking && (
                         <div style={{
-                            position: 'absolute', top: isAndroid ? '12px' : '16px', left: isAndroid ? '12px' : '16px',
-                            width: isAndroid ? '32px' : '40px', height: isAndroid ? '32px' : '40px', borderRadius: isAndroid ? '10px' : '12px',
+                            position: 'absolute', top: isAndroid ? '8px' : '16px', left: isAndroid ? '8px' : '16px',
+                            width: isAndroid ? '24px' : '40px', height: isAndroid ? '24px' : '40px', borderRadius: isAndroid ? '6px' : '12px',
                             background: index < 3 ? 'linear-gradient(135deg, #f5a623, #d48c15)' : 'rgba(0,0,0,0.6)',
                             border: '1px solid rgba(255,255,255,0.2)',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: isAndroid ? '14px' : '18px', fontWeight: 900, color: index < 3 ? '#000' : '#fff',
+                            fontSize: isAndroid ? '11px' : '18px', fontWeight: 900, color: index < 3 ? '#000' : '#fff',
                             backdropFilter: 'blur(10px)', zIndex: 10,
                             boxShadow: index < 3 ? '0 8px 20px rgba(245,166,35,0.4)' : 'none'
                         }}>
@@ -70,23 +70,23 @@ const ReviewCard = ({ review, index, showRanking }) => {
 
                     <div style={{
                         position: 'absolute', bottom: 0, left: 0, right: 0,
-                        padding: isAndroid ? '16px' : '24px',
+                        padding: isAndroid ? '8px' : '24px',
                         background: 'linear-gradient(to top, #111 20%, rgba(17,17,17,0.8) 50%, transparent 100%)'
                     }}>
-                        <div style={{ display: 'flex', gap: '8px', marginBottom: isAndroid ? '8px' : '12px' }}>
+                        <div style={{ display: 'flex', gap: '8px', marginBottom: isAndroid ? '4px' : '12px' }}>
                             <span style={{
-                                padding: '2px 10px', borderRadius: '99px', fontSize: isAndroid ? '8px' : '9px', fontWeight: 700,
+                                padding: isAndroid ? '2px 6px' : '2px 10px', borderRadius: '99px', fontSize: isAndroid ? '7px' : '9px', fontWeight: 700,
                                 background: vc.bg, color: vc.color, border: `1px solid ${vc.border}`,
                                 textTransform: 'uppercase', letterSpacing: '0.05em'
                             }}>
                                 {derivedVerdict}
                             </span>
                         </div>
-                        <h3 className="line-clamp-2" style={{ fontSize: isAndroid ? '15px' : '18px', fontWeight: 800, color: '#f2f2f2', marginBottom: '8px', lineHeight: 1.2 }}>
+                        <h3 className="line-clamp-2" style={{ fontSize: isAndroid ? '12px' : '18px', fontWeight: 800, color: '#f2f2f2', marginBottom: isAndroid ? '4px' : '8px', lineHeight: 1.15 }}>
                             {review.movie_title}
                         </h3>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: isAndroid ? '12px' : '14px', fontWeight: 700, color: '#f5a623' }}>
-                            <Star size={isAndroid ? 12 : 14} fill="#f5a623" />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: isAndroid ? '11px' : '14px', fontWeight: 700, color: '#f5a623' }}>
+                            <Star size={isAndroid ? 10 : 14} fill="#f5a623" />
                             {parseFloat(review.overall_rating || 0).toFixed(2)}
                         </div>
                     </div>
@@ -142,8 +142,8 @@ export default function ReviewRow({ reviews, showRankings, categoryTitle }) {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.5, delay: reviews.length * 0.05 }}
                         style={{ 
-                            flex: `0 0 ${isAndroid ? '180px' : '280px'}`, 
-                            height: isAndroid ? '270px' : '420px',
+                            flex: `0 0 ${isAndroid ? '120px' : '280px'}`, 
+                            height: isAndroid ? '180px' : '420px',
                             position: 'relative' 
                         }}
                     >
@@ -153,35 +153,35 @@ export default function ReviewRow({ reviews, showRankings, categoryTitle }) {
                         >
                             <div style={{
                                 height: '100%',
-                                borderRadius: '20px',
+                                borderRadius: isAndroid ? '12px' : '20px',
                                 background: 'linear-gradient(135deg, rgba(245,166,35,0.1), rgba(0,0,0,0.4))',
                                 border: '2px dashed rgba(245,166,35,0.3)',
                                 display: 'flex',
                                 flexDirection: 'column',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                gap: '16px',
+                                gap: isAndroid ? '6px' : '16px',
                                 transition: 'all 0.3s ease'
                             }}
                             className="hover:scale-[1.02] hover:bg-amber-500/10 hover:border-amber-500 transition-all"
                             >
                                 <div style={{
-                                    width: isAndroid ? '48px' : '64px', height: isAndroid ? '48px' : '64px', borderRadius: '50%',
+                                    width: isAndroid ? '36px' : '64px', height: isAndroid ? '36px' : '64px', borderRadius: '50%',
                                     background: 'rgba(245,166,35,0.1)',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                     color: '#f5a623'
                                 }}>
-                                    <Star size={isAndroid ? 24 : 32} />
+                                    <Star size={isAndroid ? 16 : 32} />
                                 </div>
                                 <div style={{ textAlign: 'center' }}>
                                     <h4 style={{ 
-                                        fontSize: isAndroid ? '15px' : '18px', fontWeight: 900, color: '#f2f2f2',
+                                        fontSize: isAndroid ? '12px' : '18px', fontWeight: 900, color: '#f2f2f2',
                                         textTransform: 'uppercase', letterSpacing: '0.1em'
                                     }}>
                                         See All
                                     </h4>
                                     <p style={{ 
-                                        fontSize: isAndroid ? '10px' : '12px', fontWeight: 700, color: 'rgba(255,255,255,0.4)',
+                                        fontSize: isAndroid ? '8px' : '12px', fontWeight: 700, color: 'rgba(255,255,255,0.4)',
                                         marginTop: '4px', textTransform: 'uppercase'
                                     }}>
                                         {reviews.length} Rankings
