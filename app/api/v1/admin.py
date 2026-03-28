@@ -306,7 +306,7 @@ async def upload_file(
         if os.path.exists(temp_path):
             os.remove(temp_path)
 
-@router.post("/categories", response_model=CategoryInDB)
+@router.post("/categories")
 async def create_category(
     data: CategoryCreate, 
     db = Depends(get_database),
@@ -321,7 +321,7 @@ async def get_all_categories(
 ):
     return await category_service.get_all_categories(db)
 
-@router.put("/categories/{category_id}", response_model=CategoryInDB)
+@router.put("/categories/{category_id}")
 async def update_category(
     category_id: str,
     data: CategoryUpdate,

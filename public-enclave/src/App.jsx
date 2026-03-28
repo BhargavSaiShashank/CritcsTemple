@@ -7,6 +7,7 @@ import Navbar from './components/Navbar'
 import Home from './pages/Home'
 import ReviewDetail from './pages/ReviewDetail'
 import HallOfFame from './pages/HallOfFame'
+import CategoryDetail from './pages/CategoryDetail'
 import Compare from './pages/Compare'
 import Predictions from './pages/Predictions'
 import Oscars from './pages/Oscars'
@@ -167,6 +168,7 @@ const App = () => {
                 <Route path="/" element={<Home />} />
                 <Route path="/review/:slug" element={<ReviewDetail />} />
                 <Route path="/hall-of-fame" element={<HallOfFame />} />
+                <Route path="/hall-of-fame-ranking/:slug" element={<CategoryDetail />} />
                 <Route path="/compare" element={<Compare />} />
                 <Route path="/predictions" element={<Predictions />} />
                 <Route path="/oscars" element={<Oscars />} />

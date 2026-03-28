@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getCategories } from '../services/api';
-import ReviewGrid from '../components/ReviewGrid';
+import ReviewRow from '../components/ReviewRow';
 
 export default function HallOfFame() {
     const [categories, setCategories] = useState([]);
@@ -18,7 +18,7 @@ export default function HallOfFame() {
         : null;
 
     return (
-        <div style={{ minHeight: '100vh', background: '#080808' }}>
+        <div style={{ minHeight: '100vh', background: '#080808', overflowX: 'hidden' }}>
             {/* Header banner */}
             <div style={{ position: 'relative', overflow: 'hidden', height: '45vh', minHeight: '380px' }}>
                 {hero?.movie_poster_url && (
@@ -80,7 +80,11 @@ export default function HallOfFame() {
                                     )}
                                 </div>
                                 {category.items && category.items.length > 0 ? (
-                                    <ReviewGrid reviews={category.items} loading={false} />
+                                    <ReviewRow 
+                                        reviews={category.items} 
+                                        showRankings={category.show_rankings} 
+                                        categoryTitle={category.title}
+                                    />
                                 ) : (
                                     <p style={{ color: 'rgba(255,255,255,0.2)', fontStyle: 'italic', fontSize: '14px' }}>No items added to this category yet.</p>
                                 )}
