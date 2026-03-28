@@ -1,5 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Body
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, RedirectResponse
 import httpx
 from typing import Optional
 from app.db.mongodb import get_database
@@ -81,7 +80,7 @@ async def get_show_details(tmdb_id: str, db = Depends(get_database)):
 
 @router.get("/proxy-image")
 async def proxy_image(url: str, quality: str = None):
-    """Proxy an external image to bypass CORS limits and apply quality downsampling for TMDB."""
+    """Bypass heavyweight server proxying by redirecting the client directly to the optimized TMDB/external CDN."""
     if quality and "image.tmdb.org/t/p/" in url:
         for size in ['/original/', '/w1280/', '/w780/', '/w500/', '/w300/', '/w154/', '/w92/']:
             if size in url:
@@ -95,14 +94,8 @@ async def proxy_image(url: str, quality: str = None):
                     url = url.replace(size, '/original/')
                 break
 
-    async def stream_image():
-        async with httpx.AsyncClient() as client:
-            async with client.stream("GET", url) as response:
-                if response.status_code != 200:
-                    raise HTTPException(status_code=response.status_code, detail="Failed to fetch image")
-                async for chunk in response.aiter_bytes():
-                    yield chunk
-    return StreamingResponse(stream_image(), media_type="image/jpeg")
+    # 302 Redirect lets the browser handle the heavy download directly from the high-speed CDN
+    return RedirectResponse(url=url)
 
 @router.get("/settings")
 async def get_public_settings(db = Depends(get_database)):
