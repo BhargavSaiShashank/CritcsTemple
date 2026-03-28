@@ -102,11 +102,6 @@ const ReviewCard = React.memo(({ review, index, showRanking, showOscarRank }) =>
                                 objectFit: 'cover',
                             }}
                         />
-                        {/* Gradient overlay focused heavily on the bottom to protect the text */}
-                        <div style={{
-                            position: 'absolute', bottom: 0, left: 0, right: 0, height: '70%',
-                            background: 'linear-gradient(to top, rgba(11,11,11,1) 0%, rgba(11,11,11,0.8) 30%, transparent 100%)',
-                        }} />
                         
                         {/* Ranking Badge */}
                         {showRanking && (
@@ -136,7 +131,8 @@ const ReviewCard = React.memo(({ review, index, showRanking, showOscarRank }) =>
                         <div style={{
                             position: 'absolute', bottom: 0, left: 0, right: 0,
                             padding: '12px 10px 16px 10px',
-                            display: 'flex', flexDirection: 'column', gap: '6px'
+                            display: 'flex', flexDirection: 'column', gap: '6px',
+                            background: 'linear-gradient(to top, rgba(11,11,11,1) 0%, rgba(11,11,11,0.8) 40%, transparent 100%)',
                         }}>
                             <div style={{ display: 'flex', gap: '4px' }}>
                                 <span className="line-clamp-1" style={{

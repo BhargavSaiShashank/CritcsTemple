@@ -98,11 +98,7 @@ const ReviewCard = ({ review, index, showRanking }) => {
                     <div style={{
                         position: 'absolute', bottom: 0, left: 0, right: 0,
                         padding: isMobile ? '10px 8px 14px 8px' : '24px',
-                        background: 'linear-gradient(to top, #111 25%, rgba(17,17,17,0.8) 55%, transparent 100%)',
-                        backgroundColor: 'rgba(11,11,11,0.4)',
-                        backdropFilter: 'blur(10px)',
-                        WebkitBackdropFilter: 'blur(10px)',
-                        borderTop: '1px solid rgba(255,255,255,0.05)'
+                        background: 'linear-gradient(to top, #111 25%, rgba(17,17,17,0.8) 55%, transparent 100%)'
                     }}>
                         <div style={{ display: 'flex', gap: '8px', marginBottom: isMobile ? '4px' : '12px' }}>
                             <span style={{
