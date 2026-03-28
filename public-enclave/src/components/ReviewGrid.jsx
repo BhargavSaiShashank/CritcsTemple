@@ -43,7 +43,7 @@ const scoreColor = (score) => {
     return '#2D0000';
 };
 
-const ReviewCard = React.memo(({ review, index }) => {
+const ReviewCard = React.memo(({ review, index, showRanking }) => {
     const [src, setSrc] = useState(review.movie_poster_url || FALLBACK);
     const derivedVerdict = getVerdictFromScore(review.overall_rating || 0);
     const vc = getV(derivedVerdict);
@@ -54,16 +54,16 @@ const ReviewCard = React.memo(({ review, index }) => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: index * 0.05 }}
             whileHover={{ y: -6, scale: 1.02 }}
-            style={{ height: '100%' }}
+            style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
         >
             <Link
                 to={`/review/${review.slug}`}
-                style={{ textDecoration: 'none', display: 'block', height: '100%' }}
+                style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', flex: 1, height: '100%' }}
             >
                 <div
                     className="group"
                     style={{
-                        height: '100%',
+                        flex: 1,
                         display: 'flex',
                         flexDirection: 'column',
                         borderRadius: '16px',
@@ -100,8 +100,25 @@ const ReviewCard = React.memo(({ review, index }) => {
                             position: 'absolute', inset: 0,
                             background: 'linear-gradient(to top, rgba(17,17,17,1) 0%, rgba(17,17,17,0.3) 50%, transparent 100%)',
                         }} />
-                        {/* Oscar Rank badge */}
-                        {review.oscar_rank && (
+                        
+                        {/* Ranking Badge */}
+                        {showRanking && (
+                            <div style={{
+                                position: 'absolute', top: '12px', left: '12px',
+                                width: '38px', height: '38px', borderRadius: '10px',
+                                background: index < 3 ? 'linear-gradient(135deg, #f5a623, #d48c15)' : 'rgba(0,0,0,0.7)',
+                                border: '1px solid rgba(255,255,255,0.2)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                fontSize: '16px', fontWeight: 900, color: index < 3 ? '#000' : '#fff',
+                                backdropFilter: 'blur(10px)', zIndex: 10,
+                                boxShadow: index < 3 ? '0 8px 20px rgba(245,166,35,0.4)' : 'none'
+                            }}>
+                                {index + 1}
+                            </div>
+                        )}
+
+                        {/* Oscar Rank badge (if any, fallback if no ranking is shown) */}
+                        {!showRanking && review.oscar_rank && (
                             <div style={{
                                 position: 'absolute', top: '12px', left: '12px',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -191,10 +208,10 @@ function SkeletonCard() {
     );
 }
 
-export default function ReviewGrid({ reviews, loading }) {
+export default function ReviewGrid({ reviews, loading, showRankings }) {
     if (loading) {
         return (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '18px' }}>
+            <div className="discovery-grid">
                 {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
             </div>
         );
@@ -209,12 +226,8 @@ export default function ReviewGrid({ reviews, loading }) {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
-                gap: '20px'
-            }}>
-                {reviews.map((r, i) => <ReviewCard key={r._id || r.id || i} review={r} index={i} />)}
+            <div className="discovery-grid">
+                {reviews.map((r, i) => <ReviewCard key={r._id || r.id || i} review={r} index={i} showRanking={showRankings} />)}
             </div>
         </div>
     );

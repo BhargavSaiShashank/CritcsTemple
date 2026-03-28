@@ -1,21 +1,26 @@
-import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient
+import asyncio
+import os
+import certifi
 
-async def main():
-    mongodb_url = "mongodb+srv://shashankdommeti524_db_user:x3pYEvwR8kAcBYlQ@review-1.jyyeusn.mongodb.net/"
-    client = AsyncIOMotorClient(mongodb_url)
-    db = client.review
+async def check_data():
+    uri = "mongodb+srv://shashankdommeti524_db_user:x3pYEvwR8kAcBYlQ@review-1.jyyeusn.mongodb.net/"
+    client = AsyncIOMotorClient(uri, tlsCAFile=certifi.where())
+    db = client["review"]
     
-    pipeline = [
-        {"$match": {"status": "published"}},
-        {"$group": {"_id": "$language", "count": {"$sum": 1}}}
-    ]
-    results = await db.reviews.aggregate(pipeline).to_list(100)
-    print("Published Reviews by Language:")
-    for res in results:
-        print(f"Language: {res['_id']} | Count: {res['count']}")
-        
-    client.close()
+    # International (not hi, te, ml, ta)
+    intl_count = await db.reviews.count_documents({
+        "status": "published",
+        "language": {"$nin": ["hi", "te", "ml", "ta"]}
+    })
+    print(f"International count: {intl_count}")
+
+    # Indian (specifically hi, te, ml, ta)
+    indian_count = await db.reviews.count_documents({
+        "status": "published",
+        "language": {"$in": ["hi", "te", "ml", "ta"]}
+    })
+    print(f"Indian count: {indian_count}")
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(check_data())

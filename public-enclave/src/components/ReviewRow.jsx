@@ -107,7 +107,7 @@ export default function ReviewRow({ reviews, showRankings, categoryTitle }) {
     if (!reviews?.length) return null;
 
     const categorySlug = categoryTitle?.toLowerCase().replace(/ /g, '-');
-    const showSeeAll = reviews.length >= 20;
+    const showSeeAll = reviews.length > 20;
 
     return (
         <div style={{ position: 'relative', width: '100%', group: 'true' }}>
@@ -124,7 +124,7 @@ export default function ReviewRow({ reviews, showRankings, categoryTitle }) {
                 }}
                 className="hide-scrollbar"
             >
-                {reviews.map((review, i) => (
+                {reviews.slice(0, 20).map((review, i) => (
                     <ReviewCard 
                         key={review.slug + i} 
                         review={review} 

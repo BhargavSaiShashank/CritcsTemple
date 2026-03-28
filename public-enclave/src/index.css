@@ -476,6 +476,34 @@ body {
     box-shadow: 0 0 30px rgba(245, 158, 11, 0.2);
 }
 
-.mask-edge-fade {
-    mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
-}
+.font-premium {
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.01em;
+}
+
+.discovery-header-glow {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 400px;
+    background: radial-gradient(circle at 50% 0%, rgba(245, 166, 35, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.discovery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 260px);
+    justify-content: center;
+    gap: 32px;
+}
+
+
+@media (max-width: 640px) {
+    .discovery-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 16px;
+    }
+}
