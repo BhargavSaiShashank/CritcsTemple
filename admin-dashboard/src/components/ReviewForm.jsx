@@ -113,31 +113,8 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             ...acc, [aspect]: { score: 0, comment: '' }
         }), {});
 
-        const savedDraft = localStorage.getItem(draftKey);
-        if (savedDraft) {
-            try {
-                const parsed = JSON.parse(savedDraft);
-                // Normalize and clean aspects
-                const normalizedDraftAspects = {};
-                Object.entries(parsed.aspects || {}).forEach(([key, val]) => {
-                    if (val != null) {
-                        normalizedDraftAspects[key] = typeof val === 'object'
-                            ? { score: parseFloat(val.score) || 0, comment: val.comment || '' }
-                            : { score: parseFloat(val) || 0, comment: '' };
-                    }
-                });
-                
-                return {
-                    ...parsed,
-                    aspects: { ...defaultAspects, ...normalizedDraftAspects }
-                };
-            } catch (e) {
-                console.error("Failed to parse draft", e);
-            }
-        }
-
+        // PRIORITY 1: Server Data (Existing Review)
         if (initialData) {
-            // Normalize and clean initial aspects
             const normalizedInitialAspects = {};
             Object.entries(initialData.aspects || {}).forEach(([key, val]) => {
                 if (val != null) {
@@ -174,6 +151,28 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             };
         }
 
+        // PRIORITY 2: Local Draft (New Review)
+        const savedDraft = localStorage.getItem(draftKey);
+        if (savedDraft) {
+            try {
+                const parsed = JSON.parse(savedDraft);
+                const normalizedDraftAspects = {};
+                Object.entries(parsed.aspects || {}).forEach(([key, val]) => {
+                    if (val != null) {
+                        normalizedDraftAspects[key] = typeof val === 'object'
+                            ? { score: parseFloat(val.score) || 0, comment: val.comment || '' }
+                            : { score: parseFloat(val) || 0, comment: '' };
+                    }
+                });
+                
+                return {
+                    ...parsed,
+                    aspects: { ...defaultAspects, ...normalizedDraftAspects }
+                };
+            } catch (e) {
+                console.error("Failed to parse draft", e);
+            }
+        }
         return {
             summary: '',
             movie_title: movie?.title || '',
@@ -204,23 +203,24 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
         localStorage.setItem(draftKey, JSON.stringify(formData));
     }, [formData, draftKey]);
 
-    // Reload form data if draftKey changes (e.g. user selects a different draft in dashboard)
+    // Reload form data if draftKey changes (new drafts) but NEVER for existing reviews (initialData)
     React.useEffect(() => {
-        const savedDraft = localStorage.getItem(draftKey);
-        if (savedDraft) {
-            try {
-                const parsed = JSON.parse(savedDraft);
-                setFormData(prev => ({
-                    ...prev,
-                    ...parsed,
-                    // Ensure the title is synced if it was missing in the draft but present in the movie prop
-                    movie_title: parsed.movie_title || movie?.title || prev.movie_title
-                }));
-            } catch (e) {
-                console.error("Failed to parse draft on key change", e);
+        if (!initialData) {
+            const savedDraft = localStorage.getItem(draftKey);
+            if (savedDraft) {
+                try {
+                    const parsed = JSON.parse(savedDraft);
+                    setFormData(prev => ({
+                        ...prev,
+                        ...parsed,
+                        movie_title: parsed.movie_title || movie?.title || prev.movie_title
+                    }));
+                } catch (e) {
+                    console.error("Failed to parse draft on key change", e);
+                }
             }
         }
-    }, [draftKey]);
+    }, [draftKey, initialData]);
     
     // Fetch Rating Timeline
     React.useEffect(() => {

@@ -8,7 +8,7 @@ import ReviewGrid from '../components/ReviewGrid';
 import BackgroundAtmosphere from '../components/BackgroundAtmosphere';
 import { getVerdictFromScore } from '../utils/verdict';
 import { useColorHarmonizer } from '../hooks/useColorHarmonizer';
-import DiscoveryCarousel from '../components/DiscoveryCarousel';
+
 import { Capacitor } from '@capacitor/core';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { initializeSmartSearch, performSmartSearch } from '../services/SmartSearch';
@@ -23,7 +23,7 @@ const VERDICT_COLOR = {
 
 export default function Home() {
     const [featuredReviews, setFeaturedReviews] = useState([]);
-    const [mustWatchReviews, setMustWatchReviews] = useState([]);
+
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isAutoPlaying, setIsAutoPlaying] = useState(true);
     const [error, setError] = useState(null);
@@ -227,12 +227,7 @@ export default function Home() {
             })
             .catch(console.error);
 
-        // Fetch Must Watch Reviews
-        getLatestReviews(10, 0, '', 'All', 'All', 'date', 'desc', null, null, true)
-            .then(({ data }) => {
-                if (data) setMustWatchReviews(data);
-            })
-            .catch(console.error);
+
     }, []);
 
     // Auto-play Logic
@@ -568,8 +563,7 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* ── DISCOVERY CAROUSEL ── */}
-            <DiscoveryCarousel reviews={mustWatchReviews} loading={mustWatchReviews.length === 0 && loading} />
+
 
             {/* ── ARCHIVE GRID ── */}
             <section className="max-w-container" style={{ paddingTop: '64px', paddingBottom: '100px' }}>
