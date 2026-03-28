@@ -50,9 +50,9 @@ const ReviewCard = ({ review, index, showRanking }) => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: index * 0.05 }}
             style={{ 
-                flex: `0 0 ${isMobile ? '120px' : '280px'}`, 
+                flex: `0 0 ${isMobile ? 'clamp(115px, 28vw, 150px)' : '280px'}`, 
                 marginRight: isMobile ? '12px' : '24px', 
-                height: isMobile ? '180px' : '420px',
+                height: isMobile ? 'clamp(172px, 42vw, 225px)' : '420px',
                 position: 'relative' 
             }}
         >
@@ -162,8 +162,8 @@ export default function ReviewRow({ reviews, showRankings, categoryTitle }) {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.5, delay: reviews.length * 0.05 }}
                         style={{ 
-                            flex: `0 0 ${isMobile ? '120px' : '280px'}`, 
-                            height: isMobile ? '180px' : '420px',
+                            flex: `0 0 ${isMobile ? 'clamp(115px, 28vw, 150px)' : '280px'}`, 
+                            height: isMobile ? 'clamp(172px, 42vw, 225px)' : '420px',
                             position: 'relative' 
                         }}
                     >
@@ -223,7 +223,7 @@ export default function ReviewRow({ reviews, showRankings, categoryTitle }) {
                     style={{
                         width: '44px', height: '44px', borderRadius: '50%',
                         background: 'rgba(17,17,17,0.8)', border: '1px solid rgba(255,255,255,0.1)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        display: isMobile ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center',
                         color: '#fff', cursor: 'pointer', backdropFilter: 'blur(10px)'
                     }}
                 >
@@ -239,7 +239,7 @@ export default function ReviewRow({ reviews, showRankings, categoryTitle }) {
                     style={{
                         width: '44px', height: '44px', borderRadius: '50%',
                         background: 'rgba(17,17,17,0.8)', border: '1px solid rgba(255,255,255,0.1)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        display: isMobile ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center',
                         color: '#fff', cursor: 'pointer', backdropFilter: 'blur(10px)'
                     }}
                 >
