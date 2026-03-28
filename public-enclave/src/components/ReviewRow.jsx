@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { getVerdictFromScore } from '../utils/verdict';
 
 
@@ -45,6 +46,12 @@ const ReviewCard = ({ review, index, showRanking }) => {
     const derivedVerdict = getVerdictFromScore(review.overall_rating || 0);
     const vc = getV(derivedVerdict);
 
+    const triggerHaptic = async () => {
+        if (Capacitor.isNativePlatform()) {
+            try { await Haptics.impact({ style: ImpactStyle.Light }); } catch (e) {}
+        }
+    };
+
     return (
         <motion.div
             initial={{ opacity: 0, x: 20 }}
@@ -57,7 +64,7 @@ const ReviewCard = ({ review, index, showRanking }) => {
                 position: 'relative' 
             }}
         >
-            <Link to={`/review/${review.slug}`} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
+            <Link to={`/review/${review.slug}`} onClick={triggerHaptic} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
                 <div style={{
                     height: '100%',
                     borderRadius: isMobile ? '12px' : '20px',
@@ -98,7 +105,11 @@ const ReviewCard = ({ review, index, showRanking }) => {
                     <div style={{
                         position: 'absolute', bottom: 0, left: 0, right: 0,
                         padding: isMobile ? '10px 8px 14px 8px' : '24px',
-                        background: 'linear-gradient(to top, #111 25%, rgba(17,17,17,0.8) 55%, transparent 100%)'
+                        background: 'rgba(0,0,0,0.4)',
+                        backdropFilter: 'blur(14px) saturate(180%)',
+                        WebkitBackdropFilter: 'blur(14px) saturate(180%)',
+                        maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, transparent 100%)',
+                        WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, transparent 100%)'
                     }}>
                         <div style={{ display: 'flex', gap: '8px', marginBottom: isMobile ? '4px' : '12px' }}>
                             <span style={{
@@ -127,7 +138,14 @@ export default function ReviewRow({ reviews, showRankings, categoryTitle }) {
     const isMobile = useIsMobile();
     const scrollRef = useRef(null);
 
+    const triggerHaptic = async () => {
+        if (Capacitor.isNativePlatform()) {
+            try { await Haptics.impact({ style: ImpactStyle.Light }); } catch (e) {}
+        }
+    };
+
     const scroll = (direction) => {
+        triggerHaptic();
         if (scrollRef.current) {
             const { scrollLeft, clientWidth } = scrollRef.current;
             const scrollTo = direction === 'left' ? scrollLeft - clientWidth * 0.8 : scrollLeft + clientWidth * 0.8;
@@ -177,6 +195,7 @@ export default function ReviewRow({ reviews, showRankings, categoryTitle }) {
                     >
                         <Link 
                             to={`/hall-of-fame-ranking/${categorySlug}`}
+                            onClick={triggerHaptic}
                             style={{ textDecoration: 'none', display: 'block', height: '100%' }}
                         >
                             <div style={{

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { getVerdictFromScore } from '../utils/verdict';
 
 const FALLBACK = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=1200';
@@ -49,6 +50,12 @@ const ReviewCard = React.memo(({ review, index, showRanking, showOscarRank }) =>
     const derivedVerdict = getVerdictFromScore(review.overall_rating || 0);
     const vc = getV(derivedVerdict);
 
+    const triggerHaptic = async () => {
+        if (Capacitor.isNativePlatform()) {
+            try { await Haptics.impact({ style: ImpactStyle.Light }); } catch (e) {}
+        }
+    };
+
     return (
         <motion.div
             initial={{ y: 20, opacity: 0 }}
@@ -59,6 +66,7 @@ const ReviewCard = React.memo(({ review, index, showRanking, showOscarRank }) =>
         >
             <Link
                 to={`/review/${review.slug}`}
+                onClick={triggerHaptic}
                 style={{ textDecoration: 'none', display: 'block', width: '100%' }}
             >
                 <div
@@ -74,16 +82,7 @@ const ReviewCard = React.memo(({ review, index, showRanking, showOscarRank }) =>
                         transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
                         cursor: 'pointer',
                     }}
-                    onMouseEnter={e => {
-                        e.currentTarget.style.borderColor = 'rgba(245,166,35,0.25)';
-                        e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(245,166,35,0.05)';
-                    }}
-                    onMouseLeave={e => {
-                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)';
-                        e.currentTarget.style.boxShadow = 'none';
-                    }}
                 >
-                    {/* Poster */}
                     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: '#181818' }}>
                         <motion.img
                             layoutId={`poster-${review.slug}`}
@@ -103,7 +102,6 @@ const ReviewCard = React.memo(({ review, index, showRanking, showOscarRank }) =>
                             }}
                         />
                         
-                        {/* Ranking Badge */}
                         {showRanking && (
                             <div className="absolute top-2 left-2 md:top-4 md:left-4 flex items-center justify-center font-black rounded-lg backdrop-blur-md z-10 w-8 h-8 md:w-14 md:h-14 text-xs md:text-2xl border box-border shadow-2xl"
                                 style={{
@@ -115,7 +113,6 @@ const ReviewCard = React.memo(({ review, index, showRanking, showOscarRank }) =>
                             </div>
                         )}
 
-                        {/* Oscar Rank badge - GATED by showOscarRank */}
                         {showOscarRank && review.oscar_rank && (
                             <div className="absolute top-2 left-2 md:top-4 md:left-4 flex items-center justify-center font-black rounded-md z-10 px-2.5 md:px-4 py-1.5 md:py-2 text-[11px] md:text-lg shadow-2xl backdrop-blur-md"
                                 style={{
@@ -127,12 +124,15 @@ const ReviewCard = React.memo(({ review, index, showRanking, showOscarRank }) =>
                             </div>
                         )}
 
-                        {/* Dense Text Section Overlaying Bottom */}
                         <div style={{
                             position: 'absolute', bottom: 0, left: 0, right: 0,
                             padding: '12px 10px 16px 10px',
                             display: 'flex', flexDirection: 'column', gap: '6px',
-                            background: 'linear-gradient(to top, rgba(11,11,11,1) 0%, rgba(11,11,11,0.8) 40%, transparent 100%)',
+                            background: 'rgba(0,0,0,0.4)',
+                            backdropFilter: 'blur(14px) saturate(180%)',
+                            WebkitBackdropFilter: 'blur(14px) saturate(180%)',
+                            maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, transparent 100%)',
+                            WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, transparent 100%)',
                         }}>
                             <div style={{ display: 'flex', gap: '4px' }}>
                                 <span className="line-clamp-1" style={{

@@ -10,8 +10,9 @@
       "androidScaleType": "CENTER_CROP"
     },
     "StatusBar": {
-      "style": "DARK",
-      "backgroundColor": "#0c0c0c"
+      "style": "LIGHT",
+      "backgroundColor": "transparent",
+      "overlaysWebView": true
     },
     "CapacitorHttp": {
       "enabled": true
