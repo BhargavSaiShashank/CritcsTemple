@@ -45,6 +45,7 @@ const scoreColor = (score) => {
 
 const ReviewCard = React.memo(({ review, index, showRanking, showOscarRank }) => {
     const [src, setSrc] = useState(review.movie_poster_url || FALLBACK);
+    const [imageLoaded, setImageLoaded] = useState(false);
     const derivedVerdict = getVerdictFromScore(review.overall_rating || 0);
     const vc = getV(derivedVerdict);
 
@@ -89,16 +90,22 @@ const ReviewCard = React.memo(({ review, index, showRanking, showOscarRank }) =>
                             src={src}
                             alt={review.movie_title}
                             onError={() => setSrc(FALLBACK)}
+                            onLoad={() => setImageLoaded(true)}
+                            initial={{ opacity: 0, scale: 1.1 }}
+                            animate={{ 
+                                opacity: imageLoaded ? 1 : 0, 
+                                scale: imageLoaded ? 1 : 1.1 
+                            }}
+                            transition={{ duration: 0.8, ease: "easeOut" }}
                             style={{
                                 position: 'absolute', inset: 0, width: '100%', height: '100%',
                                 objectFit: 'cover',
-                                transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
                             }}
                         />
                         {/* Gradient overlay focused heavily on the bottom to protect the text */}
                         <div style={{
-                            position: 'absolute', bottom: 0, left: 0, right: 0, height: '60%',
-                            background: 'linear-gradient(to top, rgba(17,17,17,1) 0%, rgba(17,17,17,0.8) 40%, transparent 100%)',
+                            position: 'absolute', bottom: 0, left: 0, right: 0, height: '70%',
+                            background: 'linear-gradient(to top, rgba(11,11,11,1) 0%, rgba(11,11,11,0.8) 30%, transparent 100%)',
                         }} />
                         
                         {/* Ranking Badge */}
@@ -172,8 +179,15 @@ const ReviewCard = React.memo(({ review, index, showRanking, showOscarRank }) =>
 
 function SkeletonCard() {
     return (
-        <div style={{ borderRadius: '16px', overflow: 'hidden', background: '#111', border: '1px solid rgba(255,255,255,0.05)' }}>
-            <div className="skeleton" style={{ width: '100%', aspectRatio: '2 / 3' }} />
+        <div style={{ 
+            borderRadius: '16px', 
+            overflow: 'hidden', 
+            background: '#111', 
+            border: '1px solid rgba(255,255,255,0.05)',
+            position: 'relative',
+            aspectRatio: '2 / 3'
+        }}>
+            <div className="skeleton" style={{ position: 'absolute', inset: 0 }} />
         </div>
     );
 }

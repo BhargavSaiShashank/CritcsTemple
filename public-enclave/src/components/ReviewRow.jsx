@@ -41,6 +41,7 @@ const getV = (v) => VERDICT_MAP[v] || { color: '#9ca3af', bg: 'rgba(255,255,255,
 
 const ReviewCard = ({ review, index, showRanking }) => {
     const isMobile = useIsMobile();
+    const [imageLoaded, setImageLoaded] = useState(false);
     const derivedVerdict = getVerdictFromScore(review.overall_rating || 0);
     const vc = getV(derivedVerdict);
 
@@ -65,10 +66,17 @@ const ReviewCard = ({ review, index, showRanking }) => {
                     border: '1px solid rgba(255,255,255,0.06)',
                     position: 'relative'
                 }}>
-                    <img 
+                    <motion.img 
                         src={review.movie_poster_url || FALLBACK} 
                         alt={review.movie_title}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.7 }}
+                        onLoad={() => setImageLoaded(true)}
+                        initial={{ opacity: 0, scale: 1.1 }}
+                        animate={{ 
+                            opacity: imageLoaded ? 1 : 0, 
+                            scale: imageLoaded ? 1 : 1.1 
+                        }}
+                        transition={{ duration: 0.8, ease: "easeOut" }}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
                     
                     {/* Ranking Badge */}
@@ -90,7 +98,11 @@ const ReviewCard = ({ review, index, showRanking }) => {
                     <div style={{
                         position: 'absolute', bottom: 0, left: 0, right: 0,
                         padding: isMobile ? '10px 8px 14px 8px' : '24px',
-                        background: 'linear-gradient(to top, #111 25%, rgba(17,17,17,0.8) 55%, transparent 100%)'
+                        background: 'linear-gradient(to top, #111 25%, rgba(17,17,17,0.8) 55%, transparent 100%)',
+                        backgroundColor: 'rgba(11,11,11,0.4)',
+                        backdropFilter: 'blur(10px)',
+                        WebkitBackdropFilter: 'blur(10px)',
+                        borderTop: '1px solid rgba(255,255,255,0.05)'
                     }}>
                         <div style={{ display: 'flex', gap: '8px', marginBottom: isMobile ? '4px' : '12px' }}>
                             <span style={{
