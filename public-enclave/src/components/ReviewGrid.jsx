@@ -124,16 +124,16 @@ const ReviewCard = React.memo(({ review, index, showRanking, showOscarRank }) =>
                             </div>
                         )}
 
-                        {/* Better Glass Masked Overlay */}
+                        {/* Compressed Masked Overlay */}
                         <div style={{
                             position: 'absolute', bottom: 0, left: 0, right: 0,
-                            padding: '16px 10px 14px 10px',
-                            display: 'flex', flexDirection: 'column', gap: '4px',
+                            padding: '8px 8px 10px 8px',
+                            display: 'flex', flexDirection: 'column', gap: '2px',
                             background: 'rgba(0,0,0,0.45)',
                             backdropFilter: 'blur(16px) saturate(180%)',
                             WebkitBackdropFilter: 'blur(16px) saturate(180%)',
-                            maskImage: 'linear-gradient(to top, black 0%, black 85%, transparent 100%)',
-                            WebkitMaskImage: 'linear-gradient(to top, black 0%, black 85%, transparent 100%)',
+                            maskImage: 'linear-gradient(to top, black 0%, black 80%, transparent 100%)',
+                            WebkitMaskImage: 'linear-gradient(to top, black 0%, black 80%, transparent 100%)',
                         }}>
                             {/* Ambient Verdict Glow */}
                             <div style={{

@@ -102,16 +102,17 @@ const ReviewCard = ({ review, index, showRanking }) => {
                         </div>
                     )}
 
-                    <div style={{
-                        position: 'absolute', bottom: 0, left: 0, right: 0,
-                        padding: isMobile ? '10px 8px 14px 8px' : '24px',
-                        background: 'rgba(0,0,0,0.45)',
-                        backdropFilter: 'blur(16px) saturate(180%)',
-                        WebkitBackdropFilter: 'blur(16px) saturate(180%)',
-                        maskImage: 'linear-gradient(to top, black 0%, black 85%, transparent 100%)',
-                        WebkitMaskImage: 'linear-gradient(to top, black 0%, black 85%, transparent 100%)'
-                    }}>
-                        <div style={{ display: 'flex', gap: '8px', marginBottom: isMobile ? '4px' : '12px' }}>
+                                        {/* Compressed Masked Overlay */}
+                                <div style={{
+                                    position: 'absolute', bottom: 0, left: 0, right: 0,
+                                    padding: isMobile ? '8px 8px 10px 8px' : '20px 24px 24px 24px',
+                                    display: 'flex', flexDirection: 'column', gap: isMobile ? '2px' : '6px',
+                                    background: 'rgba(0,0,0,0.45)',
+                                    backdropFilter: 'blur(16px) saturate(180%)',
+                                    WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+                                    maskImage: 'linear-gradient(to top, black 0%, black 80%, transparent 100%)',
+                                    WebkitMaskImage: 'linear-gradient(to top, black 0%, black 80%, transparent 100%)'
+                                }}>                 <div style={{ display: 'flex', gap: '8px', marginBottom: isMobile ? '4px' : '12px' }}>
                             <span style={{
                                 padding: isMobile ? '2px 6px' : '2px 10px', borderRadius: '99px', fontSize: isMobile ? '7px' : '9px', fontWeight: 700,
                                 background: vc.bg, color: vc.color, border: `1px solid ${vc.border}`,
