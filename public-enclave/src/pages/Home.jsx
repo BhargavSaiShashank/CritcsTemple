@@ -12,6 +12,7 @@ import { useColorHarmonizer } from '../hooks/useColorHarmonizer';
 import { Capacitor } from '@capacitor/core';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { initializeSmartSearch, performSmartSearch } from '../services/SmartSearch';
+import SurpriseOracle from '../components/SurpriseOracle';
 const FALLBACK = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=1200';
 const VERDICT_COLOR = {
     Legendary: '#FFFFFF', Masterpiece: '#FFD700', Essential: '#FF00EA',
@@ -563,7 +564,8 @@ export default function Home() {
                 </div>
             </section>
 
-
+            {/* ── THE ORACLE ── */}
+            <SurpriseOracle />
 
             {/* ── ARCHIVE GRID ── */}
             <section className="max-w-container" style={{ paddingTop: '64px', paddingBottom: '100px' }}>
