@@ -124,40 +124,48 @@ const ReviewCard = React.memo(({ review, index, showRanking, showOscarRank }) =>
                             </div>
                         )}
 
+                        {/* Better Glass Masked Overlay */}
                         <div style={{
                             position: 'absolute', bottom: 0, left: 0, right: 0,
-                            padding: '12px 10px 16px 10px',
-                            display: 'flex', flexDirection: 'column', gap: '6px',
-                            background: 'rgba(0,0,0,0.4)',
-                            backdropFilter: 'blur(14px) saturate(180%)',
-                            WebkitBackdropFilter: 'blur(14px) saturate(180%)',
-                            maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, transparent 100%)',
-                            WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, transparent 100%)',
+                            padding: '16px 10px 14px 10px',
+                            display: 'flex', flexDirection: 'column', gap: '4px',
+                            background: 'rgba(0,0,0,0.45)',
+                            backdropFilter: 'blur(16px) saturate(180%)',
+                            WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+                            maskImage: 'linear-gradient(to top, black 0%, black 85%, transparent 100%)',
+                            WebkitMaskImage: 'linear-gradient(to top, black 0%, black 85%, transparent 100%)',
                         }}>
-                            <div style={{ display: 'flex', gap: '4px' }}>
-                                <span className="line-clamp-1" style={{
-                                    display: 'inline-block',
+                            {/* Ambient Verdict Glow */}
+                            <div style={{
+                                position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px',
+                                background: vc.border, opacity: 0.4, filter: 'blur(3px)'
+                            }} />
+
+                            <div style={{ display: 'flex', marginBottom: '2px' }}>
+                                <span style={{
                                     padding: '2px 6px', borderRadius: '4px',
-                                    fontSize: 'clamp(7px, 2vw, 9px)', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase',
+                                    fontSize: '8px', fontWeight: 900, letterSpacing: '0.05em', textTransform: 'uppercase',
                                     background: vc.bg, color: vc.color, border: `1px solid ${vc.border}`
                                 }}>
                                     {derivedVerdict}
                                 </span>
                             </div>
 
-                            <h3 className="line-clamp-2" style={{ 
-                                fontSize: 'clamp(11px, 3.5vw, 15px)', 
-                                fontWeight: 800, 
-                                color: '#f2f2f2', 
-                                lineHeight: 1.15, 
-                                letterSpacing: '-0.015em'
+                            <h3 className="line-clamp-1" style={{ 
+                                fontSize: '13px', 
+                                fontWeight: 900, 
+                                color: '#fff', 
+                                lineHeight: 1.1, 
+                                letterSpacing: '-0.02em',
+                                textShadow: '0 2px 10px rgba(0,0,0,0.5)',
+                                fontFamily: 'Outfit, sans-serif'
                             }}>
                                 {review.movie_title}
                             </h3>
 
                             <div style={{ 
                                 display: 'flex', alignItems: 'center', gap: '3px', 
-                                fontSize: 'clamp(10px, 3vw, 13px)', 
+                                fontSize: '11px', 
                                 fontWeight: 800, 
                                 color: scoreColor(review.overall_rating)
                             }}>

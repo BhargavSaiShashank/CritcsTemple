@@ -105,11 +105,11 @@ const ReviewCard = ({ review, index, showRanking }) => {
                     <div style={{
                         position: 'absolute', bottom: 0, left: 0, right: 0,
                         padding: isMobile ? '10px 8px 14px 8px' : '24px',
-                        background: 'rgba(0,0,0,0.4)',
-                        backdropFilter: 'blur(14px) saturate(180%)',
-                        WebkitBackdropFilter: 'blur(14px) saturate(180%)',
-                        maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, transparent 100%)',
-                        WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, transparent 100%)'
+                        background: 'rgba(0,0,0,0.45)',
+                        backdropFilter: 'blur(16px) saturate(180%)',
+                        WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+                        maskImage: 'linear-gradient(to top, black 0%, black 85%, transparent 100%)',
+                        WebkitMaskImage: 'linear-gradient(to top, black 0%, black 85%, transparent 100%)'
                     }}>
                         <div style={{ display: 'flex', gap: '8px', marginBottom: isMobile ? '4px' : '12px' }}>
                             <span style={{
