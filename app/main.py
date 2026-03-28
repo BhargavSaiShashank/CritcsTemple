@@ -42,7 +42,9 @@ async def log_origin_middleware(request: Request, call_next):
 
 @app.on_event("startup")
 async def startup_db_client():
+    print("STARTUP: Initializing system services...")
     await connect_to_mongo()
+    print("STARTUP: System initialized and ready.")
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
