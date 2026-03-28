@@ -339,10 +339,10 @@ export default function Home() {
                 onMouseLeave={() => setIsAutoPlaying(true)}
                 style={{
                     position: 'relative',
-                    minHeight: isSmall ? 'auto' : '90vh',
+                    minHeight: isSmall ? 'auto' : '85vh',
                     paddingTop: isSmall
-                        ? 'calc(130px + var(--safe-top))'
-                        : 'calc(clamp(160px, 15vh, 220px) + var(--safe-top))',
+                        ? 'calc(85px + var(--safe-top))'
+                        : 'calc(clamp(140px, 12vh, 180px) + var(--safe-top))',
                     paddingBottom: isSmall ? '60px' : '100px',
                     overflow: 'hidden',
                     display: 'flex',
