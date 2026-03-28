@@ -30,8 +30,8 @@ const FALLBACK = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?a
 const VERDICT_MAP = {
     Legendary: { color: '#FFFFFF', bg: 'rgba(255,255,255,0.1)', border: 'rgba(255,255,255,0.2)' },
     Masterpiece: { color: '#FFD700', bg: 'rgba(255,215,0,0.1)', border: 'rgba(255,215,0,0.2)' },
-    Essential: { color: '#FF00EA', bg: 'rgba(255,0,234,0.1)', border: 'rgba(255,0,234,0.2)' },
-    Elite: { color: '#9D00FF', bg: 'rgba(157,0,255,0.1)', border: 'rgba(157,0,255,0.2)' },
+    Essential: { color: '#FF66F2', bg: 'rgba(255,102,242,0.1)', border: 'rgba(255,102,242,0.2)' },
+    Elite: { color: '#BB77FF', bg: 'rgba(187,119,255,0.1)', border: 'rgba(187,119,255,0.2)' },
     Great: { color: '#00FF44', bg: 'rgba(0,255,68,0.1)', border: 'rgba(0,255,68,0.2)' },
     Good: { color: '#8FFF00', bg: 'rgba(143,255,0,0.1)', border: 'rgba(143,255,0,0.2)' },
     Decent: { color: '#00D0FF', bg: 'rgba(0,208,255,0.1)', border: 'rgba(0,208,255,0.2)' },
@@ -89,8 +89,8 @@ const ReviewCard = ({ review, index, showRanking }) => {
 
                     <div style={{
                         position: 'absolute', bottom: 0, left: 0, right: 0,
-                        padding: isMobile ? '8px' : '24px',
-                        background: 'linear-gradient(to top, #111 20%, rgba(17,17,17,0.8) 50%, transparent 100%)'
+                        padding: isMobile ? '10px 8px 14px 8px' : '24px',
+                        background: 'linear-gradient(to top, #111 25%, rgba(17,17,17,0.8) 55%, transparent 100%)'
                     }}>
                         <div style={{ display: 'flex', gap: '8px', marginBottom: isMobile ? '4px' : '12px' }}>
                             <span style={{
