@@ -75,13 +75,13 @@ const ReviewCard = ({ review, index, showRanking }) => {
                     {showRanking && (
                         <div style={{
                             position: 'absolute', top: isMobile ? '8px' : '16px', left: isMobile ? '8px' : '16px',
-                            width: isMobile ? '24px' : '40px', height: isMobile ? '24px' : '40px', borderRadius: isMobile ? '6px' : '12px',
+                            width: isMobile ? '32px' : '56px', height: isMobile ? '32px' : '56px', borderRadius: isMobile ? '8px' : '16px',
                             background: index < 3 ? 'linear-gradient(135deg, #f5a623, #d48c15)' : 'rgba(0,0,0,0.6)',
                             border: '1px solid rgba(255,255,255,0.2)',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: isMobile ? '11px' : '18px', fontWeight: 900, color: index < 3 ? '#000' : '#fff',
+                            fontSize: isMobile ? '14px' : '28px', fontWeight: 950, color: index < 3 ? '#000' : '#fff',
                             backdropFilter: 'blur(10px)', zIndex: 10,
-                            boxShadow: index < 3 ? '0 8px 20px rgba(245,166,35,0.4)' : 'none'
+                            boxShadow: index < 3 ? '0 8px 30px rgba(245,166,35,0.5)' : '0 4px 15px rgba(0,0,0,0.5)'
                         }}>
                             {index + 1}
                         </div>

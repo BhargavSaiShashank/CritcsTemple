@@ -103,7 +103,7 @@ const ReviewCard = React.memo(({ review, index, showRanking }) => {
                         
                         {/* Ranking Badge */}
                         {showRanking && (
-                            <div className="absolute top-2 left-2 md:top-3 md:left-3 flex items-center justify-center font-black rounded-lg backdrop-blur-md z-10 w-6 h-6 md:w-10 md:h-10 text-[10px] md:text-base border box-border shadow-lg"
+                            <div className="absolute top-2 left-2 md:top-4 md:left-4 flex items-center justify-center font-black rounded-lg backdrop-blur-md z-10 w-8 h-8 md:w-14 md:h-14 text-xs md:text-2xl border box-border shadow-2xl"
                                 style={{
                                     background: index < 3 ? 'linear-gradient(135deg, #f5a623, #d48c15)' : 'rgba(0,0,0,0.7)',
                                     color: index < 3 ? '#000' : '#fff',
@@ -115,7 +115,7 @@ const ReviewCard = React.memo(({ review, index, showRanking }) => {
 
                         {/* Oscar Rank badge (if any, fallback if no ranking is shown) */}
                         {!showRanking && review.oscar_rank && (
-                            <div className="absolute top-2 left-2 md:top-3 md:left-3 flex items-center justify-center font-black rounded-md z-10 px-1.5 md:px-2.5 py-0.5 md:py-1 text-[9px] md:text-xs shadow-lg backdrop-blur-sm"
+                            <div className="absolute top-2 left-2 md:top-4 md:left-4 flex items-center justify-center font-black rounded-md z-10 px-2.5 md:px-4 py-1.5 md:py-2 text-[11px] md:text-lg shadow-2xl backdrop-blur-md"
                                 style={{
                                     background: 'linear-gradient(135deg, rgba(255,215,0,0.9), rgba(184,134,11,0.9))',
                                     color: '#000',
