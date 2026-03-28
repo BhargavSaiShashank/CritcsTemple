@@ -43,7 +43,7 @@ const scoreColor = (score) => {
     return '#2D0000';
 };
 
-const ReviewCard = React.memo(({ review, index, showRanking }) => {
+const ReviewCard = React.memo(({ review, index, showRanking, showOscarRank }) => {
     const [src, setSrc] = useState(review.movie_poster_url || FALLBACK);
     const derivedVerdict = getVerdictFromScore(review.overall_rating || 0);
     const vc = getV(derivedVerdict);
@@ -113,8 +113,8 @@ const ReviewCard = React.memo(({ review, index, showRanking }) => {
                             </div>
                         )}
 
-                        {/* Oscar Rank badge (if any, fallback if no ranking is shown) */}
-                        {!showRanking && review.oscar_rank && (
+                        {/* Oscar Rank badge - GATED by showOscarRank */}
+                        {showOscarRank && review.oscar_rank && (
                             <div className="absolute top-2 left-2 md:top-4 md:left-4 flex items-center justify-center font-black rounded-md z-10 px-2.5 md:px-4 py-1.5 md:py-2 text-[11px] md:text-lg shadow-2xl backdrop-blur-md"
                                 style={{
                                     background: 'linear-gradient(135deg, rgba(255,215,0,0.9), rgba(184,134,11,0.9))',
@@ -178,7 +178,7 @@ function SkeletonCard() {
     );
 }
 
-export default function ReviewGrid({ reviews, loading, showRankings }) {
+export default function ReviewGrid({ reviews, loading, showRankings, showOscarRank }) {
     if (loading) {
         return (
             <div className="discovery-grid">
@@ -197,7 +197,7 @@ export default function ReviewGrid({ reviews, loading, showRankings }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
             <div className="discovery-grid">
-                {reviews.map((r, i) => <ReviewCard key={r._id || r.id || i} review={r} index={i} showRanking={showRankings} />)}
+                {reviews.map((r, i) => <ReviewCard key={r._id || r.id || i} review={r} index={i} showRanking={showRankings} showOscarRank={showOscarRank} />)}
             </div>
         </div>
     );

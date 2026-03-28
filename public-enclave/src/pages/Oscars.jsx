@@ -241,7 +241,7 @@ export default function Oscars() {
                         {error}
                     </div>
                 ) : (
-                    <ReviewGrid reviews={reviews} loading={loading} />
+                    <ReviewGrid reviews={reviews} loading={loading} showOscarRank={true} />
                 )}
             </section>
         </div>
