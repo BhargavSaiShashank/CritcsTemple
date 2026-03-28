@@ -1,11 +1,29 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
 import { getVerdictFromScore } from '../utils/verdict';
 
-const isAndroid = Capacitor.getPlatform() === 'android';
+
+export function useIsMobile() {
+    const [isMobile, setIsMobile] = useState(() => {
+        if (typeof window === 'undefined') return false;
+        return Capacitor.getPlatform() === 'android' || Capacitor.getPlatform() === 'ios' || window.innerWidth <= 768;
+    });
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const handleResize = () => {
+            setIsMobile(Capacitor.getPlatform() === 'android' || Capacitor.getPlatform() === 'ios' || window.innerWidth <= 768);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    return isMobile;
+}
+
 
 const FALLBACK = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=1200';
 
@@ -22,6 +40,7 @@ const VERDICT_MAP = {
 const getV = (v) => VERDICT_MAP[v] || { color: '#9ca3af', bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.1)' };
 
 const ReviewCard = ({ review, index, showRanking }) => {
+    const isMobile = useIsMobile();
     const derivedVerdict = getVerdictFromScore(review.overall_rating || 0);
     const vc = getV(derivedVerdict);
 
@@ -31,16 +50,16 @@ const ReviewCard = ({ review, index, showRanking }) => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: index * 0.05 }}
             style={{ 
-                flex: `0 0 ${isAndroid ? '120px' : '280px'}`, 
-                marginRight: isAndroid ? '12px' : '24px', 
-                height: isAndroid ? '180px' : '420px',
+                flex: `0 0 ${isMobile ? '120px' : '280px'}`, 
+                marginRight: isMobile ? '12px' : '24px', 
+                height: isMobile ? '180px' : '420px',
                 position: 'relative' 
             }}
         >
             <Link to={`/review/${review.slug}`} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
                 <div style={{
                     height: '100%',
-                    borderRadius: isAndroid ? '12px' : '20px',
+                    borderRadius: isMobile ? '12px' : '20px',
                     overflow: 'hidden',
                     background: '#111',
                     border: '1px solid rgba(255,255,255,0.06)',
@@ -55,12 +74,12 @@ const ReviewCard = ({ review, index, showRanking }) => {
                     {/* Ranking Badge */}
                     {showRanking && (
                         <div style={{
-                            position: 'absolute', top: isAndroid ? '8px' : '16px', left: isAndroid ? '8px' : '16px',
-                            width: isAndroid ? '24px' : '40px', height: isAndroid ? '24px' : '40px', borderRadius: isAndroid ? '6px' : '12px',
+                            position: 'absolute', top: isMobile ? '8px' : '16px', left: isMobile ? '8px' : '16px',
+                            width: isMobile ? '24px' : '40px', height: isMobile ? '24px' : '40px', borderRadius: isMobile ? '6px' : '12px',
                             background: index < 3 ? 'linear-gradient(135deg, #f5a623, #d48c15)' : 'rgba(0,0,0,0.6)',
                             border: '1px solid rgba(255,255,255,0.2)',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: isAndroid ? '11px' : '18px', fontWeight: 900, color: index < 3 ? '#000' : '#fff',
+                            fontSize: isMobile ? '11px' : '18px', fontWeight: 900, color: index < 3 ? '#000' : '#fff',
                             backdropFilter: 'blur(10px)', zIndex: 10,
                             boxShadow: index < 3 ? '0 8px 20px rgba(245,166,35,0.4)' : 'none'
                         }}>
@@ -70,23 +89,23 @@ const ReviewCard = ({ review, index, showRanking }) => {
 
                     <div style={{
                         position: 'absolute', bottom: 0, left: 0, right: 0,
-                        padding: isAndroid ? '8px' : '24px',
+                        padding: isMobile ? '8px' : '24px',
                         background: 'linear-gradient(to top, #111 20%, rgba(17,17,17,0.8) 50%, transparent 100%)'
                     }}>
-                        <div style={{ display: 'flex', gap: '8px', marginBottom: isAndroid ? '4px' : '12px' }}>
+                        <div style={{ display: 'flex', gap: '8px', marginBottom: isMobile ? '4px' : '12px' }}>
                             <span style={{
-                                padding: isAndroid ? '2px 6px' : '2px 10px', borderRadius: '99px', fontSize: isAndroid ? '7px' : '9px', fontWeight: 700,
+                                padding: isMobile ? '2px 6px' : '2px 10px', borderRadius: '99px', fontSize: isMobile ? '7px' : '9px', fontWeight: 700,
                                 background: vc.bg, color: vc.color, border: `1px solid ${vc.border}`,
                                 textTransform: 'uppercase', letterSpacing: '0.05em'
                             }}>
                                 {derivedVerdict}
                             </span>
                         </div>
-                        <h3 className="line-clamp-2" style={{ fontSize: isAndroid ? '12px' : '18px', fontWeight: 800, color: '#f2f2f2', marginBottom: isAndroid ? '4px' : '8px', lineHeight: 1.15 }}>
+                        <h3 className="line-clamp-2" style={{ fontSize: isMobile ? '12px' : '18px', fontWeight: 800, color: '#f2f2f2', marginBottom: isMobile ? '4px' : '8px', lineHeight: 1.15 }}>
                             {review.movie_title}
                         </h3>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: isAndroid ? '11px' : '14px', fontWeight: 700, color: '#f5a623' }}>
-                            <Star size={isAndroid ? 10 : 14} fill="#f5a623" />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: isMobile ? '11px' : '14px', fontWeight: 700, color: '#f5a623' }}>
+                            <Star size={isMobile ? 10 : 14} fill="#f5a623" />
                             {parseFloat(review.overall_rating || 0).toFixed(2)}
                         </div>
                     </div>
@@ -97,6 +116,7 @@ const ReviewCard = ({ review, index, showRanking }) => {
 };
 
 export default function ReviewRow({ reviews, showRankings, categoryTitle }) {
+    const isMobile = useIsMobile();
     const scrollRef = useRef(null);
 
     const scroll = (direction) => {
@@ -119,7 +139,7 @@ export default function ReviewRow({ reviews, showRankings, categoryTitle }) {
                 style={{
                     display: 'flex',
                     overflowX: 'auto',
-                    padding: '10px 0 30px',
+                    padding: isMobile ? '10px 0 16px' : '10px 0 30px',
                     msOverflowStyle: 'none',
                     scrollbarWidth: 'none',
                     scrollSnapType: 'x mandatory',
@@ -142,8 +162,8 @@ export default function ReviewRow({ reviews, showRankings, categoryTitle }) {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.5, delay: reviews.length * 0.05 }}
                         style={{ 
-                            flex: `0 0 ${isAndroid ? '120px' : '280px'}`, 
-                            height: isAndroid ? '180px' : '420px',
+                            flex: `0 0 ${isMobile ? '120px' : '280px'}`, 
+                            height: isMobile ? '180px' : '420px',
                             position: 'relative' 
                         }}
                     >
@@ -153,35 +173,35 @@ export default function ReviewRow({ reviews, showRankings, categoryTitle }) {
                         >
                             <div style={{
                                 height: '100%',
-                                borderRadius: isAndroid ? '12px' : '20px',
+                                borderRadius: isMobile ? '12px' : '20px',
                                 background: 'linear-gradient(135deg, rgba(245,166,35,0.1), rgba(0,0,0,0.4))',
                                 border: '2px dashed rgba(245,166,35,0.3)',
                                 display: 'flex',
                                 flexDirection: 'column',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                gap: isAndroid ? '6px' : '16px',
+                                gap: isMobile ? '6px' : '16px',
                                 transition: 'all 0.3s ease'
                             }}
                             className="hover:scale-[1.02] hover:bg-amber-500/10 hover:border-amber-500 transition-all"
                             >
                                 <div style={{
-                                    width: isAndroid ? '36px' : '64px', height: isAndroid ? '36px' : '64px', borderRadius: '50%',
+                                    width: isMobile ? '36px' : '64px', height: isMobile ? '36px' : '64px', borderRadius: '50%',
                                     background: 'rgba(245,166,35,0.1)',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                     color: '#f5a623'
                                 }}>
-                                    <Star size={isAndroid ? 16 : 32} />
+                                    <Star size={isMobile ? 16 : 32} />
                                 </div>
                                 <div style={{ textAlign: 'center' }}>
                                     <h4 style={{ 
-                                        fontSize: isAndroid ? '12px' : '18px', fontWeight: 900, color: '#f2f2f2',
+                                        fontSize: isMobile ? '12px' : '18px', fontWeight: 900, color: '#f2f2f2',
                                         textTransform: 'uppercase', letterSpacing: '0.1em'
                                     }}>
                                         See All
                                     </h4>
                                     <p style={{ 
-                                        fontSize: isAndroid ? '8px' : '12px', fontWeight: 700, color: 'rgba(255,255,255,0.4)',
+                                        fontSize: isMobile ? '8px' : '12px', fontWeight: 700, color: 'rgba(255,255,255,0.4)',
                                         marginTop: '4px', textTransform: 'uppercase'
                                     }}>
                                         {reviews.length} Rankings

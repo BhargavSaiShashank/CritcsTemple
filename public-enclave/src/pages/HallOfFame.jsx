@@ -60,17 +60,17 @@ export default function HallOfFame() {
                 <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(to right, transparent, rgba(245,166,35,0.1), transparent)' }} />
             </div>
 
-            <div className="max-w-container" style={{ paddingTop: '48px', paddingBottom: '100px' }}>
+            <div className="max-w-container" style={{ paddingTop: '32px', paddingBottom: '100px' }}>
                 {loading ? (
                     <div style={{ padding: '100px 0', textAlign: 'center', color: '#f5a623' }}>Loading curated categories...</div>
                 ) : categories.length === 0 ? (
                     <div style={{ padding: '100px 0', textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>No categories found in the Hall of Fame.</div>
                 ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '80px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(32px, 6vw, 64px)' }}>
                         {categories.map((category, idx) => (
                             <div key={category._id || idx}>
-                                <div style={{ marginBottom: '32px', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '16px' }}>
-                                    <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#f2f2f2', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                                <div style={{ marginBottom: '16px', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '12px' }}>
+                                    <h2 style={{ fontSize: 'clamp(16px, 4vw, 22px)', fontWeight: 800, color: '#f2f2f2', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                                         {category.title}
                                     </h2>
                                     {category.description && (
