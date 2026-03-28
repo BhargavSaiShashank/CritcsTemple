@@ -495,15 +495,15 @@ body {
 
 .discovery-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, 260px);
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     justify-content: center;
-    gap: 32px;
+    gap: 24px;
 }
 
 
 @media (max-width: 640px) {
     .discovery-grid {
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        gap: 16px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
     }
 }

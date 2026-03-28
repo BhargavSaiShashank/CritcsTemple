@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Star, ArrowRight } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
 import { getVerdictFromScore } from '../utils/verdict';
 
@@ -54,18 +54,18 @@ const ReviewCard = React.memo(({ review, index, showRanking }) => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: index * 0.05 }}
             whileHover={{ y: -6, scale: 1.02 }}
-            style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+            style={{ display: 'flex', flexDirection: 'column', width: '100%' }}
         >
             <Link
                 to={`/review/${review.slug}`}
-                style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', flex: 1, height: '100%' }}
+                style={{ textDecoration: 'none', display: 'block', width: '100%' }}
             >
                 <div
                     className="group"
                     style={{
-                        flex: 1,
-                        display: 'flex',
-                        flexDirection: 'column',
+                        position: 'relative',
+                        width: '100%',
+                        aspectRatio: '2 / 3',
                         borderRadius: '16px',
                         overflow: 'hidden',
                         background: '#111',
@@ -83,7 +83,7 @@ const ReviewCard = React.memo(({ review, index, showRanking }) => {
                     }}
                 >
                     {/* Poster */}
-                    <div style={{ position: 'relative', aspectRatio: '2 / 3', overflow: 'hidden', background: '#181818', flexShrink: 0 }}>
+                    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: '#181818' }}>
                         <motion.img
                             layoutId={`poster-${review.slug}`}
                             src={src}
@@ -95,98 +95,74 @@ const ReviewCard = React.memo(({ review, index, showRanking }) => {
                                 transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
                             }}
                         />
-                        {/* Gradient overlay */}
+                        {/* Gradient overlay focused heavily on the bottom to protect the text */}
                         <div style={{
-                            position: 'absolute', inset: 0,
-                            background: 'linear-gradient(to top, rgba(17,17,17,1) 0%, rgba(17,17,17,0.3) 50%, transparent 100%)',
+                            position: 'absolute', bottom: 0, left: 0, right: 0, height: '60%',
+                            background: 'linear-gradient(to top, rgba(17,17,17,1) 0%, rgba(17,17,17,0.8) 40%, transparent 100%)',
                         }} />
                         
                         {/* Ranking Badge */}
                         {showRanking && (
-                            <div style={{
-                                position: 'absolute', top: '12px', left: '12px',
-                                width: '38px', height: '38px', borderRadius: '10px',
-                                background: index < 3 ? 'linear-gradient(135deg, #f5a623, #d48c15)' : 'rgba(0,0,0,0.7)',
-                                border: '1px solid rgba(255,255,255,0.2)',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: '16px', fontWeight: 900, color: index < 3 ? '#000' : '#fff',
-                                backdropFilter: 'blur(10px)', zIndex: 10,
-                                boxShadow: index < 3 ? '0 8px 20px rgba(245,166,35,0.4)' : 'none'
-                            }}>
+                            <div className="absolute top-2 left-2 md:top-3 md:left-3 flex items-center justify-center font-black rounded-lg backdrop-blur-md z-10 w-6 h-6 md:w-10 md:h-10 text-[10px] md:text-base border box-border shadow-lg"
+                                style={{
+                                    background: index < 3 ? 'linear-gradient(135deg, #f5a623, #d48c15)' : 'rgba(0,0,0,0.7)',
+                                    color: index < 3 ? '#000' : '#fff',
+                                    borderColor: 'rgba(255,255,255,0.2)'
+                                }}>
                                 {index + 1}
                             </div>
                         )}
 
                         {/* Oscar Rank badge (if any, fallback if no ranking is shown) */}
                         {!showRanking && review.oscar_rank && (
-                            <div style={{
-                                position: 'absolute', top: '12px', left: '12px',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                padding: '4px 10px', borderRadius: '8px',
-                                background: 'linear-gradient(135deg, rgba(255,215,0,0.9), rgba(184,134,11,0.9))',
-                                border: '1px solid rgba(255,255,255,0.3)',
-                                fontSize: '13px', fontWeight: 900, color: '#000',
-                                backdropFilter: 'blur(5px)',
-                                boxShadow: '0 4px 15px rgba(255,215,0,0.3)'
-                            }}>
+                            <div className="absolute top-2 left-2 md:top-3 md:left-3 flex items-center justify-center font-black rounded-md z-10 px-1.5 md:px-2.5 py-0.5 md:py-1 text-[9px] md:text-xs shadow-lg backdrop-blur-sm"
+                                style={{
+                                    background: 'linear-gradient(135deg, rgba(255,215,0,0.9), rgba(184,134,11,0.9))',
+                                    color: '#000',
+                                    border: '1px solid rgba(255,255,255,0.3)'
+                                }}>
                                 #{review.oscar_rank}
                             </div>
                         )}
-                        {/* Score badge */}
-                        <div style={{
-                            position: 'absolute', top: '12px', right: '12px',
-                            display: 'flex', alignItems: 'center', gap: '4px',
-                            padding: '4px 10px', borderRadius: '8px',
-                            background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)',
-                            border: '1px solid rgba(255,255,255,0.1)',
-                            fontSize: '12px', fontWeight: 800, color: scoreColor(review.overall_rating),
-                        }}>
-                            <Star size={10} fill="currentColor" color="currentColor" />
-                            {parseFloat(review.overall_rating || 0).toFixed(2)}
-                        </div>
-                    </div>
 
-                    {/* Info */}
-                    <div style={{ padding: '16px 18px 18px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                        {/* Verdict & Type */}
-                        <div style={{ height: '24px', marginBottom: '10px', display: 'flex', gap: '8px' }}>
-                            {review && (
-                                <span style={{
+                        {/* Dense Text Section Overlaying Bottom */}
+                        <div style={{
+                            position: 'absolute', bottom: 0, left: 0, right: 0,
+                            padding: '10px 8px',
+                            display: 'flex', flexDirection: 'column', gap: '4px'
+                        }}>
+                            <div style={{ display: 'flex', gap: '4px' }}>
+                                <span className="line-clamp-1" style={{
                                     display: 'inline-block',
-                                    padding: '2px 10px', borderRadius: '99px',
-                                    fontSize: '9px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
-                                    background: vc.bg, color: vc.color, border: `1px solid ${vc.border}`,
+                                    padding: '2px 6px', borderRadius: '4px',
+                                    fontSize: 'clamp(7px, 2vw, 9px)', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase',
+                                    background: vc.bg, color: vc.color, border: `1px solid ${vc.border}`
                                 }}>
                                     {derivedVerdict}
                                 </span>
-                            )}
-                            {review.content_type === 'tv' && (
-                                <span style={{
-                                    display: 'inline-block',
-                                    padding: '2px 10px', borderRadius: '99px',
-                                    fontSize: '9px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
-                                    background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.1)',
-                                }}>
-                                    TV Show
-                                </span>
-                            )}
+                            </div>
+
+                            <h3 className="line-clamp-2" style={{ 
+                                fontSize: 'clamp(11px, 3.5vw, 15px)', 
+                                fontWeight: 800, 
+                                color: '#f2f2f2', 
+                                lineHeight: 1.15, 
+                                letterSpacing: '-0.015em'
+                            }}>
+                                {review.movie_title}
+                            </h3>
+
+                            <div style={{ 
+                                display: 'flex', alignItems: 'center', gap: '3px', 
+                                fontSize: 'clamp(10px, 3vw, 13px)', 
+                                fontWeight: 800, 
+                                color: scoreColor(review.overall_rating)
+                            }}>
+                                <Star size={10} fill="currentColor" />
+                                {parseFloat(review.overall_rating || 0).toFixed(2)}
+                            </div>
                         </div>
 
-                        <h3 className="line-clamp-2" style={{ fontSize: 'clamp(14px, 4vw, 16px)', fontWeight: 700, color: '#f2f2f2', marginBottom: '8px', lineHeight: 1.3, letterSpacing: '-0.015em', height: '2.6em', overflow: 'hidden' }}>
-                            {review.movie_title}
-                        </h3>
-
-                        <div style={{ flex: 1 }}>
-                            {review.summary && (
-                                <p className="line-clamp-2" style={{ fontSize: 'clamp(11px, 3vw, 13px)', color: 'rgba(255,255,255,0.4)', lineHeight: 1.6, marginBottom: '14px' }}>
-                                    {review.summary}
-                                </p>
-                            )}
-                        </div>
-
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 700, color: '#f5a623', marginTop: 'auto' }}>
-                            Read review <ArrowRight size={13} />
-                        </div>
                     </div>
                 </div>
             </Link>
@@ -197,13 +173,7 @@ const ReviewCard = React.memo(({ review, index, showRanking }) => {
 function SkeletonCard() {
     return (
         <div style={{ borderRadius: '16px', overflow: 'hidden', background: '#111', border: '1px solid rgba(255,255,255,0.05)' }}>
-            <div className="skeleton" style={{ aspectRatio: '2 / 3' }} />
-            <div style={{ padding: '14px 16px' }}>
-                <div className="skeleton" style={{ height: '14px', borderRadius: '99px', width: '35%', marginBottom: '10px' }} />
-                <div className="skeleton" style={{ height: '18px', borderRadius: '6px', width: '75%', marginBottom: '7px' }} />
-                <div className="skeleton" style={{ height: '12px', borderRadius: '6px', width: '90%', marginBottom: '5px' }} />
-                <div className="skeleton" style={{ height: '12px', borderRadius: '6px', width: '60%' }} />
-            </div>
+            <div className="skeleton" style={{ width: '100%', aspectRatio: '2 / 3' }} />
         </div>
     );
 }
