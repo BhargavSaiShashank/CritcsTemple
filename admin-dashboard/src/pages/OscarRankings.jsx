@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Award, Search, ArrowUp, ArrowDown, X, Save, Loader2, Plus } from 'lucide-react';
 import { getReviews, getProxyImageUrl, updateOscarRankings, getSettings, updateSettings } from '../services/api';
