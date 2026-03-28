@@ -124,21 +124,17 @@ const ReviewCard = React.memo(({ review, index, showRanking, showOscarRank }) =>
                             </div>
                         )}
 
-                        {/* Compressed Masked Overlay */}
+                        {/* Seamless Gradient Overlay */}
                         <div style={{
                             position: 'absolute', bottom: 0, left: 0, right: 0,
-                            padding: '8px 8px 10px 8px',
-                            display: 'flex', flexDirection: 'column', gap: '2px',
-                            background: 'rgba(0,0,0,0.45)',
-                            backdropFilter: 'blur(16px) saturate(180%)',
-                            WebkitBackdropFilter: 'blur(16px) saturate(180%)',
-                            maskImage: 'linear-gradient(to top, black 0%, black 80%, transparent 100%)',
-                            WebkitMaskImage: 'linear-gradient(to top, black 0%, black 80%, transparent 100%)',
+                            padding: '16px 10px 14px 10px',
+                            display: 'flex', flexDirection: 'column', gap: '6px',
+                            background: 'linear-gradient(to top, #080808 20%, rgba(8,8,8,0.8) 50%, transparent 100%)'
                         }}>
                             {/* Ambient Verdict Glow */}
                             <div style={{
                                 position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px',
-                                background: vc.border, opacity: 0.4, filter: 'blur(3px)'
+                                background: vc.border, opacity: 0.4
                             }} />
 
                             <div style={{ display: 'flex', marginBottom: '2px' }}>
