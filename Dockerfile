@@ -8,16 +8,18 @@ ENV PYTHONUNBUFFERED 1
 # Set the working directory in the container
 WORKDIR /code
 
-# Copy the requirements file into the container at /code/
-COPY requirements.txt /code/
+# Copy only the requirements file first for layer caching
+COPY requirements.txt .
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+# Install dependencies
+RUN pip install --no-cache-dir --upgrade -r requirements.txt gunicorn uvicorn certifi
 
-# Copy the current directory contents into the container at /code/
-COPY . /code/
+# Copy the backend code into the container
+COPY ./app /code/app
+COPY main.py /code/main.py
 
-# Use gunicorn with uvicorn workers for production (utilizing 16GB RAM with multiple workers)
-# 4 workers is a safe start, could potentially go higher given the 16GB RAM.
-# We bind to port 7860 as expected by Hugging Face Spaces by default.
-CMD ["gunicorn", "app.main:app", "--workers", "4", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:7860", "--timeout", "120", "--keep-alive", "5"]
+# Expose the app port
+EXPOSE 10000
+
+# Run with 1 worker for memory efficiency on free-tier servers
+CMD ["gunicorn", "app.main:app", "--workers", "1", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:10000", "--timeout", "120", "--keep-alive", "5"]
