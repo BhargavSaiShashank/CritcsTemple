@@ -16,7 +16,8 @@ class Settings(BaseSettings):
     TMDB_READ_TOKEN: str = ""
     
     # Firebase
-    FIREBASE_SERVICE_ACCOUNT_PATH: str
+    FIREBASE_SERVICE_ACCOUNT_PATH: str = "backend-firebase-credentials.json"
+    FIREBASE_CREDENTIALS_JSON: str = ""
     
     # Cloudinary
     CLOUDINARY_CLOUD_NAME: str = ""
