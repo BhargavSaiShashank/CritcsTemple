@@ -434,15 +434,13 @@ export default function Home() {
                                 </motion.div>
 
                                 <h1 className="display" style={{
-                                    fontSize: isSmall ? 'clamp(1.6rem, 10vw, 3rem)' : 'clamp(2.5rem, 8vw, 6.5rem)',
+                                    fontSize: isSmall ? 'clamp(1.6rem, 10vw, 3rem)' : 'clamp(2.5rem, 6vw, 5.5rem)',
                                     fontWeight: 900,
                                     color: '#FFFFFF',
                                     lineHeight: 0.95,
                                     letterSpacing: '-0.04em',
                                     marginBottom: '8px',
                                     textShadow: '0 20px 40px rgba(0,0,0,0.5)',
-                                    wordBreak: 'break-word',
-                                    overflowWrap: 'break-word'
                                 }}>
                                     {hero?.movie_title || "Critic's Temple"}
                                 </h1>
