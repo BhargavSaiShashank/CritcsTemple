@@ -1,3 +1,14 @@
+---
+title: Critics Temple API
+emoji: 🏛️
+colorFrom: gray
+colorTo: yellow
+sdk: docker
+app_port: 7860
+pinned: false
+license: mit
+---
+
 # 🏛️ Critic's Temple
 
 [![Status](https://img.shields.io/badge/Status-Legendary-f5a623?style=for-the-badge&logoScale=1.2)]()
