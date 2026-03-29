@@ -1,4 +1,4 @@
-﻿from fastapi import FastAPI, Depends, HTTPException, Request
+from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 import traceback
 from datetime import datetime
@@ -19,7 +19,10 @@ app.add_middleware(
         "https://critiquetemple.vercel.app",
         "https://temple-admin-dashboard.vercel.app",
         "https://critiquetemplesanctuary.vercel.app",
-        "https://the-critics-temple.vercel.app",`n        "http://localhost",`n        "https://localhost",`n        "capacitor://localhost",
+        "https://the-critics-temple.vercel.app",
+        "http://localhost",
+        "https://localhost",
+        "capacitor://localhost",
     ],
     allow_origin_regex=r"https:\/\/.*\.vercel\.app$",
     allow_credentials=True,
