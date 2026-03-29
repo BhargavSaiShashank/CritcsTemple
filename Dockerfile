@@ -22,4 +22,5 @@ COPY main.py /code/main.py
 EXPOSE 10000
 
 # Run with 1 worker for memory efficiency on free-tier servers
-CMD ["gunicorn", "app.main:app", "--workers", "1", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:10000", "--timeout", "120", "--keep-alive", "5"]
+# Using the shell form of CMD to support the $PORT env variable provided by Render
+CMD gunicorn app.main:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --timeout 120 --keep-alive 5
