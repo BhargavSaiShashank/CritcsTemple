@@ -1,19 +1,21 @@
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from typing import List, Optional, Dict, Any
 from app.models.review import Verdict
-from pymongo import DESCENDING, ASCENDING
+from pymongo import DESCENDING, ASCENDING, ReturnDocument
 from fastapi import HTTPException
 
 class ReviewService:
     @staticmethod
     def serialize_doc(doc: dict) -> dict:
+        """Lightweight serialization of MongoDB documents for API responses."""
         if not doc:
             return doc
         
+        # Convert ObjectId to string for JSON compatibility
         if "_id" in doc:
             doc["_id"] = str(doc["_id"])
             
-        # Ensure aspects exist for legacy records
+        # Ensure 'aspects' dictionary exists for UI consistency
         if "aspects" not in doc:
             doc["aspects"] = {}
             
@@ -66,13 +68,9 @@ class ReviewService:
             filters.append({"is_must_watch": must_watch})
             
         if search and search.strip():
-            filters.append({
-                "$or": [
-                    {"movie_title": {"$regex": search.strip(), "$options": "i"}},
-                    {"verdict": {"$regex": search.strip(), "$options": "i"}},
-                    {"tags": {"$regex": search.strip(), "$options": "i"}}
-                ]
-            })
+            # Efficiency Tip: Using $text search is significantly faster than $regex. 
+            # Ensure a text index exists on: movie_title, verdict, and tags.
+            filters.append({"$text": {"$search": search.strip()}})
             
         query = {"$and": filters} if len(filters) > 1 else filters[0]
             
@@ -112,29 +110,38 @@ class ReviewService:
     async def increment_claps(self, db: AsyncIOMotorDatabase, slug: str) -> Dict[str, Any]:
         query = self._get_publication_query()
         query["slug"] = slug
-        result = await db.reviews.update_one(
+        
+        review = await db.reviews.find_one_and_update(
             query,
-            {"$inc": {"claps": 1}}
+            {"$inc": {"claps": 1}},
+            return_document=ReturnDocument.AFTER
         )
-        if result.modified_count == 0:
+        
+        if not review:
             raise HTTPException(status_code=404, detail="Review not found")
         
-        review = await db.reviews.find_one({"slug": slug})
         return self.serialize_doc(review)
 
     async def decrement_claps(self, db: AsyncIOMotorDatabase, slug: str) -> Dict[str, Any]:
         query = self._get_publication_query()
         query["slug"] = slug
         query["claps"] = {"$gt": 0}
+        
         # Only decrement if current claps > 0 to prevent negative values
-        result = await db.reviews.update_one(
+        review = await db.reviews.find_one_and_update(
             query,
-            {"$inc": {"claps": -1}}
+            {"$inc": {"claps": -1}},
+            return_document=ReturnDocument.AFTER
         )
-        # We don't throw 404 if it didn't modify, maybe it was already at 0.
-        review = await db.reviews.find_one({"slug": slug})
+        
         if not review:
-            raise HTTPException(status_code=404, detail="Review not found")
+            # We don't throw 404 if it didn't modify, as it might've been zero already.
+            # But we check for existence separately to be accurate.
+            exists = await db.reviews.find_one({"slug": slug})
+            if not exists:
+                 raise HTTPException(status_code=404, detail="Review not found")
+            return self.serialize_doc(exists)
+            
         return self.serialize_doc(review)
 
     async def get_related_reviews(self, db: AsyncIOMotorDatabase, slug: str) -> List[Dict[str, Any]]:
@@ -183,23 +190,29 @@ class ReviewService:
         if not updates:
             return {"status": "no-op"}
 
-        result = await db.reviews.update_one(
+        # Try to update in a single atomical operation
+        review = await db.reviews.find_one_and_update(
             query,
-            {"$inc": updates}
+            {"$inc": updates},
+            return_document=ReturnDocument.AFTER
         )
         
-        if result.modified_count == 0:
+        if not review:
             # Maybe the reactions object doesn't exist yet (for older reviews)
+            # We initialize it carefully.
             await db.reviews.update_one(
                 query,
                 {"$set": {"reactions": {"agree": 0, "disagree": 0, "havent_seen": 0}}}
             )
-            await db.reviews.update_one(
+            review = await db.reviews.find_one_and_update(
                 query,
-                {"$inc": {f"reactions.{reaction_type}": 1}}
+                {"$inc": {f"reactions.{reaction_type}": 1}},
+                return_document=ReturnDocument.AFTER
             )
             
-        review = await db.reviews.find_one({"slug": slug})
+        if not review:
+            raise HTTPException(status_code=404, detail="Review not found")
+            
         return self.serialize_doc(review)
 
     async def get_all_review_context(self, db: AsyncIOMotorDatabase) -> List[Dict[str, Any]]:
@@ -216,5 +229,24 @@ class ReviewService:
         })
         reviews = await cursor.to_list(length=100)
         return [self.serialize_doc(r) for r in reviews]
+
+    async def get_movie_by_imdb(self, db: AsyncIOMotorDatabase, imdb_id: str) -> Dict[str, Any]:
+        """Fetch a movie record by IMDB ID with service-level serialization."""
+        movie = await db.movies.find_one({"imdb_id": imdb_id})
+        if not movie:
+            raise HTTPException(status_code=404, detail="Movie not found")
+        return self.serialize_doc(movie)
+
+    async def get_show_by_tmdb(self, db: AsyncIOMotorDatabase, tmdb_id: str) -> Dict[str, Any]:
+        """Fetch a TV show record by TMDB ID with proper type coercion."""
+        try:
+            tid = int(tmdb_id)
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid TMDB ID format")
+            
+        show = await db.shows.find_one({"tmdb_id": tid})
+        if not show:
+            raise HTTPException(status_code=404, detail="TV Show not found")
+        return self.serialize_doc(show)
 
 review_service = ReviewService()

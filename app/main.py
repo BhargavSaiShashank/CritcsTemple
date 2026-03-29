@@ -9,18 +9,13 @@ from app.api.v1 import public, admin, oracle, predictions, dynamic_rating, bias
 app = FastAPI(title="The Critic's Temple")
 
 # CORS Setup
+# Optimized CORS Setup
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
         "http://localhost:5174",
         "http://localhost:3000",
-        "http://localhost:3001",
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:3000",
-        "http://localhost",
-        "https://localhost",
-        "capacitor://localhost",
         "https://critiquetemple.vercel.app",
         "https://temple-admin-dashboard.vercel.app",
         "https://critiquetemplesanctuary.vercel.app",
@@ -28,8 +23,9 @@ app.add_middleware(
     ],
     allow_origin_regex=r"https:\/\/.*\.vercel\.app$",
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
+    max_age=3600, # Cache preflight requests for 1 hour to reduce overhead
 )
 
 @app.middleware("http")

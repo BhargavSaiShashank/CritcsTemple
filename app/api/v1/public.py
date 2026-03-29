@@ -67,17 +67,11 @@ async def get_public_categories(db = Depends(get_database)):
 
 @router.get("/movie/{imdb_id}")
 async def get_movie_details(imdb_id: str, db = Depends(get_database)):
-    movie = await db.movies.find_one({"imdb_id": imdb_id})
-    if not movie:
-        raise HTTPException(status_code=404, detail="Movie not found in our database")
-    return review_service.serialize_doc(movie)
+    return await review_service.get_movie_by_imdb(db, imdb_id)
 
 @router.get("/tv/{tmdb_id}")
 async def get_show_details(tmdb_id: str, db = Depends(get_database)):
-    show = await db.shows.find_one({"tmdb_id": int(tmdb_id)})
-    if not show:
-        raise HTTPException(status_code=404, detail="TV Show not found in our database")
-    return review_service.serialize_doc(show)
+    return await review_service.get_show_by_tmdb(db, tmdb_id)
 
 @router.get("/proxy-image")
 async def proxy_image(url: str, quality: str = None):
