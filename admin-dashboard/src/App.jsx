@@ -12,6 +12,17 @@ import OscarRankings from './pages/OscarRankings'
 import Analytics from './pages/Analytics'
 import PrivateRoute from './components/PrivateRoute'
 import { auth } from './services/firebase'
+import { API_BASE_URL } from './services/api'
+
+const PrimalPulse = () => {
+    useEffect(() => {
+        // Ping the backend immediately to wake it up from Render sleep phase
+        console.log('[Primal Pulse] Waking up the Oracle from the Admin Sanctum...');
+        const wakeupUrl = API_BASE_URL.replace('/api/v1', '/health');
+        fetch(wakeupUrl).catch(() => { });
+    }, []);
+    return null;
+};
 
 const App = () => {
     useEffect(() => {
@@ -22,6 +33,7 @@ const App = () => {
 
     return (
         <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <PrimalPulse />
             <div className="min-h-screen bg-[#0c0c0c] text-white">
                 <Routes>
                     <Route path="/login" element={<Login />} />

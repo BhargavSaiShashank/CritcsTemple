@@ -4,7 +4,9 @@ import { Capacitor } from '@capacitor/core';
 
 export const API_BASE_URL = Capacitor.isNativePlatform()
     ? 'https://temple-backend-zgu3.onrender.com/api/v1'
-    : import.meta.env.VITE_API_URL || '/api/v1';
+    : window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:8000/api/v1'
+        : 'https://temple-backend-zgu3.onrender.com/api/v1';
 
 console.log(`[API_CONFIG] Base URL: ${API_BASE_URL}`);
 
