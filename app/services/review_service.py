@@ -68,9 +68,18 @@ class ReviewService:
             filters.append({"is_must_watch": must_watch})
             
         if search and search.strip():
-            # Efficiency Tip: Using $text search is significantly faster than $regex. 
-            # Ensure a text index exists on: movie_title, verdict, and tags.
-            filters.append({"$text": {"$search": search.strip()}})
+            # Robust Search Logic: Using $regex for maximum compatibility across MongoDB tiers (Free Tier issues with index building).
+            # We search across: movie_title, verdict, summary, content, and tags.
+            search_regex = {"$regex": search.strip(), "$options": "i"}
+            filters.append({
+                "$or": [
+                    {"movie_title": search_regex},
+                    {"verdict": search_regex},
+                    {"summary": search_regex},
+                    {"content": search_regex},
+                    {"tags": search_regex}
+                ]
+            })
             
         query = {"$and": filters} if len(filters) > 1 else filters[0]
             

@@ -2,6 +2,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import certifi
 import ssl
 from app.core.config import get_settings
+import pymongo
 
 settings = get_settings()
 
@@ -50,6 +51,32 @@ async def connect_to_mongo():
         except Exception as e2:
              print(f"All MongoDB connection attempts failed: {e2}")
              db.db = None
+             
+        if db.db is not None:
+            await ensure_indexes(db.db)
+
+async def ensure_indexes(database):
+    """Ensures that all necessary database indexes exist."""
+    try:
+        print("Ensuring database indexes...")
+        # Text index for search functionality
+        await database.reviews.create_index([
+            ("movie_title", pymongo.TEXT),
+            ("verdict", pymongo.TEXT),
+            ("summary", pymongo.TEXT),
+            ("content", pymongo.TEXT),
+            ("tags", pymongo.TEXT)
+        ], name="review_search_text_index")
+        
+        # Performance indexes for sorting and filtering
+        await database.reviews.create_index([("published_at", pymongo.DESCENDING)])
+        await database.reviews.create_index([("overall_rating", pymongo.DESCENDING)])
+        await database.reviews.create_index([("oscar_rank", pymongo.ASCENDING)])
+        await database.reviews.create_index([("slug", pymongo.ASCENDING)], unique=True)
+        
+        print("Database indexes ensured successfully.")
+    except Exception as e:
+        print(f"Failed to ensure indexes: {e}")
 
 async def close_mongo_connection():
     db.client.close()
