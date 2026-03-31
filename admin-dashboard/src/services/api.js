@@ -3,10 +3,10 @@ import { auth } from './firebase';
 import { Capacitor } from '@capacitor/core';
 
 export const API_BASE_URL = Capacitor.isNativePlatform()
-    ? 'https://shashank182123-critics-temple-api.hf.space/api/v1'
+    ? 'https://temple-backend-zgu3.onrender.com/api/v1'
     : window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
         ? 'http://localhost:8000/api/v1'
-        : 'https://shashank182123-critics-temple-api.hf.space/api/v1';
+        : 'https://temple-backend-zgu3.onrender.com/api/v1';
 
 console.log(`[API_CONFIG] Base URL: ${API_BASE_URL}`);
 
