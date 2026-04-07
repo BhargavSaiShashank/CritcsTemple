@@ -64,4 +64,4 @@ const RatingTimelineGraph = ({ data }) => {
   );
 };
 
-export default RatingTimelineGraph;
+export default React.memo(RatingTimelineGraph);

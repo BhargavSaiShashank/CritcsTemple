@@ -355,4 +355,4 @@ const SanctuaryCard = ({ movie, review, cardRef }) => {
     );
 };
 
-export default SanctuaryCard;
+export default React.memo(SanctuaryCard);

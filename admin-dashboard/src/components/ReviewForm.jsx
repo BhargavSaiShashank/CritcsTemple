@@ -90,6 +90,7 @@ const AspectItem = React.memo(({
     comment,
     activeAspectIdx, 
     activeSlider, 
+    activeGroup,
     setActiveAspectIdx, 
     setActiveSlider, 
     getOpinion, 
@@ -121,7 +122,7 @@ const AspectItem = React.memo(({
                         {aspect.replace(/_/g, ' ')}
                     </label>
                     {activeAspectIdx === idx && (
-                        <motion.div layoutId="focus-dot" className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_10px_#f59e0b]" />
+                        <motion.div layoutId={`focus-dot-${activeGroup}`} className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_10px_#f59e0b]" />
                     )}
                 </div>
                 <span className="text-2xl md:text-4xl font-black text-white italic tracking-tighter">{score}</span>
@@ -133,12 +134,12 @@ const AspectItem = React.memo(({
                             initial={{ opacity: 0, y: 10, scale: 0.9, filter: 'blur(10px)' }}
                             animate={{ 
                                 opacity: 1, 
-                                y: Capacitor.isNativePlatform() ? -165 : -115, 
-                                scale: 1, 
+                                y: Capacitor.isNativePlatform() ? -180 : -130, 
+                                scale: 1.05, 
                                 filter: 'blur(0px)' 
                             }}
                             exit={{ opacity: 0, y: -20, scale: 0.95, filter: 'blur(10px)' }}
-                            className="absolute left-1/2 -translate-x-1/2 p-6 rounded-[28px] pointer-events-none z-[100] backdrop-blur-3xl shadow-[0_40px_100px_rgba(0,0,0,0.8)] overflow-hidden border border-white/20 flex flex-col items-center gap-3 min-w-[320px] max-w-[400px]"
+                            className="absolute left-1/2 -translate-x-1/2 p-6 rounded-[28px] pointer-events-none z-[110] backdrop-blur-3xl shadow-[0_40px_100px_rgba(0,0,0,0.8)] overflow-hidden border border-white/20 flex flex-col items-center gap-3 min-w-[320px] max-w-[400px]"
                             style={{ 
                                 background: `linear-gradient(135deg, rgba(8,8,8,0.98), ${(getOpinion(aspect, score) || {color: '#6366f1'}).color}25)`,
                                 boxShadow: `0 0 50px ${(getOpinion(aspect, score) || {color: '#6366f1'}).color}15 inset, 0 40px 100px rgba(0,0,0,0.8)`
@@ -342,8 +343,12 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
         };
     });
 
+    // Debounced LocalStorage Save to stop blocking UI thread during slider movement
     React.useEffect(() => {
-        localStorage.setItem(draftKey, JSON.stringify(formData));
+        const timeout = setTimeout(() => {
+            localStorage.setItem(draftKey, JSON.stringify(formData));
+        }, 1000);
+        return () => clearTimeout(timeout);
     }, [formData, draftKey]);
 
     // Reload form data if draftKey changes (new drafts) but NEVER for existing reviews (initialData)
@@ -400,7 +405,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
         }
     }, [formData.movie_title]);
 
-    const getOpinion = (aspect, score) => {
+    const getOpinion = React.useCallback((aspect, score) => {
         if (!scoringBenchmark) return null;
         const benchmark = scoringBenchmark[aspect] || scoringBenchmark[aspect.toLowerCase()];
         if (!benchmark) return null;
@@ -424,7 +429,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
         if (delta > -1.4) return { text: "CONSERVATIVE", color: "#3b82f6", reason: customReason || "Slightly more critical than the consensus." };
         if (delta > -2.2) return { text: "UNDERSTATED", color: "#6366f1", reason: customReason || "Focusing heavily on perceived flaws." };
         return { text: "HARSH OUTLIER", color: "#a855f7", reason: customReason || "Significantly below the viewer consensus." };
-    };
+    }, [scoringBenchmark]);
 
     const handlePhaseUpdate = async (phaseName) => {
         // Ensure we have a valid movie_id
@@ -509,6 +514,10 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
     // Reset aspect index when group changes
     React.useEffect(() => {
         setActiveAspectIdx(0);
+        // Scroll to top of form content on mobile to ensure new aspects are visible
+        if (Capacitor.isNativePlatform()) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     }, [activeGroup]);
 
     // Keyboard Shortcuts (Kinetic Scoring)
@@ -786,7 +795,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
         }
     };
 
-    const handleAspectChange = (aspect, field, value) => {
+    const handleAspectChange = React.useCallback((aspect, field, value) => {
         if (field === 'score' && Capacitor.isNativePlatform()) {
             import('@capacitor/haptics').then(({ Haptics, ImpactStyle }) => {
                 Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
@@ -801,8 +810,8 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                     [field]: value 
                 }
             }
-        }))
-    }
+        }));
+    }, []);
 
     const handleImprinting = async (status) => {
         console.log("[DEBUG] Form Data before submission:", formData);
@@ -1145,22 +1154,23 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                     </p>
                 </motion.div>
 
-                <nav className="glass-obsidian rounded-[42px] p-4 space-y-2 border-white/5">
+                <nav className="glass-obsidian rounded-[32px] md:rounded-[42px] p-2 md:p-4 flex md:flex-col gap-2 border-white/5 overflow-x-auto no-scrollbar scroll-smooth">
                     {aspectGroups.map((group, idx) => (
                         <button
                             key={group.name}
+                            type="button"
                             onClick={() => setActiveGroup(idx)}
-                            className={`w-full flex items-center justify-between p-6 rounded-3xl transition-all duration-500 group relative overflow-hidden ${activeGroup === idx
+                            className={`flex-shrink-0 md:w-full flex items-center justify-between p-3 md:p-6 rounded-2xl md:rounded-3xl transition-all duration-500 group relative overflow-hidden ${activeGroup === idx
                                 ? 'bg-amber-500 text-black shadow-2xl shadow-amber-500/20'
                                 : 'hover:bg-white/5 text-white/30 hover:text-white'
                                 }`}
                         >
-                            <div className="flex items-center gap-5 relative z-10">
-                                {group.icon}
-                                <span className="font-black text-[10px] uppercase tracking-[0.3em]">{group.name}</span>
+                            <div className="flex items-center gap-3 md:gap-5 relative z-10">
+                                {React.cloneElement(group.icon, { size: isDesktop ? 18 : 14 })}
+                                <span className="font-black text-[8px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] whitespace-nowrap">{group.name}</span>
                             </div>
                             {activeGroup === idx && <motion.div layoutId="nav-glow" className="absolute inset-0 bg-gradient-to-r from-amber-400 to-amber-600" />}
-                            <ChevronRight size={18} className={activeGroup === idx ? 'relative z-10' : 'opacity-0'} />
+                            <ChevronRight size={18} className={activeGroup === idx ? 'relative z-10 hidden md:block' : 'opacity-0'} />
                         </button>
                     ))}
                 </nav>
@@ -1239,6 +1249,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                                 comment={formData.aspects[aspect]?.comment ?? ''}
                                 activeAspectIdx={activeAspectIdx}
                                 activeSlider={activeSlider}
+                                activeGroup={activeGroup}
                                 setActiveAspectIdx={setActiveAspectIdx}
                                 setActiveSlider={setActiveSlider}
                                 getOpinion={getOpinion}

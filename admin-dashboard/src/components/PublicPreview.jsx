@@ -237,4 +237,4 @@ const PublicPreview = ({ review, movie }) => {
     );
 };
 
-export default PublicPreview;
+export default React.memo(PublicPreview);
