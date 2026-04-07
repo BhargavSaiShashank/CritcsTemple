@@ -201,7 +201,7 @@ const AspectItem = React.memo(({
                         setActiveSlider(aspect)
                     }}
                     onTouchEnd={() => {
-                        setTimeout(() => setActiveSlider(null), 2500)
+                        setActiveSlider(null)
                     }}
                     onInput={() => {
                         if (activeSlider !== aspect) setActiveSlider(aspect);
