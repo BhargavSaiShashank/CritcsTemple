@@ -13,8 +13,8 @@ const ReviewRadar = ({ aspects }) => {
     }));
 
     return (
-        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
+        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '200px' }}>
+            <ResponsiveContainer width="100%" height="100%" minHeight={200}>
                 <RadarChart cx="50%" cy="50%" outerRadius="70%" data={dnaData}>
                     <PolarGrid stroke="#ffffff10" />
                     <PolarAngleAxis

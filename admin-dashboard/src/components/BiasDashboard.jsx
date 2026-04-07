@@ -182,8 +182,8 @@ const BiasDashboard = () => {
           <div className="w-1 h-4 bg-indigo-500 rounded-full" />
           Genre Preference Deviation
         </h3>
-        <div className="h-64 mt-4 relative" style={{ minWidth: '1px', minHeight: '1px' }}>
-          <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} debounce={50}>
+        <div className="h-64 mt-4 relative" style={{ minWidth: '1px', minHeight: '250px' }}>
+          <ResponsiveContainer width="100%" height="100%" minHeight={250} debounce={50}>
             <BarChart data={bias.genre_bias.map(g => ({ ...g, deviation: g.deviation * simulation.sensitivity }))}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff05" />
               <XAxis 

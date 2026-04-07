@@ -396,9 +396,9 @@ export default function Home() {
                             transition={{ duration: 0.6 }}
                             style={{
                                 display: 'grid',
-                                gridTemplateColumns: isSmall ? '1fr' : 'repeat(auto-fit, minmax(320px, 1fr))',
+                                gridTemplateColumns: isSmall ? '1fr' : '1.3fr 0.7fr',
                                 alignItems: 'center',
-                                gap: isSmall ? '2.5rem' : 'clamp(2rem, 8vw, 6rem)',
+                                gap: isSmall ? '2.5rem' : 'clamp(2rem, 6vw, 4rem)',
                                 textAlign: isSmall ? 'center' : 'left'
                             }}
                         >
@@ -441,6 +441,9 @@ export default function Home() {
                                     letterSpacing: '-0.04em',
                                     marginBottom: '8px',
                                     textShadow: '0 20px 40px rgba(0,0,0,0.5)',
+                                    maxWidth: isSmall ? '100%' : '110%',
+                                    position: 'relative',
+                                    zIndex: 5
                                 }}>
                                     {hero?.movie_title || "Critic's Temple"}
                                 </h1>

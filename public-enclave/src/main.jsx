@@ -58,8 +58,26 @@ if (typeof window !== 'undefined') {
 
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { Capacitor } from '@capacitor/core'
+import { StatusBar, Style } from '@capacitor/status-bar'
+import { SplashScreen } from '@capacitor/splash-screen'
 import './index.css'
 import App from './App.jsx'
+
+const initNative = async () => {
+  if (Capacitor.isNativePlatform()) {
+    document.body.classList.add('is-native');
+    try {
+      await StatusBar.setStyle({ style: Style.Dark });
+      await StatusBar.setBackgroundColor({ color: '#080808' });
+      await SplashScreen.hide();
+    } catch (e) {
+      console.warn("Capacitor plugins not fully available", e);
+    }
+  }
+};
+
+initNative();
 
 console.log("[RENDER] Triggering createRoot");
 

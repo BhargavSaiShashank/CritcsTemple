@@ -99,6 +99,8 @@ export const resolveUpcomingMovie = (id, actual_verdict) => api.patch(`/admin/up
 // Global Settings
 export const getSettings = () => api.get('/admin/settings');
 export const updateSettings = (data) => api.put('/admin/settings', data);
+export const challengeReview = (data) => api.post('/admin/challenge', data);
+export const getScoringBenchmark = (data) => api.post('/admin/benchmark', data);
 
 // Image Proxy
 export const getProxyImageUrl = (url) => {

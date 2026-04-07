@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Trash2, Calendar, Star, TrendingUp } from 'lucide-react';
+import { X, Trash2, Calendar, Star, TrendingUp, Ghost } from 'lucide-react';
 import { getProxyImageUrl } from '../services/api';
 
 const ReviewDetailsModal = ({ review, isOpen, onClose, onDelete }) => {
@@ -160,6 +160,19 @@ const ReviewDetailsModal = ({ review, isOpen, onClose, onDelete }) => {
                                                     </ul>
                                                 </div>
                                             )}
+                                        </div>
+                                    )}
+
+                                    {/* AI Review Critique Footnote */}
+                                    {review.adversary_footnote && (
+                                        <div className="bg-red-500/[0.03] border border-red-500/10 rounded-3xl p-8 space-y-4">
+                                            <div className="flex items-center gap-3 text-red-500/60">
+                                                <Ghost size={16} />
+                                                <span className="text-[10px] font-black uppercase tracking-[0.2em]">AI Review Critique</span>
+                                            </div>
+                                            <p className="text-base text-white/50 font-medium italic leading-relaxed">
+                                                "{review.adversary_footnote}"
+                                            </p>
                                         </div>
                                     )}
                                 </div>

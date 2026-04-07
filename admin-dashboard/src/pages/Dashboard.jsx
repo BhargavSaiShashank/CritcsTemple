@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { auth } from '../services/firebase'
 import { fetchMovieFromOMDb, searchMovies, fetchShowFromTMDB, searchShows, createReview, exportDataVault, getProxyImageUrl } from '../services/api'
 import { useNavigate, Link } from 'react-router-dom';
+import { Capacitor } from '@capacitor/core'
 import ReviewForm from '../components/ReviewForm'
 import {
     Search, Plus, LogOut, TrendingUp, Sparkles, Image as ImageIcon,
@@ -144,6 +145,12 @@ const Dashboard = () => {
                 content_type: isTV ? 'tv' : 'movie',
                 release_year: isTV ? data.first_air_year : data.release_year,
                 director: isTV ? (data.crew?.find(c => c.job === 'Executive Producer')?.name || 'Showrunner') : (data.crew?.find(c => c.job === 'Director')?.name || 'Visionary')
+            }
+            // Trigger Haptics on Selection
+            if (Capacitor.isNativePlatform()) {
+                import('@capacitor/haptics').then(({ Haptics, ImpactStyle }) => {
+                    Haptics.impact({ style: ImpactStyle.Medium }).catch(() => {});
+                });
             }
             setMovie(normalized)
             setSearchResults([])

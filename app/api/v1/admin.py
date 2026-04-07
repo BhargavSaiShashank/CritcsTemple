@@ -21,6 +21,7 @@ from app.services.category_service import category_service
 from app.services.prediction_service import prediction_service
 from app.core.auth import get_current_admin
 from app.core.utils import calculate_overall_score
+from app.services.adversary_service import adversary_service
 import os
 import shutil
 from slugify import slugify
@@ -412,3 +413,69 @@ async def proxy_image(url: str = Query(...)):
             )
         except Exception as e:
             raise HTTPException(status_code=502, detail=f"Failed to fetch image: {str(e)}")
+
+@router.post("/challenge")
+async def challenge_review(
+    payload: Dict[str, Any],
+    admin: dict = Depends(get_current_admin)
+):
+    """
+    Summon the Adversary to challenge the critic's current draft.
+    """
+    movie_title = payload.get("movie_title", "Untitled Movie")
+    content = payload.get("content", "")
+    aspects = payload.get("aspects", {})
+    rating = payload.get("overall_rating", 5.0)
+
+    challenge = await adversary_service.generate_challenge(
+        movie_title=movie_title,
+        content=content,
+        aspects=aspects,
+        rating=rating
+    )
+    
+    if "error" in challenge:
+        raise HTTPException(status_code=500, detail=challenge["error"])
+        
+    return challenge
+
+@router.post("/benchmark")
+async def get_scoring_benchmark(
+    payload: Dict[str, Any],
+    db = Depends(get_database),
+    admin: dict = Depends(get_current_admin)
+):
+    """
+    Get the AI's 'Truth Profile'. Generates once and persists forever for a movie.
+    """
+    movie_title = payload.get("movie_title")
+    genres = payload.get("genres", [])
+    release_year = payload.get("release_year")
+
+    if not movie_title:
+        raise HTTPException(status_code=400, detail="Movie title required")
+
+    # Check for existing benchmark (Immutable Record)
+    # Using title and year as a unique key for benchmarks
+    benchmark_id = f"benchmark_{slugify(movie_title)}_{release_year or 'na'}"
+    existing = await db.benchmarks.find_one({"_id": benchmark_id})
+    if existing:
+        return existing["data"]
+
+    # Generate new benchmark (The First Manifestation)
+    benchmark_data = await adversary_service.generate_scoring_benchmark(
+        movie_title=movie_title,
+        genres=genres,
+        release_year=release_year
+    )
+    
+    if benchmark_data:
+        await db.benchmarks.insert_one({
+            "_id": benchmark_id,
+            "movie_title": movie_title,
+            "release_year": release_year,
+            "data": benchmark_data,
+            "created_at": datetime.utcnow()
+        })
+    
+    return benchmark_data

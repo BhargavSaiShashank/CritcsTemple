@@ -91,6 +91,7 @@ class ReviewBase(BaseModel):
     claps: int = 0
     scheduled_date: Optional[datetime] = None
     reactions: Reactions = Field(default_factory=Reactions)
+    adversary_footnote: Optional[str] = None
 
 class ReviewCreate(ReviewBase):
     pass
@@ -122,6 +123,7 @@ class ReviewUpdate(BaseModel):
     trailer_url: Optional[str] = None
     movie_year: Optional[int] = None
     scheduled_date: Optional[datetime] = None
+    adversary_footnote: Optional[str] = None
 
 class ReviewInDB(ReviewBase):
     id: Optional[str] = Field(None, alias="_id")

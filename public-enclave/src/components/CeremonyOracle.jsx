@@ -4,6 +4,8 @@ import { Sparkles, X, Send, Loader2 } from 'lucide-react';
 import { API_URL } from '../services/api';
 import axios from 'axios';
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, Radar, Tooltip } from 'recharts';
+import { Capacitor } from '@capacitor/core';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 const TypeWriter = ({ text, speed = 20, onComplete }) => {
     const [displayedText, setDisplayedText] = useState('');
@@ -107,7 +109,12 @@ const CeremonyOracle = () => {
                 animate={{ scale: 1, opacity: 1 }}
                 whileHover={{ scale: 1.1, rotate: 5 }}
                 whileTap={{ scale: 0.9 }}
-                onClick={() => setIsOpen(true)}
+                onClick={() => {
+                    setIsOpen(true);
+                    if (Capacitor.isNativePlatform()) {
+                        Haptics.impact({ style: ImpactStyle.Medium });
+                    }
+                }}
                 style={{
                     position: 'fixed',
                     bottom: window.innerWidth < 768 ? '20px' : '30px',
@@ -258,8 +265,8 @@ const CeremonyOracle = () => {
                                             {m.propheticDNA && (
                                                 <div style={{ marginTop: '16px', height: '240px', width: '100%', minHeight: '240px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', padding: '12px', position: 'relative', display: 'block' }}>
                                                     <div style={{ textAlign: 'center', fontSize: '9px', fontWeight: 900, color: 'rgba(255,255,255,0.3)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Prophetic DNA Projection</div>
-                                                    <div style={{ position: 'absolute', inset: '40px 12px 12px 12px' }}>
-                                                        <ResponsiveContainer width="99%" height="99%" minHeight={180}>
+                                                    <div style={{ position: 'absolute', inset: '40px 12px 12px 12px', minHeight: '200px' }}>
+                                                        <ResponsiveContainer width="99%" height="99%" minHeight={200}>
                                                             <RadarChart cx="50%" cy="50%" outerRadius="70%" data={Object.entries(m.propheticDNA).map(([k, v]) => ({ subject: k.toUpperCase(), A: v }))}>
                                                                 <PolarGrid stroke="rgba(255,255,255,0.1)" />
                                                                 <PolarAngleAxis dataKey="subject" tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 8 }} />

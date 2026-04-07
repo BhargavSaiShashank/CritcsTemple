@@ -75,7 +75,7 @@ async def get_show_details(tmdb_id: str, db = Depends(get_database)):
 
 @router.get("/proxy-image")
 async def proxy_image(url: str, quality: str = None):
-    """Bypass heavyweight server proxying by redirecting the client directly to the optimized TMDB/external CDN."""
+    """Proxies an image to bypass CORS and network blocks by streaming bytes directly."""
     if quality and "image.tmdb.org/t/p/" in url:
         for size in ['/original/', '/w1280/', '/w780/', '/w500/', '/w300/', '/w154/', '/w92/']:
             if size in url:
@@ -89,8 +89,22 @@ async def proxy_image(url: str, quality: str = None):
                     url = url.replace(size, '/original/')
                 break
 
-    # 302 Redirect lets the browser handle the heavy download directly from the high-speed CDN
-    return RedirectResponse(url=url)
+    async with httpx.AsyncClient(verify=False) as client:
+        try:
+            response = await client.get(url, timeout=10.0)
+            response.raise_for_status()
+            
+            return StreamingResponse(
+                iter([response.content]), 
+                media_type=response.headers.get("content-type", "image/jpeg"),
+                headers={
+                    "Cache-Control": "public, max-age=86400",
+                    "Access-Control-Allow-Origin": "*"
+                }
+            )
+        except Exception as e:
+            # Fallback to redirect if proxy fails or raise error
+            return RedirectResponse(url=url)
 
 @router.get("/settings")
 async def get_public_settings(db = Depends(get_database)):

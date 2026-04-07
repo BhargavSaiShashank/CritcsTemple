@@ -7,13 +7,14 @@ import {
     Sparkles, Eye, Download, List, Loader2, Quote, Zap, Camera, Music, Heart,
     TrendingUp, Award, Layers, Ghost, Filter, ChevronRight, Plus, MoreVertical, Archive, AlignLeft
 } from 'lucide-react'
-import { createReview, updateReview, getProxyImageUrl, getRatingTimeline, updateDynamicRating, resetRatingTimeline } from '../services/api'
+import { createReview, updateReview, getProxyImageUrl, getRatingTimeline, updateDynamicRating, resetRatingTimeline, challengeReview, getScoringBenchmark } from '../services/api'
 import SanctuaryCard from './SanctuaryCard';
 import PublicPreview from './PublicPreview';
 import RatingTimelineGraph from './RatingTimelineGraph';
 import html2canvas from 'html2canvas';
 import { VERDICT_SCALE } from '../constants/verdictScale';
 import { History, RefreshCw } from 'lucide-react';
+import { Capacitor } from '@capacitor/core'
 
 const CRITICAL_PRESETS = [
     { 
@@ -82,6 +83,142 @@ const aspectGroups = [
     }
 ]
 
+const AspectItem = React.memo(({ 
+    aspect, 
+    idx, 
+    score, 
+    comment,
+    activeAspectIdx, 
+    activeSlider, 
+    setActiveAspectIdx, 
+    setActiveSlider, 
+    getOpinion, 
+    handleAspectChange 
+}) => {
+    return (
+        <motion.div
+            layout
+            onMouseEnter={() => {
+                if (!Capacitor.isNativePlatform()) {
+                    setActiveSlider(aspect);
+                    setActiveAspectIdx(idx);
+                }
+            }}
+            onMouseLeave={() => {
+                if (!Capacitor.isNativePlatform()) {
+                    setActiveSlider(null);
+                }
+            }}
+            className={`space-y-4 group/item p-3 md:p-4 rounded-3xl transition-all duration-500 relative ${
+                activeAspectIdx === idx ? 'bg-amber-500/5 ring-1 ring-amber-500/20 shadow-[0_0_30px_rgba(245,158,11,0.05)]' : ''
+            }`}
+        >
+            <div className="flex justify-between items-end px-1">
+                <div className="flex items-center gap-3">
+                    <label className={`text-[9px] font-black uppercase tracking-[0.4em] transition-colors ${
+                        activeAspectIdx === idx ? 'text-amber-500' : 'text-amber-500/40 group-hover/item:text-amber-500'
+                    }`}>
+                        {aspect.replace(/_/g, ' ')}
+                    </label>
+                    {activeAspectIdx === idx && (
+                        <motion.div layoutId="focus-dot" className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_10px_#f59e0b]" />
+                    )}
+                </div>
+                <span className="text-2xl md:text-4xl font-black text-white italic tracking-tighter">{score}</span>
+            </div>
+            <div className="relative">
+                <AnimatePresence>
+                    {(activeSlider === aspect) && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10, scale: 0.9, filter: 'blur(10px)' }}
+                            animate={{ 
+                                opacity: 1, 
+                                y: Capacitor.isNativePlatform() ? -165 : -115, 
+                                scale: 1, 
+                                filter: 'blur(0px)' 
+                            }}
+                            exit={{ opacity: 0, y: -20, scale: 0.95, filter: 'blur(10px)' }}
+                            className="absolute left-1/2 -translate-x-1/2 p-6 rounded-[28px] pointer-events-none z-[100] backdrop-blur-3xl shadow-[0_40px_100px_rgba(0,0,0,0.8)] overflow-hidden border border-white/20 flex flex-col items-center gap-3 min-w-[320px] max-w-[400px]"
+                            style={{ 
+                                background: `linear-gradient(135deg, rgba(8,8,8,0.98), ${(getOpinion(aspect, score) || {color: '#6366f1'}).color}25)`,
+                                boxShadow: `0 0 50px ${(getOpinion(aspect, score) || {color: '#6366f1'}).color}15 inset, 0 40px 100px rgba(0,0,0,0.8)`
+                            }}
+                        >
+                            <div className="absolute top-0 left-0 w-full h-[1px] bg-white/20 animate-pulse" />
+                            <div 
+                                className="absolute top-0 left-0 w-full h-1 opacity-60"
+                                style={{ background: (getOpinion(aspect, score) || {color: '#6366f1'}).color }}
+                            />
+
+                            <div className="flex items-center gap-3 mb-1">
+                                {(getOpinion(aspect, score)?.text === "CYNICAL" || getOpinion(aspect, score)?.text === "DISSIDENT") ? (
+                                    <Ghost size={14} style={{ color: (getOpinion(aspect, score) || {color: '#6366f1'}).color }} />
+                                ) : getOpinion(aspect, score)?.text === "OBJECTIVE" ? (
+                                    <Sparkles size={14} style={{ color: (getOpinion(aspect, score) || {color: '#6366f1'}).color }} />
+                                ) : (
+                                    <TrendingUp size={14} style={{ color: (getOpinion(aspect, score) || {color: '#6366f1'}).color }} />
+                                )}
+                                <span 
+                                    className="text-[11px] font-black tracking-[0.4em] italic text-center"
+                                    style={{ color: (getOpinion(aspect, score) || {color: '#6366f1'}).color }}
+                                >
+                                    {(getOpinion(aspect, score) || { text: "CALIBRATING" }).text}
+                                </span>
+                            </div>
+
+                            <p className="text-[11px] font-medium text-white/70 italic text-center leading-[1.8] tracking-tight">
+                                {(getOpinion(aspect, score) || { reason: "AI is analyzing your input patterns against the cinematic baseline." }).reason}
+                            </p>
+
+                            <div className="mt-2 flex items-center gap-2">
+                                <div className="w-1 h-1 rounded-full bg-white/20" />
+                                <span className="text-[7px] font-black uppercase tracking-widest text-white/20">Archive Logic Baseline</span>
+                                <div className="w-1 h-1 rounded-full bg-white/20" />
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+                <input
+                    type="range" min="0" max="10" step="0.1"
+                    value={score}
+                    onFocus={() => {
+                        setActiveAspectIdx(idx)
+                        setActiveSlider(aspect)
+                    }}
+                    onBlur={() => {
+                        if (!Capacitor.isNativePlatform()) setActiveSlider(null);
+                    }}
+                    onMouseDown={() => {
+                        setActiveAspectIdx(idx)
+                        setActiveSlider(aspect)
+                    }}
+                    onMouseUp={() => {
+                        if (!Capacitor.isNativePlatform()) setActiveSlider(null);
+                    }}
+                    onTouchStart={() => {
+                        setActiveAspectIdx(idx)
+                        setActiveSlider(aspect)
+                    }}
+                    onTouchEnd={() => {
+                        setTimeout(() => setActiveSlider(null), 2500)
+                    }}
+                    onInput={() => {
+                        if (activeSlider !== aspect) setActiveSlider(aspect);
+                    }}
+                    onChange={e => handleAspectChange(aspect, 'score', parseFloat(e.target.value))}
+                    className="w-full h-1 bg-white/5 rounded-full appearance-none cursor-pointer accent-amber-500 relative z-30"
+                />
+            </div>
+            <textarea
+                placeholder="Add precision thought..."
+                value={comment}
+                onChange={e => handleAspectChange(aspect, 'comment', e.target.value)}
+                className="w-full bg-transparent text-sm text-white/30 outline-none border-l border-white/5 focus:border-amber-500/30 pl-6 py-2 h-16 transition-all resize-none italic group-hover/item:text-white/60"
+            />
+        </motion.div>
+    );
+});
+
 const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -94,6 +231,10 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
     const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1280);
     const [ratingTimeline, setRatingTimeline] = useState(null);
     const [phaseLoading, setPhaseLoading] = useState(false);
+    const [adversaryChallenge, setAdversaryChallenge] = useState(null);
+    const [isChallenging, setIsChallenging] = useState(false);
+    const [scoringBenchmark, setScoringBenchmark] = useState(null);
+    const [activeSlider, setActiveSlider] = useState(null);
 
 
 
@@ -146,6 +287,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                 oscar_rank: initialData.oscar_rank || 0,
                 scheduled_date: initialData.scheduled_date ? initialData.scheduled_date.slice(0, 16) : '',
                 content_type: initialData.content_type || 'movie',
+                adversary_footnote: initialData.adversary_footnote || null,
                 micro_calibration: initialData.micro_calibration || null,
                 aspects: { ...defaultAspects, ...normalizedInitialAspects }
             };
@@ -195,6 +337,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
             oscar_rank: 0,
             scheduled_date: '',
             content_type: movie?.content_type || 'movie',
+            adversary_footnote: null,
             aspects: defaultAspects
         };
     });
@@ -236,6 +379,52 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
         };
         fetchTimeline();
     }, [movie]);
+
+    const fetchScoringBenchmark = async () => {
+        if (!formData.movie_title) return;
+        try {
+            const response = await getScoringBenchmark({
+                movie_title: formData.movie_title,
+                genres: formData.tags.filter(t => !['must_watch', 'featured', 'oscar', 'critique_ritual', 'divine_intelligence'].includes(t)),
+                release_year: formData.movie_year
+            });
+            if (response.data) setScoringBenchmark(response.data);
+        } catch (e) {
+            console.error("Benchmark failed", e);
+        }
+    };
+
+    React.useEffect(() => {
+        if (formData.movie_title) {
+            fetchScoringBenchmark();
+        }
+    }, [formData.movie_title]);
+
+    const getOpinion = (aspect, score) => {
+        if (!scoringBenchmark) return null;
+        const benchmark = scoringBenchmark[aspect] || scoringBenchmark[aspect.toLowerCase()];
+        if (!benchmark) return null;
+        
+        const ideal = typeof benchmark === 'object' ? benchmark.score : benchmark;
+        const delta = score - ideal;
+        
+        const getCustomReason = () => {
+            if (typeof benchmark !== 'object') return null;
+            if (delta > 0.5) return benchmark.overvalued_reason;
+            if (delta < -0.5) return benchmark.undervalued_reason;
+            return benchmark.reason;
+        };
+
+        const customReason = getCustomReason();
+        
+        if (delta > 2.2) return { text: "CRITICAL OUTLIER", color: "#dc2626", reason: customReason || "Significantly above the viewer consensus." };
+        if (delta > 1.4) return { text: "OVERSTATED", color: "#f43f5e", reason: customReason || "Highly generous interpretation." };
+        if (delta > 0.5) return { text: "LENIENT", color: "#fb923c", reason: customReason || "A bit more generous than the average viewer." };
+        if (delta > -0.5) return { text: "ON POINT", color: "#10b981", reason: customReason || "Perfectly aligned with cinematic truth." };
+        if (delta > -1.4) return { text: "CONSERVATIVE", color: "#3b82f6", reason: customReason || "Slightly more critical than the consensus." };
+        if (delta > -2.2) return { text: "UNDERSTATED", color: "#6366f1", reason: customReason || "Focusing heavily on perceived flaws." };
+        return { text: "HARSH OUTLIER", color: "#a855f7", reason: customReason || "Significantly below the viewer consensus." };
+    };
 
     const handlePhaseUpdate = async (phaseName) => {
         // Ensure we have a valid movie_id
@@ -598,6 +787,11 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
     };
 
     const handleAspectChange = (aspect, field, value) => {
+        if (field === 'score' && Capacitor.isNativePlatform()) {
+            import('@capacitor/haptics').then(({ Haptics, ImpactStyle }) => {
+                Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
+            });
+        }
         setFormData(prev => ({
             ...prev,
             aspects: {
@@ -689,7 +883,10 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
     return (
         <div className="relative">
             {/* Global Actions Floating Buttons */}
-            <div className="fixed top-12 md:top-10 right-6 md:right-10 z-[100] flex items-center gap-3">
+            <div 
+                className="fixed right-6 md:right-10 z-[100] flex items-center gap-3"
+                style={{ top: 'calc(var(--safe-top) + 12px)' }}
+            >
                 {/* Critical Presets Dropdown */}
                 <div className="relative">
                     <button
@@ -884,7 +1081,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                     <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
                     <Sparkles className="mx-auto mb-4 md:mb-6 text-amber-500/40 animate-pulse" size={32} />
                     <div className="flex flex-col items-center gap-1 mb-4">
-                        <p className="text-[10px] font-black uppercase tracking-[0.6em] text-white/20">Temple Accuracy</p>
+                        <p className="text-[10px] font-black uppercase tracking-[0.6em] text-white/20">Review Rating</p>
                         <div className="flex items-center gap-3">
                             <span className={`text-[8px] font-black tracking-widest ${!showLegacy ? 'text-amber-500' : 'text-white/20'}`}>V8.0</span>
                             <button 
@@ -944,7 +1141,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                     </div>
                     <div className="h-1 w-24 bg-gradient-to-r from-transparent via-amber-500/50 to-transparent mx-auto mb-4" />
                     <p className={`text-[10px] font-black uppercase tracking-[0.4em] transition-colors ${showLegacy ? 'text-indigo-400/60' : 'text-amber-500'}`}>
-                        {showLegacy ? 'Legacy Archive' : 'Master Distinction'}
+                        {showLegacy ? 'Legacy Archive' : 'Final Score'}
                     </p>
                 </motion.div>
 
@@ -973,7 +1170,7 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                     <div className="flex items-center justify-between">
                         <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 flex items-center gap-2">
                             <History size={14} className="text-indigo-400" />
-                            Evolution Registry
+                            Rating History
                         </h3>
                         {ratingTimeline && (
                             <button
@@ -1028,51 +1225,32 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -50 }}
                         transition={{ type: 'spring', damping: 30, stiffness: 150 }}
-                        className="glass-obsidian rounded-[40px] md:rounded-[60px] p-8 md:p-16 grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 relative overflow-hidden"
+                        className="glass-obsidian rounded-[40px] md:rounded-[60px] p-8 md:p-16 grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 relative"
                     >
                         <div className="absolute top-0 right-0 p-8 md:p-12 text-white/[0.02] font-black text-7xl md:text-9xl pointer-events-none select-none italic">
                             {activeGroup + 1}
                         </div>
                         {aspectGroups[activeGroup].aspects.map((aspect, idx) => (
-                            <div 
-                                key={aspect} 
-                                className={`space-y-6 group/item p-4 rounded-3xl transition-all duration-500 ${
-                                    activeAspectIdx === idx ? 'bg-amber-500/5 ring-1 ring-amber-500/20 shadow-[0_0_30px_rgba(245,158,11,0.05)]' : ''
-                                }`}
-                            >
-                                <div className="flex justify-between items-end px-1">
-                                    <div className="flex items-center gap-3">
-                                        <label className={`text-[9px] font-black uppercase tracking-[0.4em] transition-colors ${
-                                            activeAspectIdx === idx ? 'text-amber-500' : 'text-amber-500/40 group-hover/item:text-amber-500'
-                                        }`}>
-                                            {aspect.replace(/_/g, ' ')}
-                                        </label>
-                                        {activeAspectIdx === idx && (
-                                            <motion.div layoutId="focus-dot" className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_10px_#f59e0b]" />
-                                        )}
-                                    </div>
-                                    <span className="text-3xl md:text-4xl font-black text-white italic tracking-tighter">{(formData.aspects[aspect]?.score ?? 0)}</span>
-                                </div>
-                                <input
-                                    type="range" min="0" max="10" step="0.1"
-                                    value={formData.aspects[aspect]?.score ?? 0}
-                                    onChange={e => handleAspectChange(aspect, 'score', parseFloat(e.target.value))}
-                                    className="w-full h-1 bg-white/5 rounded-full appearance-none cursor-pointer accent-amber-500"
-                                />
-                                <textarea
-                                    placeholder="Add precision thought..."
-                                    value={formData.aspects[aspect]?.comment ?? ''}
-                                    onChange={e => handleAspectChange(aspect, 'comment', e.target.value)}
-                                    className="w-full bg-transparent text-sm text-white/30 outline-none border-l border-white/5 focus:border-amber-500/30 pl-6 py-2 h-16 transition-all resize-none italic group-hover/item:text-white/60"
-                                />
-                            </div>
+                            <AspectItem 
+                                key={aspect}
+                                aspect={aspect}
+                                idx={idx}
+                                score={formData.aspects[aspect]?.score ?? 0}
+                                comment={formData.aspects[aspect]?.comment ?? ''}
+                                activeAspectIdx={activeAspectIdx}
+                                activeSlider={activeSlider}
+                                setActiveAspectIdx={setActiveAspectIdx}
+                                setActiveSlider={setActiveSlider}
+                                getOpinion={getOpinion}
+                                handleAspectChange={handleAspectChange}
+                            />
                         ))}
                     </motion.div>
                 </AnimatePresence>
 
                 <div className="glass-obsidian rounded-[40px] md:rounded-[60px] p-8 md:p-16 space-y-12 md:space-y-16">
                     <div className="space-y-6">
-                        <label className="text-[10px] font-black uppercase tracking-[0.6em] text-white/10">The Essence</label>
+                        <label className="text-[10px] font-black uppercase tracking-[0.6em] text-white/10">Summary</label>
                         <input
                             value={formData.summary}
                             onChange={e => setFormData({ ...formData, summary: e.target.value })}
@@ -1264,6 +1442,117 @@ const ReviewForm = ({ movie, onSubmit, loading, initialData }) => {
                                 <Plus size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/10" />
                             </div>
                         </div>
+                    </div>
+
+                    {/* ── THE ADVERSARY (AI CHALLENGE) ── */}
+                    <div className="py-12 border-t border-white/5 space-y-8">
+                        <div className="flex items-center justify-between">
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-black uppercase tracking-[0.6em] text-red-500/40 flex items-center gap-2">
+                                    <Ghost size={12} /> AI Review Critique
+                                </label>
+                                <p className="text-[9px] font-bold text-white/5 uppercase tracking-widest">Get an automated second opinion on your review</p>
+                            </div>
+                            <button
+                                onClick={async () => {
+                                    if (isChallenging) return;
+                                    setIsChallenging(true);
+                                    try {
+                                        const res = await challengeReview({
+                                            movie_title: movie?.title || initialData?.movie_title,
+                                            content: formData.content,
+                                            aspects: formData.aspects,
+                                            overall_rating: scoringResult.score
+                                        });
+                                        setAdversaryChallenge(res.data);
+                                    } catch (err) {
+                                        console.error("Critique generation failed:", err);
+                                    } finally {
+                                        setIsChallenging(false);
+                                    }
+                                }}
+                                disabled={isChallenging}
+                                className={`px-6 py-2.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-3 ${
+                                    isChallenging ? 'bg-white/5 text-white/20' : 'bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-black shadow-[0_0_20px_rgba(239,68,68,0.1)]'
+                                }`}
+                            >
+                                {isChallenging ? <Loader2 size={12} className="animate-spin" /> : 'Generate Critique'}
+                            </button>
+                        </div>
+
+                        <AnimatePresence>
+                            {adversaryChallenge && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="bg-red-500/[0.03] border border-red-500/10 rounded-[32px] p-8 md:p-10 space-y-8"
+                                >
+                                    <div className="space-y-4">
+                                        <div className="flex items-center gap-3 text-red-500/60">
+                                            <Zap size={14} />
+                                            <span className="text-[10px] font-black uppercase tracking-[0.2em]">AI Feedback</span>
+                                        </div>
+                                        <p className="text-sm md:text-base text-white/60 font-medium italic leading-relaxed">
+                                            "{adversaryChallenge.critique}"
+                                        </p>
+                                    </div>
+
+                                    {adversaryChallenge.data && (
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                            {Object.entries(adversaryChallenge.data).map(([key, val]) => (
+                                                <div key={key} className="space-y-3 bg-red-500/[0.05] p-5 rounded-2xl border border-red-500/5">
+                                                    <span className="text-[8px] font-black uppercase tracking-widest text-red-500/40">
+                                                        {key.replace('_', ' ')}
+                                                    </span>
+                                                    <p className="text-[10px] font-bold text-white/40 leading-relaxed">
+                                                        {val}
+                                                    </p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                    
+                                    <button 
+                                        onClick={() => setAdversaryChallenge(null)}
+                                        className="text-[8px] font-black uppercase tracking-widest text-white/10 hover:text-white/30 transition-colors"
+                                    >
+                                        Clear Feedback
+                                    </button>
+
+                                    {/* SEAl BUTTON */}
+                                    <button
+                                        onClick={() => {
+                                            setFormData({ ...formData, adversary_footnote: adversaryChallenge.critique });
+                                            setAdversaryChallenge(null);
+                                        }}
+                                        className="ml-6 px-6 py-2.5 rounded-full bg-red-500 text-black text-[9px] font-black uppercase tracking-[0.2em] hover:bg-white transition-all shadow-[0_0_30px_rgba(239,68,68,0.2)]"
+                                    >
+                                        Add as Footnote
+                                    </button>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        {/* SHOW SEALED FOOTNOTE IF EXISTS */}
+                        {formData.adversary_footnote && (
+                            <div className="bg-red-500/5 border border-red-500/10 rounded-2xl p-6 flex items-start gap-4">
+                                <div className="p-2 bg-red-500/10 rounded-lg">
+                                    <Ghost size={14} className="text-red-500" />
+                                </div>
+                                <div className="space-y-1 flex-1">
+                                    <span className="text-[8px] font-black uppercase tracking-widest text-red-500/40">Saved AI Critique Footnote</span>
+                                    <p className="text-[10px] font-bold text-white/60 italic leading-relaxed">
+                                        "{formData.adversary_footnote}"
+                                    </p>
+                                </div>
+                                <button 
+                                    onClick={() => setFormData({ ...formData, adversary_footnote: null })}
+                                    className="text-white/10 hover:text-red-500 transition-colors"
+                                >
+                                    <Trash2 size={12} />
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     <div className="py-12 border-y border-white/5 space-y-10">

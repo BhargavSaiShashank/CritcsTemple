@@ -17344,3 +17344,122 @@ fastapi.exceptions.ResponseValidationError: 4 validation errors:
   File "C:\Users\shahs\Review\app\api\v1\admin.py", line 324, in update_category
     PUT /api/v1/admin/categories/{category_id}
 
+
+--- 2026-04-07 21:42:00.935256 ---
+GLOBAL ERROR: E11000 duplicate key error collection: review.benchmarks index: _id_ dup key: { _id: "benchmark_ante-sundaraniki_2022" }, full error: {'index': 0, 'code': 11000, 'errmsg': 'E11000 duplicate key error collection: review.benchmarks index: _id_ dup key: { _id: "benchmark_ante-sundaraniki_2022" }', 'keyPattern': {'_id': 1}, 'keyValue': {'_id': 'benchmark_ante-sundaraniki_2022'}}
+Traceback (most recent call last):
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\starlette\middleware\base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\starlette\_utils.py", line 87, in collapse_excgroups
+    raise exc
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\shahs\Review\app\main.py", line 39, in log_origin_middleware
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\starlette\middleware\cors.py", line 95, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\starlette\middleware\cors.py", line 153, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\starlette\routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\starlette\routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\starlette\routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\fastapi\routing.py", line 119, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\fastapi\routing.py", line 105, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\fastapi\routing.py", line 424, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\fastapi\routing.py", line 312, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\shahs\Review\app\api\v1\admin.py", line 473, in get_scoring_benchmark
+    await db.benchmarks.insert_one({
+    ...<5 lines>...
+    })
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\concurrent\futures\thread.py", line 86, in run
+    result = ctx.run(self.task)
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\concurrent\futures\thread.py", line 73, in run
+    return fn(*args, **kwargs)
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pymongo\synchronous\collection.py", line 891, in insert_one
+    self._insert_one(
+    ~~~~~~~~~~~~~~~~^
+        document,
+        ^^^^^^^^^
+    ...<5 lines>...
+        comment=comment,
+        ^^^^^^^^^^^^^^^^
+    ),
+    ^
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pymongo\synchronous\collection.py", line 831, in _insert_one
+    self._database.client._retryable_write(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        acknowledged, _insert_command, session, operation=_Op.INSERT
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2083, in _retryable_write
+    return self._retry_with_session(retryable, func, s, bulk, operation, operation_id)
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1968, in _retry_with_session
+    return self._retry_internal(
+           ~~~~~~~~~~~~~~~~~~~~^
+        func=func,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        operation_id=operation_id,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pymongo\_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2014, in _retry_internal
+    ).run()
+      ~~~^^
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2763, in run
+    return self._read() if self._is_read else self._write()
+                                              ~~~~~~~~~~~^^
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2895, in _write
+    return self._func(self._session, conn, self._retryable)  # type: ignore
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pymongo\synchronous\collection.py", line 829, in _insert_command
+    _check_write_command_response(result)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pymongo\helpers_shared.py", line 322, in _check_write_command_response
+    _raise_last_write_error(write_errors)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\shahs\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pymongo\helpers_shared.py", line 292, in _raise_last_write_error
+    raise DuplicateKeyError(error.get("errmsg"), 11000, error)
+pymongo.errors.DuplicateKeyError: E11000 duplicate key error collection: review.benchmarks index: _id_ dup key: { _id: "benchmark_ante-sundaraniki_2022" }, full error: {'index': 0, 'code': 11000, 'errmsg': 'E11000 duplicate key error collection: review.benchmarks index: _id_ dup key: { _id: "benchmark_ante-sundaraniki_2022" }', 'keyPattern': {'_id': 1}, 'keyValue': {'_id': 'benchmark_ante-sundaraniki_2022'}}
+
