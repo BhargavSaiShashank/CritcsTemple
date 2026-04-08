@@ -55,8 +55,12 @@ class CategoryService:
             if content_type:
                 query["content_type"] = content_type
             
-            # Sort by rating (highest to lowest)
-            reviews_cursor = db.reviews.find(query).sort("overall_rating", -1).limit(limit)
+            # Optimization: Use projection to skip large fields
+            projection = {
+                "movie_title": 1, "movie_poster_url": 1, "overall_rating": 1, 
+                "slug": 1, "verdict": 1, "movie_year": 1, "content_type": 1
+            }
+            reviews_cursor = db.reviews.find(query, projection).sort("overall_rating", -1).limit(limit)
             populated_items = await reviews_cursor.to_list(length=limit)
             cat["items"] = [self.serialize_doc(r) for r in populated_items]
         else:
@@ -64,8 +68,12 @@ class CategoryService:
             slugs = cat.get("items", [])
             query = {"slug": {"$in": slugs}, "status": "published"}
             
-            # Fetch reviews
-            reviews_cursor = db.reviews.find(query)
+            # Optimization: Use projection
+            projection = {
+                "movie_title": 1, "movie_poster_url": 1, "overall_rating": 1, 
+                "slug": 1, "verdict": 1, "movie_year": 1, "content_type": 1
+            }
+            reviews_cursor = db.reviews.find(query, projection)
             reviews = await reviews_cursor.to_list(length=50)
             
             # Create a lookup map to preserve item array order

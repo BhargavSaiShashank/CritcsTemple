@@ -60,8 +60,14 @@ class OracleAnalyticsService:
         return "en"
 
     async def get_legacy_stats(self, db: AsyncIOMotorDatabase) -> Dict[str, Any]:
-        cursor = db.reviews.find({"status": "published"})
-        reviews = await cursor.to_list(length=2000)
+        # Optimization: Use projection to exclude massive content fields (content, summary, etc.)
+        projection = {
+            "movie_id": 1, "movie_title": 1, "overall_rating": 1, 
+            "published_at": 1, "created_at": 1, "language": 1, 
+            "tags": 1, "aspects": 1, "genre": 1
+        }
+        cursor = db.reviews.find({"status": "published"}, projection)
+        reviews = await cursor.to_list(length=3000) # Increased limit but with projection it's safe
         
         if not reviews:
             return {"error": "No data found"}
@@ -89,9 +95,9 @@ class OracleAnalyticsService:
                 lang = id_to_lang.get(mid)
                 
             if not lang or lang == "en":
-                # Try tags or content if ID lookup failed or returned default 'en'
+                # Try tags or title if ID lookup failed or returned default 'en'
                 tags = [t.lower() for t in r.get("tags", [])]
-                text_to_scan = (r.get("content", "") + " " + r.get("summary", "") + " " + r.get("movie_title", "")).lower()
+                text_to_scan = (r.get("movie_title", "")).lower()
                 
                 found_lang = None
                 # Check mapping (check both code and full name)

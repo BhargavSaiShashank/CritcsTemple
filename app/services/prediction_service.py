@@ -154,9 +154,9 @@ class PredictionService:
             }}
         )
 
-        # Process all pending predictions for this movie
+        # Process all pending predictions for this movie (Safe limit of 2,000 to prevent OOM)
         cursor = db.predictions.find({"upcoming_movie_id": movie_id, "status": "pending"})
-        predictions = await cursor.to_list(length=None)
+        predictions = await cursor.to_list(length=2000)
         
         correct_uids = []
         incorrect_uids = []

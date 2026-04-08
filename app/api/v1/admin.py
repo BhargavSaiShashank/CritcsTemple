@@ -470,12 +470,16 @@ async def get_scoring_benchmark(
     )
     
     if benchmark_data:
-        await db.benchmarks.insert_one({
-            "_id": benchmark_id,
-            "movie_title": movie_title,
-            "release_year": release_year,
-            "data": benchmark_data,
-            "created_at": datetime.utcnow()
-        })
+        try:
+            await db.benchmarks.insert_one({
+                "_id": benchmark_id,
+                "movie_title": movie_title,
+                "release_year": release_year,
+                "data": benchmark_data,
+                "created_at": datetime.utcnow()
+            })
+        except Exception:
+            # If it was inserted by a parallel request, we just ignore the error
+            pass
     
     return benchmark_data

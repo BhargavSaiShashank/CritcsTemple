@@ -12,7 +12,9 @@ class AnalyticsService:
             raise HTTPException(status_code=503, detail="Database Offline")
             
         try:
-            reviews = await db.reviews.find({"status": "published"}).to_list(1000)
+            # Optimization: Use projection to only fetch aspects
+            projection = {"aspects": 1}
+            reviews = await db.reviews.find({"status": "published"}, projection).to_list(1000)
             
             aspect_keys = [
                 "story", "screenplay", "originality", "opening", "climax",
@@ -65,7 +67,12 @@ class AnalyticsService:
 
         try:
             # Top 5 Trending by Claps
-            trending_cursor = db.reviews.find({"status": "published"}).sort("claps", -1).limit(5)
+            # Optimization: Use projection
+            projection = {
+                "movie_title": 1, "slug": 1, "claps": 1, 
+                "verdict": 1, "movie_poster_url": 1
+            }
+            trending_cursor = db.reviews.find({"status": "published"}, projection).sort("claps", -1).limit(5)
             trending_list = await trending_cursor.to_list(5)
             trending = [
                 {
@@ -81,8 +88,7 @@ class AnalyticsService:
             # We calculate total reactions: agree + disagree + havent_seen
             pipeline = [
                 {"$match": {"status": "published"}},
-                {
-                    "$addFields": {
+                {"$addFields": {
                         "total_reactions": {
                             "$add": [
                                 {"$ifNull": ["$reactions.agree", 0]},
@@ -92,6 +98,10 @@ class AnalyticsService:
                         }
                     }
                 },
+                {"$project": {
+                    "movie_title": 1, "slug": 1, "reactions": 1, 
+                    "total_reactions": 1, "movie_poster_url": 1
+                }},
                 {"$sort": {"total_reactions": -1}},
                 {"$limit": 5}
             ]
