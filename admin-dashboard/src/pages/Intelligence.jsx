@@ -4,7 +4,7 @@ import {
     Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip
 } from 'recharts';
 import {
-    TrendingUp, History, LayoutDashboard, Loader2, Star, ChevronRight, Filter, Search, Sparkles
+    TrendingUp, History, LayoutDashboard, Loader2, Star, ChevronRight, Filter, Search, Sparkles, X
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { getReviews, getDNAAnalytics, getEngagementAnalytics, deleteReview, getProxyImageUrl } from '../services/api';
@@ -67,9 +67,17 @@ const Intelligence = () => {
 
     const filteredReviews = reviews.filter(r => {
         const matchesStatus = filter === 'all' ? true : r.status === filter;
-        const matchesSearch = r.summary.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            r.verdict.toLowerCase().includes(searchTerm.toLowerCase());
-        return matchesStatus && matchesSearch;
+        const query = searchTerm.trim().toLowerCase();
+        if (!query) return matchesStatus;
+
+        const titleMatch = (r.movie_title || '').toLowerCase().includes(query);
+        const summaryMatch = (r.summary || '').toLowerCase().includes(query);
+        const verdictMatch = (r.verdict || '').toLowerCase().includes(query);
+        const authorMatch = (r.author || '').toLowerCase().includes(query);
+        const slugMatch = (r.slug || '').toLowerCase().includes(query);
+        const tagsMatch = Array.isArray(r.tags) && r.tags.some(tag => (tag || '').toLowerCase().includes(query));
+
+        return matchesStatus && (titleMatch || summaryMatch || verdictMatch || authorMatch || slugMatch || tagsMatch);
     });
 
     const handleDelete = async (id) => {
@@ -280,8 +288,17 @@ const Intelligence = () => {
                                     placeholder="SEARCH VERDICTS..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="bg-white/5 border border-white/10 rounded-xl pl-12 pr-6 py-3 text-[10px] font-black uppercase tracking-widest focus:outline-none focus:border-amber-500/50 transition-all w-full md:w-64"
+                                    className="bg-white/5 border border-white/10 rounded-xl pl-12 pr-10 py-3 text-[10px] font-black uppercase tracking-widest focus:outline-none focus:border-amber-500/50 transition-all w-full md:w-64"
                                 />
+                                {searchTerm && (
+                                    <button
+                                        onClick={() => setSearchTerm('')}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
+                                        title="Clear search"
+                                    >
+                                        <X size={14} />
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
